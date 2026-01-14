@@ -1,13 +1,19 @@
 import { Routes, Route } from 'react-router-dom';
 import { HomePage, NotFoundPage } from '@/pages';
+import {
+  LoginPage,
+  RegisterPage,
+  ProfileSetupPage,
+} from '@/features/auth/pages';
 
 export function AppRouter() {
   return (
     <Routes>
       <Route path='/' element={<HomePage />} />
       {/* Auth routes */}
-      {/* <Route path="/login" element={<LoginPage />} /> */}
-      {/* <Route path="/register" element={<RegisterPage />} /> */}
+      <Route path='/login' element={<LoginPage />} />
+      <Route path='/register' element={<RegisterPage />} />
+      <Route path='/profile-setup' element={<ProfileSetupPage />} />
 
       {/* Jobs routes */}
       {/* <Route path="/jobs" element={<JobsPage />} /> */}

@@ -1,0 +1,309 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, MapPin, FileText, Upload, ArrowRight, X } from 'lucide-react';
+
+export function ProfileSetupPage() {
+  const navigate = useNavigate();
+
+  // Redirect if profile is already complete
+  useEffect(() => {
+    const profileComplete = localStorage.getItem('profile_complete') === 'true';
+    if (profileComplete) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    city: '',
+    bio: '',
+  });
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          avatar: "Rasm hajmi 5MB dan katta bo'lmasligi kerak",
+        }));
+        return;
+      }
+      setAvatar(file);
+      setAvatarPreview(URL.createObjectURL(file));
+      if (errors.avatar) {
+        setErrors((prev) => ({ ...prev, avatar: '' }));
+      }
+    }
+  };
+
+  const removeAvatar = () => {
+    setAvatar(null);
+    setAvatarPreview(null);
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "To'liq ismingizni kiriting";
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'Shaharni tanlang yoki kiriting';
+    }
+
+    if (!formData.bio.trim()) {
+      newErrors.bio = "Qisqa ma'lumot kiriting";
+    } else if (formData.bio.trim().length < 20) {
+      newErrors.bio = 'Kamida 20 ta belgi kiriting';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    setIsLoading(true);
+    // TODO: API call to save profile
+    setTimeout(() => {
+      setIsLoading(false);
+      // Mark profile as complete
+      localStorage.setItem('profile_complete', 'true');
+      navigate('/dashboard');
+    }, 1000);
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const cities = [
+    'Toshkent',
+    'Samarqand',
+    'Buxoro',
+    'Andijon',
+    "Farg'ona",
+    'Namangan',
+    'Qarshi',
+    'Nukus',
+    'Termiz',
+    'Guliston',
+    'Jizzax',
+    'Navoiy',
+    'Urganch',
+  ];
+
+  return (
+    <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
+      <div className='max-w-2xl w-full'>
+        {/* Logo */}
+        <div className='text-center mb-8'>
+          <div className='inline-flex items-center space-x-2 mb-4'>
+            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#0A66C2] text-white font-bold text-xl'>
+              ISH
+            </div>
+            <span className='text-2xl font-bold text-gray-900'>ISH</span>
+          </div>
+          <h2 className='text-3xl font-bold text-gray-900'>
+            Profilni to'ldiring
+          </h2>
+          <p className='mt-2 text-sm text-gray-600'>
+            Birinchi marta profilingizni to'ldiring va ish topishni boshlang
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className='bg-white rounded-2xl shadow-xl p-8'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            {/* Avatar Upload */}
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Profil rasmi
+              </label>
+              <div className='flex items-center gap-6'>
+                <div className='relative'>
+                  {avatarPreview ? (
+                    <div className='relative'>
+                      <img
+                        src={avatarPreview}
+                        alt='Avatar preview'
+                        className='w-24 h-24 rounded-full object-cover border-4 border-gray-200'
+                      />
+                      <button
+                        type='button'
+                        onClick={removeAvatar}
+                        className='absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors'
+                      >
+                        <X className='h-4 w-4' />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className='w-24 h-24 rounded-full bg-gray-100 border-4 border-gray-200 flex items-center justify-center'>
+                      <User className='h-12 w-12 text-gray-400' />
+                    </div>
+                  )}
+                </div>
+                <div className='flex-1'>
+                  <label
+                    htmlFor='avatar'
+                    className='inline-flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#0A66C2] hover:bg-blue-50 transition-colors'
+                  >
+                    <Upload className='h-5 w-5 text-gray-400' />
+                    <span className='text-sm font-medium text-gray-700'>
+                      Rasm yuklash
+                    </span>
+                    <input
+                      id='avatar'
+                      type='file'
+                      accept='image/*'
+                      onChange={handleAvatarChange}
+                      className='hidden'
+                    />
+                  </label>
+                  <p className='mt-1 text-xs text-gray-500'>
+                    JPG, PNG yoki GIF (maks. 5MB)
+                  </p>
+                  {errors.avatar && (
+                    <p className='mt-1 text-sm text-red-600'>{errors.avatar}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label
+                htmlFor='fullName'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                To'liq ism
+              </label>
+              <div className='relative'>
+                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                  <User className='h-5 w-5 text-gray-400' />
+                </div>
+                <input
+                  id='fullName'
+                  type='text'
+                  value={formData.fullName}
+                  onChange={(e) => handleChange('fullName', e.target.value)}
+                  placeholder='Ism Familiya'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
+                    errors.fullName
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 bg-white'
+                  }`}
+                />
+              </div>
+              {errors.fullName && (
+                <p className='mt-1 text-sm text-red-600'>{errors.fullName}</p>
+              )}
+            </div>
+
+            {/* City */}
+            <div>
+              <label
+                htmlFor='city'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Shahar
+              </label>
+              <div className='relative'>
+                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                  <MapPin className='h-5 w-5 text-gray-400' />
+                </div>
+                <input
+                  id='city'
+                  type='text'
+                  list='cities'
+                  value={formData.city}
+                  onChange={(e) => handleChange('city', e.target.value)}
+                  placeholder='Shaharni tanlang yoki kiriting'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
+                    errors.city
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 bg-white'
+                  }`}
+                />
+                <datalist id='cities'>
+                  {cities.map((city) => (
+                    <option key={city} value={city} />
+                  ))}
+                </datalist>
+              </div>
+              {errors.city && (
+                <p className='mt-1 text-sm text-red-600'>{errors.city}</p>
+              )}
+            </div>
+
+            {/* Bio */}
+            <div>
+              <label
+                htmlFor='bio'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                Qisqa ma'lumot ish haqida
+              </label>
+              <div className='relative'>
+                <div className='absolute top-3 left-3 pointer-events-none'>
+                  <FileText className='h-5 w-5 text-gray-400' />
+                </div>
+                <textarea
+                  id='bio'
+                  value={formData.bio}
+                  onChange={(e) => handleChange('bio', e.target.value)}
+                  placeholder="O'zingiz haqingizda qisqa ma'lumot bering (kamida 20 ta belgi)..."
+                  rows={4}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent resize-none ${
+                    errors.bio
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 bg-white'
+                  }`}
+                />
+              </div>
+              <div className='flex items-center justify-between mt-1'>
+                {errors.bio ? (
+                  <p className='text-sm text-red-600'>{errors.bio}</p>
+                ) : (
+                  <p className='text-xs text-gray-500'>
+                    {formData.bio.length}/20 minimum belgi
+                  </p>
+                )}
+                <p className='text-xs text-gray-400'>
+                  {formData.bio.length} belgi
+                </p>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type='submit'
+              disabled={isLoading}
+              className='w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#0A66C2] text-white rounded-lg font-semibold hover:bg-[#004182] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {isLoading ? (
+                <span>Saqlanmoqda...</span>
+              ) : (
+                <>
+                  <span>Davom etish</span>
+                  <ArrowRight className='h-5 w-5' />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
