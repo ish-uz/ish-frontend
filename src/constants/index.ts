@@ -59,6 +59,7 @@ export const ROUTES = {
   REGISTER: '/register',
   JOBS: '/jobs',
   JOB_DETAIL: '/jobs/:id',
+  EMPLOYEES: '/employees',
   PROFILES: '/profiles',
   PROFILE_DETAIL: '/profiles/:id',
   COMPANIES: '/companies',

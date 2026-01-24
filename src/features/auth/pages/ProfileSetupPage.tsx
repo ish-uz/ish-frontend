@@ -1,22 +1,57 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, MapPin, FileText, Upload, ArrowRight, X } from 'lucide-react';
+import { profileService } from '@/features/profiles/services/profileService';
+import { userService } from '@/features/users/services/userService';
 
 export function ProfileSetupPage() {
   const navigate = useNavigate();
 
-  // Redirect if profile is already complete
-  useEffect(() => {
-    const profileComplete = localStorage.getItem('profile_complete') === 'true';
-    if (profileComplete) {
-      navigate('/dashboard');
-    }
-  }, [navigate]);
   const [formData, setFormData] = useState({
     fullName: '',
     city: '',
     bio: '',
   });
+
+  // Check if profile already exists and is complete, and auto-fill user data
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const profile = await profileService.getCurrentProfile();
+        if (profile && profile.isComplete) {
+          // Profile is complete, redirect to profile settings
+          navigate('/profile/settings');
+        } else if (profile) {
+          // Profile exists but incomplete, pre-fill data
+          setFormData({
+            fullName: profile.fullName || '',
+            city: profile.city || '',
+            bio: profile.bio || '',
+          });
+        }
+      } catch (error: any) {
+        // Profile doesn't exist (404) - try to get user data to auto-fill name
+        if (error.response?.status === 401) {
+          // Not authenticated, redirect to login
+          navigate('/login');
+        } else if (error.response?.status === 404) {
+          // Profile doesn't exist, get user data to auto-fill fullName
+          try {
+            const currentUser = await userService.getCurrentUser();
+            if (currentUser) {
+              setFormData(prev => ({
+                ...prev,
+                fullName: `${currentUser.firstName} ${currentUser.lastName}`.trim(),
+              }));
+            }
+          } catch (userError) {
+            // Couldn't get user data, that's ok - user will fill manually
+          }
+        }
+      }
+    };
+    checkProfile();
+  }, [navigate]);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -72,13 +107,27 @@ export function ProfileSetupPage() {
     if (!validate()) return;
 
     setIsLoading(true);
-    // TODO: API call to save profile
-    setTimeout(() => {
+    try {
+      // Create profile via API
+      await profileService.createProfile({
+        fullName: formData.fullName,
+        city: formData.city,
+        bio: formData.bio,
+      });
+
+      // After successful profile creation, redirect to profile settings
+      navigate('/profile/settings');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || 'Failed to create profile. Please try again.';
+      if (error.response?.status === 401) {
+        // Not authenticated, redirect to login
+        navigate('/login');
+      } else {
+        setErrors({ bio: errorMessage });
+      }
+    } finally {
       setIsLoading(false);
-      // Mark profile as complete
-      localStorage.setItem('profile_complete', 'true');
-      navigate('/dashboard');
-    }, 1000);
+    }
   };
 
   const handleChange = (field: string, value: string) => {

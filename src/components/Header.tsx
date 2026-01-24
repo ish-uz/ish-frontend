@@ -34,11 +34,11 @@ export function Header() {
               <span>Ish qidirish</span>
             </Link>
             <Link
-              to="/employers"
+              to="/employees"
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Users className="h-4 w-4" />
-              <span>Xodim topish</span>
+              <span>Xodimlar</span>
             </Link>
             <Link
               to="/freelancers"
@@ -104,12 +104,12 @@ export function Header() {
                 <span>Ish qidirish</span>
               </Link>
               <Link
-                to="/employers"
+                to="/employees"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4" />
-                <span>Xodim topish</span>
+                <span>Xodimlar</span>
               </Link>
               <Link
                 to="/freelancers"

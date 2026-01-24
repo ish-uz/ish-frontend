@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import { PhoneInput } from '../components/PhoneInput';
+import { authService } from '../services/authService';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export function LoginPage() {
   const [errors, setErrors] = useState<{ phone?: string; password?: string }>(
     {}
   );
+  const [generalError, setGeneralError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
@@ -28,24 +30,63 @@ export function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const translateError = (errorMessage: string): string => {
+    const errorLower = errorMessage.toLowerCase();
+    
+    // Common error translations
+    if (errorLower.includes('incorrect phone') || errorLower.includes('incorrect password')) {
+      return "Telefon raqami yoki parol noto'g'ri";
+    }
+    if (errorLower.includes('invalid') || errorLower.includes('incorrect')) {
+      return "Telefon raqami yoki parol noto'g'ri";
+    }
+    if (errorLower.includes('not found')) {
+      return "Foydalanuvchi topilmadi";
+    }
+    if (errorLower.includes('unauthorized')) {
+      return "Kirish rad etildi. Iltimos, ma'lumotlaringizni tekshiring";
+    }
+    
+    // Default message
+    return "Kirish muvaffaqiyatsiz. Iltimos, telefon raqami va parolni tekshiring";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Clear previous errors
+    setErrors({});
+    setGeneralError(null);
 
     if (!validate()) return;
 
     setIsLoading(true);
-    // TODO: API call
-    setTimeout(() => {
+    try {
+      // Login API call
+      const authResponse = await authService.login({
+        phone: phone,
+        password: password,
+      });
+
+      // Save token
+      localStorage.setItem('token', authResponse.access_token);
+
+      // After login, go to dashboard
+      navigate('/dashboard');
+    } catch (error: any) {
+      const rawErrorMessage = error.response?.data?.detail || 'Login failed. Please check your credentials.';
+      const errorMessage = translateError(rawErrorMessage);
+      
+      // Show general error banner
+      setGeneralError(errorMessage);
+      
+      // Also show error on password field
+      setErrors({
+        password: errorMessage,
+      });
+    } finally {
       setIsLoading(false);
-      // Check if profile is already set up
-      const profileComplete =
-        localStorage.getItem('profile_complete') === 'true';
-      if (profileComplete) {
-        navigate('/dashboard');
-      } else {
-        navigate('/profile-setup');
-      }
-    }, 1000);
+    }
   };
 
   return (
@@ -73,6 +114,29 @@ export function LoginPage() {
 
         {/* Form */}
         <div className='bg-white rounded-2xl shadow-xl p-8'>
+          {/* Error Banner */}
+          {generalError && (
+            <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3'>
+              <AlertCircle className='h-5 w-5 text-red-600 flex-shrink-0 mt-0.5' />
+              <div className='flex-1'>
+                <p className='text-sm font-medium text-red-800'>{generalError}</p>
+                <p className='text-xs text-red-600 mt-1'>
+                  Iltimos, telefon raqami va parolni tekshiring yoki{' '}
+                  <Link to='/register' className='font-medium underline hover:text-red-800'>
+                    ro'yxatdan o'ting
+                  </Link>
+                </p>
+              </div>
+              <button
+                type='button'
+                onClick={() => setGeneralError(null)}
+                className='text-red-400 hover:text-red-600 transition-colors'
+              >
+                <X className='h-4 w-4' />
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className='space-y-6'>
             <PhoneInput
               value={phone}
