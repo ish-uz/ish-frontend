@@ -11,6 +11,14 @@ export const profileService = {
   },
 
   /**
+   * Get profile by user ID
+   */
+  getProfileByUserId: async (userId: number): Promise<Profile> => {
+    const response = await api.get(`/v1/profiles/user/${userId}`);
+    return response.data;
+  },
+
+  /**
    * Create profile
    */
   createProfile: async (data: Partial<Profile>): Promise<Profile> => {
@@ -47,6 +55,14 @@ export const profileService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
+  },
+
+  /**
+   * Delete CV file
+   */
+  deleteCV: async (): Promise<Profile> => {
+    const response = await api.delete('/v1/profiles/me/cv');
     return response.data;
   },
 };

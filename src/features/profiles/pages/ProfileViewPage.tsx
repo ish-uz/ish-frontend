@@ -6,6 +6,7 @@ import {
   Building2, Clock, Award, Code
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
+import { userService } from '@/features/users/services/userService';
 import { Profile } from '@/types';
 
 export function ProfileViewPage() {
@@ -23,15 +24,46 @@ export function ProfileViewPage() {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      // If no ID provided, load current user's profile
-      const data = await profileService.getCurrentProfile();
+      setError(null);
+      
+      let data: Profile;
+      let profileUserId: number;
+      
+      if (id) {
+        // Load profile by user ID
+        const userId = parseInt(id, 10);
+        if (isNaN(userId)) {
+          setError('Invalid user ID');
+          return;
+        }
+        data = await profileService.getProfileByUserId(userId);
+        profileUserId = data.userId;
+      } else {
+        // Load current user's profile
+        data = await profileService.getCurrentProfile();
+        profileUserId = data.userId;
+        setIsOwnProfile(true);
+      }
+      
       setProfile(data);
-      setIsOwnProfile(true);
+      
+      // Check if this is the current user's own profile
+      try {
+        const currentUser = await userService.getCurrentUser();
+        setIsOwnProfile(currentUser.id === profileUserId);
+      } catch {
+        // User not logged in or error - not own profile
+        setIsOwnProfile(false);
+      }
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
       } else if (err.response?.status === 404) {
-        navigate('/profile-setup');
+        if (!id) {
+          navigate('/profile-setup');
+        } else {
+          setError('Profile not found');
+        }
       } else {
         setError(err.response?.data?.detail || 'Failed to load profile');
       }
@@ -276,7 +308,7 @@ export function ProfileViewPage() {
                 </div>
               </div>
               <a
-                href={profile.cvFile}
+                href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'}/uploads/${profile.cvFile}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

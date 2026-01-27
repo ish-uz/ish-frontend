@@ -61,10 +61,40 @@ export function DashboardLayout() {
   };
 
   const isActiveRoute = (path: string) => {
+    const currentPath = location.pathname;
+    const currentSearch = location.search;
+    
+    // Handle query parameters
     if (path.includes('?')) {
-      return location.pathname + location.search === path;
+      return currentPath + currentSearch === path;
     }
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+    
+    // Exact match
+    if (currentPath === path) {
+      return true;
+    }
+    
+    // Check if current path starts with this path + '/'
+    const pathWithSlash = path + '/';
+    if (currentPath.startsWith(pathWithSlash)) {
+      // Get all nav items to check for more specific matches
+      const allNavItems = [...mainNavItems, ...settingsNavItems];
+      
+      // Check if there's a more specific route that also matches
+      const hasMoreSpecificMatch = allNavItems.some(item => {
+        const itemPath = item.path.split('?')[0]; // Remove query params
+        if (itemPath === path) return false; // Don't compare with itself
+        if (itemPath.length <= path.length) return false; // Not more specific
+        
+        // Check if the more specific path matches current path
+        return currentPath === itemPath || currentPath.startsWith(itemPath + '/');
+      });
+      
+      // Only activate if there's no more specific matching route
+      return !hasMoreSpecificMatch;
+    }
+    
+    return false;
   };
 
   if (loading) {

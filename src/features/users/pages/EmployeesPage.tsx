@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { userService } from '../services/userService';
 import { User } from '@/types';
 import { User as UserIcon, Mail, Phone, Search, Filter, Briefcase } from 'lucide-react';
@@ -160,9 +161,12 @@ export function EmployeesPage() {
                   )}
                 </div>
 
-                <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <Link
+                  to={`/profile/${user.id}`}
+                  className="w-full inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
                   View Profile
-                </button>
+                </Link>
               </div>
             ))}
           </div>

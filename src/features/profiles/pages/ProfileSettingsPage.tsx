@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { profileService } from '../services/profileService';
 import { Profile, Experience, Education } from '@/types';
 import { 
@@ -11,12 +11,24 @@ type TabType = 'basic' | 'skills' | 'experience' | 'education' | 'cv' | 'visibil
 
 export function ProfileSettingsPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('basic');
+  
+  // Get initial tab from URL query parameter
+  const getInitialTab = (): TabType => {
+    const tabParam = searchParams.get('tab');
+    const validTabs: TabType[] = ['basic', 'skills', 'experience', 'education', 'cv', 'visibility'];
+    if (tabParam && validTabs.includes(tabParam as TabType)) {
+      return tabParam as TabType;
+    }
+    return 'basic';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getInitialTab());
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   // Form states
@@ -30,6 +42,21 @@ export function ProfileSettingsPage() {
   const [newSkill, setNewSkill] = useState('');
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [educations, setEducations] = useState<Education[]>([]);
+
+  // Update tab from URL when it changes
+  useEffect(() => {
+    const tabFromUrl = getInitialTab();
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   useEffect(() => {
     loadProfile();
@@ -300,7 +327,7 @@ export function ProfileSettingsPage() {
                     <button
                       key={tab.id}
                       onClick={() => {
-                        setActiveTab(tab.id);
+                        handleTabChange(tab.id);
                         setMobileTabsOpen(false);
                       }}
                       className={`
@@ -762,12 +789,35 @@ export function ProfileSettingsPage() {
                   </div>
                   {profile?.cvFile && (
                     <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5 text-green-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-green-800">CV uploaded</p>
-                          <p className="text-xs text-green-600 truncate">{profile.cvFile}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 min-w-0 flex-1">
+                          <FileText className="h-5 w-5 text-green-600 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-green-800">CV uploaded</p>
+                            <p className="text-xs text-green-600 truncate">{profile.cvFile}</p>
+                          </div>
                         </div>
+                        <button
+                          onClick={async () => {
+                            if (!confirm('Are you sure you want to delete your CV?')) return;
+                            try {
+                              setSaving(true);
+                              setError(null);
+                              const updated = await profileService.deleteCV();
+                              setProfile(updated);
+                              setSuccess('CV deleted successfully!');
+                              setTimeout(() => setSuccess(null), 3000);
+                            } catch (err: any) {
+                              setError(err.response?.data?.detail || 'Failed to delete CV');
+                            } finally {
+                              setSaving(false);
+                            }
+                          }}
+                          disabled={saving}
+                          className="ml-4 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   )}
