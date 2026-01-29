@@ -113,4 +113,40 @@ export const jobService = {
   incrementViews: async (id: number): Promise<void> => {
     await api.post(`/v1/jobs/${id}/view`);
   },
+
+  /**
+   * Save a job
+   */
+  saveJob: async (id: number): Promise<void> => {
+    await api.post(`/v1/jobs/${id}/save`);
+  },
+
+  /**
+   * Unsave a job
+   */
+  unsaveJob: async (id: number): Promise<void> => {
+    await api.delete(`/v1/jobs/${id}/save`);
+  },
+
+  /**
+   * Get saved jobs
+   */
+  getSavedJobs: async (skip = 0, limit = 100): Promise<Job[]> => {
+    const response = await api.get('/v1/jobs/saved', {
+      params: { skip, limit },
+    });
+    return response.data.map(toCamelCase);
+  },
+
+  /**
+   * Check if job is saved
+   */
+  checkJobSaved: async (id: number): Promise<boolean> => {
+    try {
+      const response = await api.get(`/v1/jobs/${id}/saved`);
+      return response.data.saved || false;
+    } catch {
+      return false;
+    }
+  },
 };

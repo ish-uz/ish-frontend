@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { 
   User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
-  LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X
+  LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';
@@ -18,6 +18,7 @@ const mainNavItems: NavItem[] = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: User, label: 'My Profile', path: '/profile' },
   { icon: Briefcase, label: 'Browse Jobs', path: '/jobs' },
+  { icon: BookmarkCheck, label: 'Saved Jobs', path: '/jobs/saved' },
   { icon: PlusCircle, label: 'Post a Job', path: '/jobs/create' },
   { icon: FileText, label: 'My Jobs', path: '/jobs/my' },
   { icon: Send, label: 'My Applications', path: '/applications' },

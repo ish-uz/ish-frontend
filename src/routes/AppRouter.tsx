@@ -5,7 +5,7 @@ import {
   RegisterPage,
   ProfileSetupPage,
 } from '@/features/auth/pages';
-import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage } from '@/features/jobs/pages';
+import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, SavedJobsPage } from '@/features/jobs/pages';
 import { EmployeesPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
@@ -33,6 +33,7 @@ export function AppRouter() {
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/jobs/create" element={<CreateJobPage />} />
         <Route path="/jobs/my" element={<MyJobsPage />} />
+        <Route path="/jobs/saved" element={<SavedJobsPage />} />
         <Route path="/jobs/:id" element={<JobDetailsPage />} />
         <Route path="/jobs/:id/edit" element={<EditJobPage />} />
         

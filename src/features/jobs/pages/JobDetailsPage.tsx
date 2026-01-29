@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, MapPin, Briefcase, DollarSign, Eye, Building2,
-  Calendar, CheckCircle2, Send, X, User, Globe, Users
+  Calendar, CheckCircle2, Send, X, User, Globe, Users, Bookmark, BookmarkCheck
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
 import { applicationService } from '@/features/applications/services/applicationService';
@@ -25,6 +25,10 @@ export function JobDetailsPage() {
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
+  
+  // Save job state
+  const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -34,6 +38,7 @@ export function JobDetailsPage() {
       }
       loadJob();
       loadCurrentUser();
+      checkIfSaved();
     }
     
     // Cleanup: reset loading flag when component unmounts or id changes
@@ -91,6 +96,43 @@ export function JobDetailsPage() {
     } catch (err) {
       // User not logged in or error - that's ok
       setCurrentUser(null);
+    }
+  };
+
+  const checkIfSaved = async () => {
+    if (!id) return;
+    try {
+      const saved = await jobService.checkJobSaved(Number(id));
+      setIsSaved(saved);
+    } catch (err) {
+      // User not logged in or error - that's ok
+      setIsSaved(false);
+    }
+  };
+
+  const handleSaveJob = async () => {
+    if (!id || !currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setSaving(true);
+      if (isSaved) {
+        await jobService.unsaveJob(Number(id));
+        setIsSaved(false);
+      } else {
+        await jobService.saveJob(Number(id));
+        setIsSaved(true);
+      }
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        navigate('/login');
+      } else {
+        console.error('Failed to save/unsave job:', err);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -266,6 +308,29 @@ export function JobDetailsPage() {
                     <CheckCircle2 className="h-4 w-4" />
                     Applied!
                   </div>
+                )}
+                {!isJobOwner && currentUser && (
+                  <button
+                    onClick={handleSaveJob}
+                    disabled={saving}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                      isSaved
+                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    } disabled:opacity-50`}
+                  >
+                    {isSaved ? (
+                      <>
+                        <BookmarkCheck className="h-4 w-4" />
+                        Saved
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark className="h-4 w-4" />
+                        Save
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
             </div>
