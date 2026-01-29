@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { userService } from '../services/userService';
 import { User } from '@/types';
-import { User as UserIcon, Mail, Phone, Search, Filter, Briefcase } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, Search, Filter, Briefcase, Code, X } from 'lucide-react';
 
 export function EmployeesPage() {
   const [employees, setEmployees] = useState<User[]>([]);
@@ -10,12 +10,15 @@ export function EmployeesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [skillInput, setSkillInput] = useState('');
 
   useEffect(() => {
     loadEmployees();
-  }, []);
+  }, [selectedSkills]);
 
   useEffect(() => {
+    // Client-side filtering by search query (name, email)
     if (searchQuery.trim()) {
       const filtered = employees.filter(
         (user) =>
@@ -31,13 +34,32 @@ export function EmployeesPage() {
   const loadEmployees = async () => {
     try {
       setLoading(true);
-      const data = await userService.getEmployees(0, 100);
+      const data = await userService.getEmployees(0, 100, selectedSkills.length > 0 ? selectedSkills : undefined);
       setEmployees(data);
       setFilteredEmployees(data);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load employees');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddSkill = () => {
+    const skill = skillInput.trim();
+    if (skill && !selectedSkills.includes(skill)) {
+      setSelectedSkills([...selectedSkills, skill]);
+      setSkillInput('');
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSelectedSkills(selectedSkills.filter(skill => skill !== skillToRemove));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddSkill();
     }
   };
 
@@ -83,7 +105,8 @@ export function EmployeesPage() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6 space-y-4">
+          {/* Search Bar */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -101,6 +124,54 @@ export function EmployeesPage() {
                 {filteredEmployees.length} {filteredEmployees.length === 1 ? 'professional' : 'professionals'} found
               </span>
             </div>
+          </div>
+
+          {/* Skills Filter */}
+          <div className="border-t border-gray-200 pt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Code className="h-4 w-4 inline mr-1" />
+              Filter by Skills
+            </label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {selectedSkills.map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                >
+                  {skill}
+                  <button
+                    onClick={() => handleRemoveSkill(skill)}
+                    className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={skillInput}
+                onChange={(e) => setSkillInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter a skill (e.g., Python, React, SQL)..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                onClick={handleAddSkill}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Add
+              </button>
+            </div>
+            {selectedSkills.length > 0 && (
+              <button
+                onClick={() => setSelectedSkills([])}
+                className="mt-2 text-sm text-gray-600 hover:text-gray-800 underline"
+              >
+                Clear all skills
+              </button>
+            )}
           </div>
         </div>
 

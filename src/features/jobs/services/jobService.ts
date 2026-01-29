@@ -41,10 +41,16 @@ export const jobService = {
   /**
    * Get all jobs
    */
-  getJobs: async (skip = 0, limit = 100, status?: string): Promise<Job[]> => {
-    const response = await api.get('/v1/jobs', {
-      params: { skip, limit, status },
-    });
+  getJobs: async (skip = 0, limit = 100, status?: string, skills?: string[], search?: string): Promise<Job[]> => {
+    const params: any = { skip, limit };
+    if (status) params.status = status;
+    if (skills && skills.length > 0) {
+      params.skills = skills.join(',');
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
+    }
+    const response = await api.get('/v1/jobs', { params });
     return response.data.map(toCamelCase);
   },
 

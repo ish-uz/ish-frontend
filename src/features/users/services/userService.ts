@@ -44,10 +44,12 @@ export const userService = {
   /**
    * Get employees (users who are open to work)
    */
-  getEmployees: async (skip = 0, limit = 100): Promise<User[]> => {
-    const response = await api.get('/v1/users/employees', {
-      params: { skip, limit },
-    });
+  getEmployees: async (skip = 0, limit = 100, skills?: string[]): Promise<User[]> => {
+    const params: any = { skip, limit };
+    if (skills && skills.length > 0) {
+      params.skills = skills.join(',');
+    }
+    const response = await api.get('/v1/users/employees', { params });
     return response.data.map(toCamelCase);
   },
 };
