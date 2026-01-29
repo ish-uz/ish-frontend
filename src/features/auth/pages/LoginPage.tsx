@@ -70,6 +70,9 @@ export function LoginPage() {
 
       // Save token
       localStorage.setItem('token', authResponse.access_token);
+      
+      // Dispatch event to update Header
+      window.dispatchEvent(new Event('tokenChanged'));
 
       // After login, go to dashboard
       navigate('/dashboard');
