@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { jobService } from '../services/jobService';
-import { Job } from '@/types';
-import { Briefcase, MapPin, DollarSign, Clock, Search, Filter, Building2, X, Code } from 'lucide-react';
+import { Job, JobType } from '@/types';
+import {
+  Briefcase, MapPin, DollarSign, Clock, Search, Filter, Building2, X, Code,
+  ChevronDown, ChevronUp, Globe, Calendar, SlidersHorizontal
+} from 'lucide-react';
 
 export function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -12,7 +15,32 @@ export function JobsPage() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Advanced filters (local state - not applied until "Apply Filters" is clicked)
+  const [jobType, setJobType] = useState<JobType | ''>('');
+  const [location, setLocation] = useState('');
+  const [salaryMin, setSalaryMin] = useState<number | ''>('');
+  const [salaryMax, setSalaryMax] = useState<number | ''>('');
+  const [isRemote, setIsRemote] = useState<boolean | null>(null);
+  const [dateFrom, setDateFrom] = useState('');
+
+  // Applied filters (used for API calls)
+  const [appliedJobType, setAppliedJobType] = useState<JobType | ''>('');
+  const [appliedLocation, setAppliedLocation] = useState('');
+  const [appliedSalaryMin, setAppliedSalaryMin] = useState<number | ''>('');
+  const [appliedSalaryMax, setAppliedSalaryMax] = useState<number | ''>('');
+  const [appliedIsRemote, setAppliedIsRemote] = useState<boolean | null>(null);
+  const [appliedDateFrom, setAppliedDateFrom] = useState('');
+
+  const jobTypes: { value: JobType; label: string }[] = [
+    { value: 'full-time', label: 'Full Time' },
+    { value: 'part-time', label: 'Part Time' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'internship', label: 'Internship' },
+    { value: 'remote', label: 'Remote' },
+  ];
 
   // Debounce search query
   useEffect(() => {
@@ -31,24 +59,37 @@ export function JobsPage() {
     };
   }, [searchQuery]);
 
-  // Load jobs when filters change
+  // Load jobs when filters change (search, skills, and applied advanced filters)
   useEffect(() => {
     loadJobs();
-  }, [debouncedSearchQuery, selectedSkills]);
+  }, [debouncedSearchQuery, selectedSkills, appliedJobType, appliedLocation, appliedSalaryMin, appliedSalaryMax, appliedIsRemote, appliedDateFrom]);
 
   const loadJobs = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await jobService.getJobs(
         0,
         100,
         'active',
         selectedSkills.length > 0 ? selectedSkills : undefined,
-        debouncedSearchQuery || undefined
+        debouncedSearchQuery || undefined,
+        appliedJobType || undefined,
+        appliedLocation || undefined,
+        appliedSalaryMin !== '' ? Number(appliedSalaryMin) : undefined,
+        appliedSalaryMax !== '' ? Number(appliedSalaryMax) : undefined,
+        appliedIsRemote !== null ? appliedIsRemote : undefined,
+        appliedDateFrom || undefined
       );
       setJobs(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load jobs');
+      const errorDetail = err.response?.data?.detail;
+      const errorMessage = Array.isArray(errorDetail)
+        ? errorDetail.map((e: any) => e.msg || JSON.stringify(e)).join(', ')
+        : typeof errorDetail === 'string'
+        ? errorDetail
+        : 'Failed to load jobs';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -73,13 +114,63 @@ export function JobsPage() {
     }
   };
 
+  const applyFilters = () => {
+    setAppliedJobType(jobType);
+    setAppliedLocation(location);
+    setAppliedSalaryMin(salaryMin);
+    setAppliedSalaryMax(salaryMax);
+    setAppliedIsRemote(isRemote);
+    setAppliedDateFrom(dateFrom);
+  };
+
   const clearAllFilters = () => {
     setSearchQuery('');
     setDebouncedSearchQuery('');
     setSelectedSkills([]);
+    setJobType('');
+    setLocation('');
+    setSalaryMin('');
+    setSalaryMax('');
+    setIsRemote(null);
+    setDateFrom('');
+    // Also clear applied filters
+    setAppliedJobType('');
+    setAppliedLocation('');
+    setAppliedSalaryMin('');
+    setAppliedSalaryMax('');
+    setAppliedIsRemote(null);
+    setAppliedDateFrom('');
   };
 
-  const hasActiveFilters = searchQuery.trim() || selectedSkills.length > 0;
+  const hasActiveFilters = 
+    searchQuery.trim() || 
+    selectedSkills.length > 0 ||
+    appliedJobType !== '' ||
+    appliedLocation.trim() !== '' ||
+    appliedSalaryMin !== '' ||
+    appliedSalaryMax !== '' ||
+    appliedIsRemote !== null ||
+    appliedDateFrom !== '';
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (searchQuery.trim()) count++;
+    if (selectedSkills.length > 0) count++;
+    if (appliedJobType !== '') count++;
+    if (appliedLocation.trim()) count++;
+    if (appliedSalaryMin !== '' || appliedSalaryMax !== '') count++;
+    if (appliedIsRemote !== null) count++;
+    if (appliedDateFrom) count++;
+    return count;
+  };
+
+  const hasUnsavedFilters = 
+    jobType !== appliedJobType ||
+    location !== appliedLocation ||
+    salaryMin !== appliedSalaryMin ||
+    salaryMax !== appliedSalaryMax ||
+    isRemote !== appliedIsRemote ||
+    dateFrom !== appliedDateFrom;
 
   if (loading && jobs.length === 0) {
     return (
@@ -122,7 +213,7 @@ export function JobsPage() {
           </p>
         </div>
 
-        {/* Search and Filters - Improved UX */}
+        {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-md p-4 lg:p-6 mb-6">
           {/* Main Search Bar */}
           <div className="relative mb-4">
@@ -144,8 +235,8 @@ export function JobsPage() {
             )}
           </div>
 
-          {/* Skills Filter - Compact Design */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          {/* Skills Filter */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-4">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 flex-shrink-0">
               <Code className="h-4 w-4 text-blue-600" />
               <span>Skills:</span>
@@ -188,6 +279,150 @@ export function JobsPage() {
             </div>
           </div>
 
+          {/* Advanced Filters Toggle */}
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors mb-4"
+          >
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>Advanced Filters</span>
+              {getActiveFiltersCount() > 0 && (
+                <span className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                  {getActiveFiltersCount()}
+                </span>
+              )}
+            </div>
+            {showAdvancedFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+
+          {/* Advanced Filters Panel */}
+          {showAdvancedFilters && (
+            <div className="border-t border-gray-200 pt-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                {/* Job Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <Briefcase className="h-4 w-4 inline mr-1" />
+                    Job Type
+                  </label>
+                  <select
+                    value={jobType}
+                    onChange={(e) => setJobType(e.target.value as JobType | '')}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Types</option>
+                    {jobTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <MapPin className="h-4 w-4 inline mr-1" />
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g., Tashkent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+
+                {/* Remote Work */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <Globe className="h-4 w-4 inline mr-1" />
+                    Remote Work
+                  </label>
+                  <select
+                    value={isRemote === null ? '' : isRemote ? 'true' : 'false'}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setIsRemote(value === '' ? null : value === 'true');
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All</option>
+                    <option value="true">Remote Only</option>
+                    <option value="false">On-site Only</option>
+                  </select>
+                </div>
+
+                {/* Salary Min */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <DollarSign className="h-4 w-4 inline mr-1" />
+                    Min Salary (UZS)
+                  </label>
+                  <input
+                    type="number"
+                    value={salaryMin}
+                    onChange={(e) => setSalaryMin(e.target.value ? Number(e.target.value) : '')}
+                    placeholder="e.g., 5000000"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+
+                {/* Salary Max */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <DollarSign className="h-4 w-4 inline mr-1" />
+                    Max Salary (UZS)
+                  </label>
+                  <input
+                    type="number"
+                    value={salaryMax}
+                    onChange={(e) => setSalaryMax(e.target.value ? Number(e.target.value) : '')}
+                    placeholder="e.g., 10000000"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+
+                {/* Date From */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <Calendar className="h-4 w-4 inline mr-1" />
+                    Posted After
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Apply Filters Button */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+                <div className="text-sm text-gray-600">
+                  {hasUnsavedFilters && (
+                    <span className="text-orange-600 font-medium">You have unsaved filter changes</span>
+                  )}
+                </div>
+                <button
+                  onClick={applyFilters}
+                  disabled={!hasUnsavedFilters}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Active Filters Summary */}
           {hasActiveFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
@@ -195,8 +430,7 @@ export function JobsPage() {
                 <Filter className="h-4 w-4" />
                 <span>
                   {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
-                  {searchQuery && ` for "${searchQuery}"`}
-                  {selectedSkills.length > 0 && ` with ${selectedSkills.length} skill${selectedSkills.length > 1 ? 's' : ''}`}
+                  {getActiveFiltersCount() > 0 && ` (${getActiveFiltersCount()} filter${getActiveFiltersCount() > 1 ? 's' : ''} active)`}
                 </span>
               </div>
               <button

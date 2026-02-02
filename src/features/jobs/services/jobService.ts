@@ -41,7 +41,19 @@ export const jobService = {
   /**
    * Get all jobs
    */
-  getJobs: async (skip = 0, limit = 100, status?: string, skills?: string[], search?: string): Promise<Job[]> => {
+  getJobs: async (
+    skip = 0,
+    limit = 100,
+    status?: string,
+    skills?: string[],
+    search?: string,
+    jobType?: string,
+    location?: string,
+    salaryMin?: number,
+    salaryMax?: number,
+    isRemote?: boolean,
+    dateFrom?: string
+  ): Promise<Job[]> => {
     const params: any = { skip, limit };
     if (status) params.status = status;
     if (skills && skills.length > 0) {
@@ -49,6 +61,22 @@ export const jobService = {
     }
     if (search && search.trim()) {
       params.search = search.trim();
+    }
+    if (jobType) params.job_type = jobType;
+    if (location && location.trim()) {
+      params.location = location.trim();
+    }
+    if (salaryMin !== undefined && salaryMin !== null) {
+      params.salary_min = salaryMin;
+    }
+    if (salaryMax !== undefined && salaryMax !== null) {
+      params.salary_max = salaryMax;
+    }
+    if (isRemote !== undefined && isRemote !== null) {
+      params.is_remote = isRemote;
+    }
+    if (dateFrom) {
+      params.date_from = dateFrom;
     }
     const response = await api.get('/v1/jobs', { params });
     return response.data.map(toCamelCase);
