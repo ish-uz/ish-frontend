@@ -2,41 +2,36 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { userService } from '../services/userService';
 import { User } from '@/types';
-import { User as UserIcon, Mail, Phone, Search, Filter, Briefcase, Code, X } from 'lucide-react';
+import { Pagination } from '@/components/ui/Pagination';
+import { User as UserIcon, Mail, Phone, Filter, Briefcase, Code, X } from 'lucide-react';
 
 export function EmployeesPage() {
   const [employees, setEmployees] = useState<User[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
 
+  // Reset to page 1 when filters change
   useEffect(() => {
-    loadEmployees();
+    setCurrentPage(1);
   }, [selectedSkills]);
 
+  // Load employees when filters or page change
   useEffect(() => {
-    // Client-side filtering by search query (name, email)
-    if (searchQuery.trim()) {
-      const filtered = employees.filter(
-        (user) =>
-          `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredEmployees(filtered);
-    } else {
-      setFilteredEmployees(employees);
-    }
-  }, [searchQuery, employees]);
+    loadEmployees();
+  }, [currentPage, selectedSkills]);
 
   const loadEmployees = async () => {
     try {
       setLoading(true);
-      const data = await userService.getEmployees(0, 100, selectedSkills.length > 0 ? selectedSkills : undefined);
-      setEmployees(data);
-      setFilteredEmployees(data);
+      const skip = (currentPage - 1) * itemsPerPage;
+      const result = await userService.getEmployees(skip, itemsPerPage, selectedSkills.length > 0 ? selectedSkills : undefined);
+      setEmployees(result.users);
+      setTotalItems(result.total);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load employees');
     } finally {
@@ -104,24 +99,14 @@ export function EmployeesPage() {
           </p>
         </div>
 
-        {/* Search and Filters */}
+        {/* Filters */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6 space-y-4">
-          {/* Search Bar */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name or email..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          {/* Header with count */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Filter className="h-5 w-5 text-gray-400" />
               <span className="text-sm text-gray-600">
-                {filteredEmployees.length} {filteredEmployees.length === 1 ? 'professional' : 'professionals'} found
+                {totalItems} {totalItems === 1 ? 'professional' : 'professionals'} found
               </span>
             </div>
           </div>
@@ -176,21 +161,19 @@ export function EmployeesPage() {
         </div>
 
         {/* Employees List */}
-        {filteredEmployees.length === 0 ? (
+        {employees.length === 0 ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <UserIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {searchQuery ? 'No results found' : 'No employees found'}
+              No employees found
             </h3>
             <p className="text-gray-500">
-              {searchQuery
-                ? 'Try adjusting your search query'
-                : 'There are no employees available at the moment.'}
+              There are no employees available at the moment.
             </p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredEmployees.map((user) => (
+            {employees.map((user) => (
               <div
                 key={user.id}
                 className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-gray-100"
@@ -241,6 +224,20 @@ export function EmployeesPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && employees.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalItems / itemsPerPage)}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
         )}
       </div>
     </div>

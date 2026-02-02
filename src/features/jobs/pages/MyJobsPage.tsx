@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
 import { applicationService } from '@/features/applications/services/applicationService';
+import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
 
 export function MyJobsPage() {
@@ -14,16 +15,21 @@ export function MyJobsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     loadJobs();
-  }, []);
+  }, [currentPage]);
 
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const data = await jobService.getMyJobs();
-      setJobs(data);
+      const skip = (currentPage - 1) * itemsPerPage;
+      const result = await jobService.getMyJobs(skip, itemsPerPage);
+      setJobs(result.jobs);
+      setTotalItems(result.total);
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -353,6 +359,20 @@ export function MyJobsPage() {
               <p className="text-sm text-slate-500">Total Views</p>
             </div>
           </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && jobs.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalItems / itemsPerPage)}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
         )}
       </div>
     </div>

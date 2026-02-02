@@ -76,7 +76,7 @@ export const jobService = {
    */
   getJobs: async (
     skip = 0,
-    limit = 100,
+    limit = 20,
     status?: string,
     skills?: string[],
     search?: string,
@@ -86,7 +86,7 @@ export const jobService = {
     salaryMax?: number,
     isRemote?: boolean,
     dateFrom?: string
-  ): Promise<Job[]> => {
+  ): Promise<{ jobs: Job[]; total: number }> => {
     const params: any = { skip, limit };
     if (status) params.status = status;
     if (skills && skills.length > 0) {
@@ -112,7 +112,16 @@ export const jobService = {
       params.date_from = dateFrom;
     }
     const response = await api.get('/v1/jobs', { params });
-    return response.data.map(toCamelCase);
+    
+    // Handle both old format (array) and new format (PaginatedResponse)
+    if (Array.isArray(response.data)) {
+      return { jobs: response.data.map(toCamelCase), total: response.data.length };
+    }
+    
+    return {
+      jobs: response.data.items.map(toCamelCase),
+      total: response.data.total,
+    };
   },
 
   /**
@@ -126,11 +135,20 @@ export const jobService = {
   /**
    * Get my jobs (jobs I posted)
    */
-  getMyJobs: async (skip = 0, limit = 100, status?: string): Promise<Job[]> => {
+  getMyJobs: async (skip = 0, limit = 20, status?: string): Promise<{ jobs: Job[]; total: number }> => {
     const response = await api.get('/v1/jobs/my-jobs', {
       params: { skip, limit, status },
     });
-    return response.data.map(toCamelCase);
+    
+    // Handle both old format (array) and new format (PaginatedResponse)
+    if (Array.isArray(response.data)) {
+      return { jobs: response.data.map(toCamelCase), total: response.data.length };
+    }
+    
+    return {
+      jobs: response.data.items.map(toCamelCase),
+      total: response.data.total,
+    };
   },
 
   /**
@@ -192,11 +210,20 @@ export const jobService = {
   /**
    * Get saved jobs
    */
-  getSavedJobs: async (skip = 0, limit = 100): Promise<Job[]> => {
+  getSavedJobs: async (skip = 0, limit = 20): Promise<{ jobs: Job[]; total: number }> => {
     const response = await api.get('/v1/jobs/saved', {
       params: { skip, limit },
     });
-    return response.data.map(toCamelCase);
+    
+    // Handle both old format (array) and new format (PaginatedResponse)
+    if (Array.isArray(response.data)) {
+      return { jobs: response.data.map(toCamelCase), total: response.data.length };
+    }
+    
+    return {
+      jobs: response.data.items.map(toCamelCase),
+      total: response.data.total,
+    };
   },
 
   /**

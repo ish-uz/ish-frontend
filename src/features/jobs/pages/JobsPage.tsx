@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { jobService } from '../services/jobService';
 import { Job, JobType } from '@/types';
+import { Pagination } from '@/components/ui/Pagination';
 import {
   Briefcase, MapPin, DollarSign, Clock, Search, Filter, Building2, X, Code,
   ChevronDown, ChevronUp, Globe, Calendar, SlidersHorizontal
@@ -11,6 +12,9 @@ export function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -59,18 +63,24 @@ export function JobsPage() {
     };
   }, [searchQuery]);
 
-  // Load jobs when filters change (search, skills, and applied advanced filters)
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, selectedSkills, appliedJobType, appliedLocation, appliedSalaryMin, appliedSalaryMax, appliedIsRemote, appliedDateFrom]);
+
+  // Load jobs when filters or page change
   useEffect(() => {
     loadJobs();
-  }, [debouncedSearchQuery, selectedSkills, appliedJobType, appliedLocation, appliedSalaryMin, appliedSalaryMax, appliedIsRemote, appliedDateFrom]);
+  }, [currentPage, debouncedSearchQuery, selectedSkills, appliedJobType, appliedLocation, appliedSalaryMin, appliedSalaryMax, appliedIsRemote, appliedDateFrom]);
 
   const loadJobs = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await jobService.getJobs(
-        0,
-        100,
+      const skip = (currentPage - 1) * itemsPerPage;
+      const result = await jobService.getJobs(
+        skip,
+        itemsPerPage,
         'active',
         selectedSkills.length > 0 ? selectedSkills : undefined,
         debouncedSearchQuery || undefined,
@@ -81,7 +91,8 @@ export function JobsPage() {
         appliedIsRemote !== null ? appliedIsRemote : undefined,
         appliedDateFrom || undefined
       );
-      setJobs(data);
+      setJobs(result.jobs);
+      setTotalItems(result.total);
     } catch (err: any) {
       const errorDetail = err.response?.data?.detail;
       const errorMessage = Array.isArray(errorDetail)
@@ -570,6 +581,20 @@ export function JobsPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && jobs.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalItems / itemsPerPage)}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
         )}
       </div>
     </div>

@@ -44,12 +44,21 @@ export const userService = {
   /**
    * Get employees (users who are open to work)
    */
-  getEmployees: async (skip = 0, limit = 100, skills?: string[]): Promise<User[]> => {
+  getEmployees: async (skip = 0, limit = 20, skills?: string[]): Promise<{ users: User[]; total: number }> => {
     const params: any = { skip, limit };
     if (skills && skills.length > 0) {
       params.skills = skills.join(',');
     }
     const response = await api.get('/v1/users/employees', { params });
-    return response.data.map(toCamelCase);
+    
+    // Handle both old format (array) and new format (PaginatedResponse)
+    if (Array.isArray(response.data)) {
+      return { users: response.data.map(toCamelCase), total: response.data.length };
+    }
+    
+    return {
+      users: response.data.items.map(toCamelCase),
+      total: response.data.total,
+    };
   },
 };

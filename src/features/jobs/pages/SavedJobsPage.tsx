@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { jobService } from '../services/jobService';
+import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
 import { BookmarkCheck, MapPin, DollarSign, Clock, Building2, Briefcase, Trash2 } from 'lucide-react';
 
@@ -9,17 +10,22 @@ export function SavedJobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     loadSavedJobs();
-  }, []);
+  }, [currentPage]);
 
   const loadSavedJobs = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await jobService.getSavedJobs();
-      setJobs(data);
+      const skip = (currentPage - 1) * itemsPerPage;
+      const result = await jobService.getSavedJobs(skip, itemsPerPage);
+      setJobs(result.jobs);
+      setTotalItems(result.total);
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -201,6 +207,20 @@ export function SavedJobsPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && jobs.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalItems / itemsPerPage)}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+          />
         )}
       </div>
     </div>
