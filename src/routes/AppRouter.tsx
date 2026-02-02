@@ -9,6 +9,7 @@ import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, Saved
 import { EmployeesPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
+import { CreateCompanyPage, MyCompaniesPage, EditCompanyPage } from '@/features/companies/pages';
 import { DashboardLayout } from '@/components/layouts';
 
 export function AppRouter() {
@@ -45,7 +46,9 @@ export function AppRouter() {
         <Route path="/employees" element={<EmployeesPage />} />
         
         {/* Companies */}
-        {/* <Route path="/companies" element={<CompaniesPage />} /> */}
+        <Route path="/companies" element={<MyCompaniesPage />} />
+        <Route path="/companies/create" element={<CreateCompanyPage />} />
+        <Route path="/companies/:id/edit" element={<EditCompanyPage />} />
       </Route>
 
       {/* 404 */}

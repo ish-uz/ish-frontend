@@ -127,7 +127,10 @@ export function SavedJobsPage() {
                     </h3>
                     <div className="flex items-center text-sm text-gray-600">
                       <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">{job.company?.name || 'Company'}</span>
+                      <span className="truncate">
+                        {job.company?.name || 
+                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : 'Company')}
+                      </span>
                     </div>
                   </div>
                   {job.company?.logo && (

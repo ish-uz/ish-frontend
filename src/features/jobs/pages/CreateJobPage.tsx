@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Briefcase, MapPin, DollarSign, FileText,
   Plus, X, Save, Globe, Building2
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
-import { JobType, JobCreate } from '@/types';
+import { companyService } from '../../companies/services/companyService';
+import { JobType, JobCreate, Company } from '@/types';
 
 export function CreateJobPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
 
   // Form state
   const [formData, setFormData] = useState<JobCreate>({
@@ -23,8 +26,26 @@ export function CreateJobPage() {
     jobType: 'full-time',
     requirements: [],
     isRemote: false,
+    companyId: undefined,
   });
   const [newRequirement, setNewRequirement] = useState('');
+
+  // Load user's companies
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        setLoadingCompanies(true);
+        const data = await companyService.getMyCompanies();
+        setCompanies(data);
+      } catch (err: any) {
+        // Silently fail - company selection is optional
+        console.error('Failed to load companies:', err);
+      } finally {
+        setLoadingCompanies(false);
+      }
+    };
+    loadCompanies();
+  }, []);
 
   const jobTypes: { value: JobType; label: string }[] = [
     { value: 'full-time', label: 'Full Time' },
@@ -138,6 +159,36 @@ export function CreateJobPage() {
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="e.g., Senior Software Engineer"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Company (Optional)
+                </label>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <select
+                    value={formData.companyId || ''}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      companyId: e.target.value ? Number(e.target.value) : undefined 
+                    })}
+                    disabled={loadingCompanies}
+                    className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Individual / No company</option>
+                    {companies.map((company) => (
+                      <option key={company.id} value={company.id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {companies.length === 0 && !loadingCompanies && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    You don't have any companies yet. The job will be posted as an individual.
+                  </p>
+                )}
               </div>
 
               <div>

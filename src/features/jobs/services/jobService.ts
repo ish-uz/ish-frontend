@@ -16,26 +16,59 @@ const toSnakeCase = (data: JobCreate) => ({
 });
 
 // Convert snake_case response to camelCase
-const toCamelCase = (data: any): Job => ({
-  id: data.id,
-  authorId: data.author_id,
-  companyId: data.company_id,
-  title: data.title,
-  description: data.description,
-  location: data.location,
-  salaryMin: data.salary_min,
-  salaryMax: data.salary_max,
-  salaryCurrency: data.salary_currency,
-  jobType: data.job_type,
-  status: data.status,
-  requirements: data.requirements,
-  isRemote: data.is_remote,
-  viewsCount: data.views_count,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
-  company: data.company,
-  author: data.author,
-});
+const toCamelCase = (data: any): Job => {
+  // Convert company if present
+  const company = data.company ? {
+    id: data.company.id,
+    ownerId: data.company.owner_id,
+    name: data.company.name,
+    description: data.company.description,
+    logo: data.company.logo,
+    website: data.company.website,
+    location: data.company.location,
+    industry: data.company.industry,
+    size: data.company.size,
+    isVerified: data.company.is_verified,
+    createdAt: data.company.created_at,
+    updatedAt: data.company.updated_at,
+  } : undefined;
+
+  // Convert author if present
+  const author = data.author ? {
+    id: data.author.id,
+    email: data.author.email,
+    phone: data.author.phone,
+    firstName: data.author.first_name,
+    lastName: data.author.last_name,
+    avatar: data.author.avatar,
+    role: data.author.role,
+    isActive: data.author.is_active,
+    isVerified: data.author.is_verified,
+    createdAt: data.author.created_at,
+    updatedAt: data.author.updated_at,
+  } : undefined;
+
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    companyId: data.company_id,
+    title: data.title,
+    description: data.description,
+    location: data.location,
+    salaryMin: data.salary_min,
+    salaryMax: data.salary_max,
+    salaryCurrency: data.salary_currency,
+    jobType: data.job_type,
+    status: data.status,
+    requirements: data.requirements,
+    isRemote: data.is_remote,
+    viewsCount: data.views_count,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    company,
+    author,
+  };
+};
 
 export const jobService = {
   /**

@@ -271,7 +271,8 @@ export function JobDetailsPage() {
                       {job.title}
                     </h1>
                     <p className="text-slate-600">
-                      {job.company?.name || 'Company'}
+                      {job.company?.name || 
+                       (job.author ? `${job.author.firstName} ${job.author.lastName}` : 'Company')}
                     </p>
                   </div>
                 </div>

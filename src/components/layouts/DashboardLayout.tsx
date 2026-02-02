@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { 
   User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
-  LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck
+  LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';
@@ -14,15 +15,46 @@ interface NavItem {
   badge?: number;
 }
 
-const mainNavItems: NavItem[] = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: User, label: 'My Profile', path: '/profile' },
-  { icon: Briefcase, label: 'Browse Jobs', path: '/jobs' },
-  { icon: BookmarkCheck, label: 'Saved Jobs', path: '/jobs/saved' },
-  { icon: PlusCircle, label: 'Post a Job', path: '/jobs/create' },
-  { icon: FileText, label: 'My Jobs', path: '/jobs/my' },
-  { icon: Send, label: 'My Applications', path: '/applications' },
-  { icon: Users, label: 'Employees', path: '/employees' },
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+  defaultOpen?: boolean;
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Main',
+    items: [
+      { icon: Home, label: 'Dashboard', path: '/dashboard' },
+      { icon: User, label: 'My Profile', path: '/profile' },
+      { icon: Users, label: 'Employees', path: '/employees' },
+    ],
+    defaultOpen: true,
+  },
+  {
+    label: 'Jobs',
+    items: [
+      { icon: Briefcase, label: 'Browse Jobs', path: '/jobs' },
+      { icon: BookmarkCheck, label: 'Saved Jobs', path: '/jobs/saved' },
+      { icon: PlusCircle, label: 'Post a Job', path: '/jobs/create' },
+      { icon: FileText, label: 'My Jobs', path: '/jobs/my' },
+    ],
+    defaultOpen: true,
+  },
+  {
+    label: 'Applications',
+    items: [
+      { icon: Send, label: 'My Applications', path: '/applications' },
+    ],
+    defaultOpen: true,
+  },
+  {
+    label: 'Companies',
+    items: [
+      { icon: Building2, label: 'My Companies', path: '/companies' },
+    ],
+    defaultOpen: true,
+  },
 ];
 
 const settingsNavItems: NavItem[] = [
@@ -38,6 +70,9 @@ export function DashboardLayout() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(
+    new Set(navGroups.filter(g => g.defaultOpen).map(g => g.label))
+  );
 
   useEffect(() => {
     loadProfile();
@@ -61,6 +96,18 @@ export function DashboardLayout() {
     navigate('/');
   };
 
+  const toggleGroup = (groupLabel: string) => {
+    setOpenGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupLabel)) {
+        newSet.delete(groupLabel);
+      } else {
+        newSet.add(groupLabel);
+      }
+      return newSet;
+    });
+  };
+
   const isActiveRoute = (path: string) => {
     const currentPath = location.pathname;
     const currentSearch = location.search;
@@ -79,7 +126,7 @@ export function DashboardLayout() {
     const pathWithSlash = path + '/';
     if (currentPath.startsWith(pathWithSlash)) {
       // Get all nav items to check for more specific matches
-      const allNavItems = [...mainNavItems, ...settingsNavItems];
+      const allNavItems = navGroups.flatMap(g => g.items).concat(settingsNavItems);
       
       // Check if there's a more specific route that also matches
       const hasMoreSpecificMatch = allNavItems.some(item => {
@@ -194,44 +241,72 @@ export function DashboardLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
-          {/* Main Navigation */}
-          <div className="space-y-1">
-            {sidebarOpen && (
-              <p className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Menu
-              </p>
-            )}
-            {mainNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = isActiveRoute(item.path);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`
-                    flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all
-                    ${isActive
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }
-                    ${!sidebarOpen && 'justify-center'}
-                  `}
-                  title={!sidebarOpen ? item.label : undefined}
-                >
-                  <Icon className={`h-5 w-5 flex-shrink-0 ${isActive ? '' : ''}`} />
-                  {sidebarOpen && (
-                    <span className="font-medium">{item.label}</span>
-                  )}
-                  {item.badge && sidebarOpen && (
-                    <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {/* Navigation Groups */}
+          {navGroups.map((group) => {
+            const isGroupOpen = openGroups.has(group.label);
+            const hasActiveItem = group.items.some(item => isActiveRoute(item.path));
+            
+            return (
+              <div key={group.label} className="space-y-1">
+                {sidebarOpen ? (
+                  <button
+                    onClick={() => toggleGroup(group.label)}
+                    className={`
+                      w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider
+                      hover:text-slate-600 transition-colors
+                      ${hasActiveItem ? 'text-slate-600' : ''}
+                    `}
+                  >
+                    <span>{group.label}</span>
+                    {isGroupOpen ? (
+                      <ChevronUp className="h-3 w-3" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3" />
+                    )}
+                  </button>
+                ) : (
+                  <div className="px-3 py-2">
+                    <div className="h-px bg-slate-200"></div>
+                  </div>
+                )}
+                
+                {isGroupOpen && (
+                  <div className="space-y-1">
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = isActiveRoute(item.path);
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`
+                            flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all
+                            ${isActive
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            }
+                            ${!sidebarOpen && 'justify-center'}
+                          `}
+                          title={!sidebarOpen ? item.label : undefined}
+                        >
+                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          {sidebarOpen && (
+                            <span className="font-medium">{item.label}</span>
+                          )}
+                          {item.badge && sidebarOpen && (
+                            <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {/* Settings Navigation */}
           <div className="pt-4 mt-4 border-t border-slate-200 space-y-1">
