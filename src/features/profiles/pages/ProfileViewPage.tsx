@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  User, MapPin, Briefcase, GraduationCap, Mail, Phone, 
+  User, MapPin, Briefcase, GraduationCap,
   Calendar, ExternalLink, Edit2, FileText, CheckCircle2,
-  Building2, Clock, Award, Code
+  Building2, Award, Code
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { userService } from '@/features/users/services/userService';

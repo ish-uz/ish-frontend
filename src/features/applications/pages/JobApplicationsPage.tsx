@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, User, Calendar, FileText, MapPin, Mail, Phone,
-  CheckCircle2, XCircle, Clock, Eye, AlertCircle, Briefcase
+  ArrowLeft, User, Calendar, FileText, Mail, Phone,
+  CheckCircle2, XCircle, Clock, Eye, AlertCircle, Briefcase, MessageCircle
 } from 'lucide-react';
 import { applicationService } from '../services/applicationService';
 import { jobService } from '@/features/jobs/services/jobService';
@@ -52,7 +52,14 @@ export function JobApplicationsPage() {
 
   const handleStatusChange = async (applicationId: number, newStatus: 'accepted' | 'rejected' | 'reviewed') => {
     try {
-      await applicationService.updateApplication(applicationId, { status: newStatus });
+      const result = await applicationService.updateApplication(applicationId, { status: newStatus });
+      
+      // If accepted and conversation was created, navigate to chat
+      if (newStatus === 'accepted' && result.conversationId) {
+        navigate(`/chat/${result.conversationId}`);
+        return;
+      }
+      
       setApplications(applications.map(app => 
         app.id === applicationId ? { ...app, status: newStatus } : app
       ));
@@ -291,6 +298,15 @@ export function JobApplicationsPage() {
                               Reject
                             </button>
                           </>
+                        )}
+                        {application.status === 'accepted' && application.conversationId && (
+                          <Link
+                            to={`/chat/${application.conversationId}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            Open Chat
+                          </Link>
                         )}
                       </div>
                     </div>

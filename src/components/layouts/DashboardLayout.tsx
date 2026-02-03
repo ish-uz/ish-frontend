@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { 
   User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, MessageCircle
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';
@@ -27,6 +27,7 @@ const navGroups: NavGroup[] = [
     items: [
       { icon: Home, label: 'Dashboard', path: '/dashboard' },
       { icon: User, label: 'My Profile', path: '/profile' },
+      { icon: MessageCircle, label: 'Messages', path: '/chat' },
       { icon: Users, label: 'Employees', path: '/employees' },
     ],
     defaultOpen: true,

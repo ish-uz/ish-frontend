@@ -53,6 +53,7 @@ export interface Application {
   // Populated fields
   job?: Job
   applicant?: User
+  conversationId?: number
 }
 
 export type ApplicationStatus = 'pending' | 'reviewed' | 'accepted' | 'rejected'
@@ -159,4 +160,57 @@ export interface JobCreate {
 export interface ApplicationCreate {
   jobId: number
   coverLetter?: string
+}
+
+// Chat types
+export type MessageStatus = 'sent' | 'delivered' | 'read'
+
+export interface Message {
+  id: number
+  conversationId: number
+  senderId: number
+  content: string
+  status: MessageStatus
+  createdAt: string
+  readAt?: string
+}
+
+export interface ConversationParticipant {
+  id: number
+  firstName: string
+  lastName: string
+  avatar?: string
+}
+
+export interface Conversation {
+  id: number
+  applicationId: number
+  employerId: number
+  applicantId: number
+  createdAt: string
+  updatedAt: string
+  employer?: ConversationParticipant
+  applicant?: ConversationParticipant
+  lastMessage?: Message
+  unreadCount: number
+  jobTitle?: string
+}
+
+export interface ConversationListResponse {
+  items: Conversation[]
+  total: number
+}
+
+export interface MessageListResponse {
+  items: Message[]
+  total: number
+  hasMore: boolean
+}
+
+// WebSocket message types
+export type WSMessageType = 'new_message' | 'message_delivered' | 'message_read' | 'messages_read' | 'error'
+
+export interface WSMessage {
+  type: WSMessageType
+  data: any
 }

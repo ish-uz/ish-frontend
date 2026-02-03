@@ -10,6 +10,7 @@ import { EmployeesPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
 import { CreateCompanyPage, MyCompaniesPage, EditCompanyPage } from '@/features/companies/pages';
+import { ChatsPage, ChatPage } from '@/features/chat';
 import { DashboardLayout } from '@/components/layouts';
 
 export function AppRouter() {
@@ -49,6 +50,10 @@ export function AppRouter() {
         <Route path="/companies" element={<MyCompaniesPage />} />
         <Route path="/companies/create" element={<CreateCompanyPage />} />
         <Route path="/companies/:id/edit" element={<EditCompanyPage />} />
+        
+        {/* Chat */}
+        <Route path="/chat" element={<ChatsPage />} />
+        <Route path="/chat/:id" element={<ChatPage />} />
       </Route>
 
       {/* 404 */}

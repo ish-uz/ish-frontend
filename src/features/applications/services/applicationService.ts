@@ -53,8 +53,9 @@ const toCamelCase = (data: any): Application => ({
   status: data.status,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
-  job: jobToCamelCase(data.job),
-  applicant: userToCamelCase(data.applicant),
+  job: jobToCamelCase(data.job) || undefined,
+  applicant: userToCamelCase(data.applicant) || undefined,
+  conversationId: data.conversation_id,
 });
 
 export const applicationService = {
