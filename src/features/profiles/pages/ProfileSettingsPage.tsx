@@ -685,24 +685,35 @@ export function ProfileSettingsPage() {
                               className="w-full px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                             />
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">
-                              End
-                            </label>
-                            <input
-                              type="month"
-                              value={edu.endDate || ''}
-                              onChange={(e) => updateEducation(index, 'endDate', e.target.value)}
-                              className="w-full px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            />
-                          </div>
+                          {!edu.current && (
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
+                                End
+                              </label>
+                              <input
+                                type="month"
+                                value={edu.endDate || ''}
+                                onChange={(e) => updateEducation(index, 'endDate', e.target.value)}
+                                className="w-full px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="sm:col-span-2">
                           <label className="flex items-center space-x-2">
                             <input
                               type="checkbox"
                               checked={edu.current}
-                              onChange={(e) => updateEducation(index, 'current', e.target.checked)}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                const updated = [...educations];
+                                updated[index] = {
+                                  ...updated[index],
+                                  current: checked,
+                                  ...(checked ? { endDate: '' } : {}),
+                                };
+                                setEducations(updated);
+                              }}
                               className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                             />
                             <span className="text-sm text-slate-700">Currently studying here</span>

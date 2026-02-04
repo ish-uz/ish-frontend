@@ -184,14 +184,14 @@ export function DashboardLayout() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-40 h-screen bg-white border-r border-slate-200
+          fixed top-0 left-0 z-40 h-screen flex flex-col bg-white border-r border-slate-200
           transition-all duration-300 ease-in-out
           ${sidebarOpen ? 'w-64' : 'w-20'}
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
+        <div className="h-16 flex-shrink-0 flex items-center justify-between px-4 border-b border-slate-200">
           <Link to="/" className="flex items-center space-x-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/20">
               ISH
@@ -214,7 +214,7 @@ export function DashboardLayout() {
 
         {/* Profile Card */}
         {profile && (
-          <div className={`p-4 ${sidebarOpen ? 'px-4' : 'px-2'}`}>
+          <div className={`flex-shrink-0 p-4 ${sidebarOpen ? 'px-4' : 'px-2'}`}>
             <Link
               to="/profile"
               className={`
@@ -240,8 +240,8 @@ export function DashboardLayout() {
           </div>
         )}
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+        {/* Navigation — scrollable when content overflows */}
+        <nav className="flex-1 min-h-0 px-3 py-2 space-y-1 overflow-y-auto">
           {/* Navigation Groups */}
           {navGroups.map((group) => {
             const isGroupOpen = openGroups.has(group.label);
@@ -345,7 +345,7 @@ export function DashboardLayout() {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-3 border-t border-slate-200">
+        <div className="flex-shrink-0 p-3 border-t border-slate-200">
           <button
             onClick={handleLogout}
             className={`
