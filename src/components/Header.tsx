@@ -71,7 +71,12 @@ export function Header() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A66C2] text-white font-bold text-xl">
               ISH
             </div>
-            <span className="text-xl font-bold text-gray-900">ISH</span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg font-bold text-gray-900">ISH</span>
+              <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                va mutaxassislar shu yerda
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

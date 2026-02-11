@@ -197,7 +197,12 @@ export function DashboardLayout() {
               ISH
             </div>
             {sidebarOpen && (
-              <span className="text-xl font-bold text-slate-900">ISH</span>
+              <div className="flex flex-col justify-center min-w-0 leading-tight">
+                <span className="text-lg font-bold text-slate-900">ISH</span>
+                <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
+                  va mutaxassislar shu yerda
+                </span>
+              </div>
             )}
           </Link>
           <button
