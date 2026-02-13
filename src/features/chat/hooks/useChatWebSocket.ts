@@ -1,7 +1,15 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Message, WSMessage } from '@/types';
 
-const WS_BASE_URL = 'ws://localhost:8000/ws';
+function getWebSocketUrl(): string {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  const base = apiUrl.replace(/\/api\/?$/, '');
+  const wsProtocol = base.startsWith('https') ? 'wss' : 'ws';
+  const wsHost = base.replace(/^https?:\/\//, '');
+  return `${wsProtocol}://${wsHost}/ws`;
+}
+
+const WS_BASE_URL = getWebSocketUrl();
 
 interface UseChatWebSocketOptions {
   onNewMessage?: (message: Message) => void;
