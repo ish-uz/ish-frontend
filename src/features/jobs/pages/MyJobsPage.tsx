@@ -5,7 +5,6 @@ import {
   Edit2, Trash2, MoreVertical, CheckCircle2, Clock, XCircle, Send
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
-import { applicationService } from '@/features/applications/services/applicationService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
 

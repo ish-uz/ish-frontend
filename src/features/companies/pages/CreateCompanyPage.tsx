@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  ArrowLeft, Building2, MapPin, FileText, Globe, Save, Briefcase
+  ArrowLeft, Building2, MapPin, FileText, Globe, Save
 } from 'lucide-react';
 import { companyService } from '../services/companyService';
 import { userService } from '../../users/services/userService';
@@ -50,7 +50,7 @@ export function CreateCompanyPage() {
       // Get current user to set owner_id
       const currentUser = await userService.getCurrentUser();
       
-      const company = await companyService.createCompany({
+      await companyService.createCompany({
         ...formData,
         ownerId: currentUser.id,
         size: formData.size || undefined,

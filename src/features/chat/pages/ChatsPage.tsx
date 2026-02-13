@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, User as UserIcon, Clock, Check, CheckCheck } from 'lucide-react';
+import { MessageCircle, Check, CheckCheck } from 'lucide-react';
 import { chatService } from '../services/chatService';
-import { Conversation, Message } from '@/types';
+import { Conversation } from '@/types';
 import { userService } from '@/features/users/services/userService';
 
 export function ChatsPage() {

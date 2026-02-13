@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Briefcase, Users, Eye, TrendingUp, Bell, Calendar,
-  ChevronRight, CheckCircle2, AlertCircle, Clock
+  Briefcase, Users, Eye, TrendingUp, Bell,
+  ChevronRight, CheckCircle2, Clock
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';

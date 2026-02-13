@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { jobService } from '../services/jobService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
-import { BookmarkCheck, MapPin, DollarSign, Clock, Building2, Briefcase, Trash2 } from 'lucide-react';
+import { BookmarkCheck, MapPin, DollarSign, Clock, Building2, Trash2 } from 'lucide-react';
 
 export function SavedJobsPage() {
   const navigate = useNavigate();

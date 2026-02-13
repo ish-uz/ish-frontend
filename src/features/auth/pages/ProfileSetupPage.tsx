@@ -52,7 +52,7 @@ export function ProfileSetupPage() {
     };
     checkProfile();
   }, [navigate]);
-  const [avatar, setAvatar] = useState<File | null>(null);
+  const [, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);

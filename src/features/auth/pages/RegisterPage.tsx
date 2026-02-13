@@ -63,7 +63,7 @@ export function RegisterPage() {
     setIsLoading(true);
     try {
       // Register API call
-      const userData = await authService.register({
+      await authService.register({
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,

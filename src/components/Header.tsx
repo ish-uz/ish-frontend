@@ -7,7 +7,7 @@ import { User as UserType } from '@/types';
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const [, setCurrentUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 

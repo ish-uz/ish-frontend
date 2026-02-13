@@ -55,7 +55,7 @@ export function ChatPage() {
     ));
   }, []);
 
-  const handleMessagesRead = useCallback((convId: number, count: number) => {
+  const handleMessagesRead = useCallback((convId: number, _count: number) => {
     if (convId === conversationId) {
       setMessages(prev => prev.map(m => 
         m.senderId === currentUserId ? { ...m, status: 'read' as const } : m
@@ -66,7 +66,7 @@ export function ChatPage() {
   const { 
     isConnected, 
     connect, 
-    disconnect, 
+    disconnect: _disconnect, 
     joinConversation, 
     leaveConversation,
     sendMessage: wsSendMessage,
@@ -385,7 +385,7 @@ export function ChatPage() {
             </div>
             
             {/* Messages */}
-            {group.messages.map((message, messageIndex) => {
+            {group.messages.map((message) => {
               const isOwn = message.senderId === currentUserId;
               
               return (

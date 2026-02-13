@@ -1,4 +1,4 @@
-import { CheckCircle, Shield, Star, FileText, Lock, Zap, Users, Award } from 'lucide-react';
+import { CheckCircle, Shield, Star, FileText, Lock, Zap } from 'lucide-react';
 
 export function TrustSection() {
   const features = [
