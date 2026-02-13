@@ -112,8 +112,9 @@ export function ChatPage() {
         setMessages(messagesData.messages);
         setHasMore(messagesData.hasMore);
         
-        // Mark as read
+        // Mark as read so server count updates; notify layout to refresh badge
         await chatService.markConversationAsRead(conversationId);
+        window.dispatchEvent(new CustomEvent('ish:refresh-message-unread'));
         
       } catch (err: any) {
         if (err.response?.status === 401) {
@@ -151,10 +152,38 @@ export function ChatPage() {
     }
   }, [isConnected, conversationId, joinConversation, markAsRead]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom: instant when opening chat (like messengers), smooth when new message at end
+  const isInitialScrollDone = useRef(false);
+  const lastMessageIdRef = useRef<number | null>(null);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length === 0) return;
+    const lastId = messages[messages.length - 1]?.id ?? null;
+    const isNewMessageAtEnd = lastMessageIdRef.current !== lastId;
+    lastMessageIdRef.current = lastId;
+
+    const instant = !isInitialScrollDone.current;
+    if (instant) {
+      isInitialScrollDone.current = true;
+      const rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = messagesContainerRef.current;
+          if (el) el.scrollTop = el.scrollHeight;
+          messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        });
+      });
+      return () => cancelAnimationFrame(rafId);
+    }
+    // Only scroll to bottom when a new message was added at end (send/receive), not when loading more
+    if (isNewMessageAtEnd) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
+
+  // Reset when switching conversation
+  useEffect(() => {
+    isInitialScrollDone.current = false;
+    lastMessageIdRef.current = null;
+  }, [conversationId]);
 
   // Load more messages
   const loadMoreMessages = async () => {

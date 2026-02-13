@@ -184,7 +184,7 @@ export interface ConversationParticipant {
 
 export interface Conversation {
   id: number
-  applicationId: number
+  applicationId?: number
   employerId: number
   applicantId: number
   createdAt: string
@@ -205,6 +205,32 @@ export interface MessageListResponse {
   items: Message[]
   total: number
   hasMore: boolean
+}
+
+// Chat invitation types
+export interface InvitationParticipant {
+  id: number
+  firstName: string
+  lastName: string
+  avatar?: string
+}
+
+export interface ChatInvitation {
+  id: number
+  fromUserId: number
+  toUserId: number
+  message?: string
+  status: 'pending' | 'accepted' | 'rejected'
+  conversationId?: number
+  createdAt: string
+  fromUser?: InvitationParticipant
+  toUser?: InvitationParticipant
+}
+
+export interface ChatWithUserResponse {
+  conversation?: Conversation
+  pendingInvitationFromMe?: ChatInvitation
+  pendingInvitationFromThem?: ChatInvitation
 }
 
 // WebSocket message types

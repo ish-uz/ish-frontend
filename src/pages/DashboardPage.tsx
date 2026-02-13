@@ -16,55 +16,66 @@ interface StatCard {
   color: string;
 }
 
+interface DashboardStats {
+  profileViews: number;
+  jobsApplied: number;
+  connections: number;
+  notifications: number;
+}
+
 export function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsError, setStatsError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadProfile();
+    loadProfileAndStats();
   }, []);
 
-  const loadProfile = async () => {
+  const loadProfileAndStats = async () => {
     try {
-      const data = await profileService.getCurrentProfile();
-      setProfile(data);
+      const profileData = await profileService.getCurrentProfile();
+      setProfile(profileData);
     } catch (err) {
       console.error('Failed to load profile:', err);
+    }
+    try {
+      setStatsError(false);
+      const statsData = await profileService.getDashboardStats();
+      setStats(statsData);
+    } catch (err) {
+      console.error('Failed to load dashboard stats:', err);
+      setStatsError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const stats: StatCard[] = [
-    { 
-      icon: Eye, 
-      label: 'Profile Views', 
-      value: '128', 
-      change: '+12%', 
-      trend: 'up',
-      color: 'blue' 
+  const statCards: StatCard[] = [
+    {
+      icon: Eye,
+      label: 'Profile Views',
+      value: stats?.profileViews ?? '—',
+      color: 'blue',
     },
-    { 
-      icon: Briefcase, 
-      label: 'Jobs Applied', 
-      value: '5', 
-      change: '+2', 
-      trend: 'up',
-      color: 'emerald' 
+    {
+      icon: Briefcase,
+      label: 'Jobs Applied',
+      value: stats?.jobsApplied ?? '—',
+      color: 'emerald',
     },
-    { 
-      icon: Users, 
-      label: 'Connections', 
-      value: '42', 
-      change: '+8', 
-      trend: 'up',
-      color: 'violet' 
+    {
+      icon: Users,
+      label: 'Connections',
+      value: stats?.connections ?? '—',
+      color: 'violet',
     },
-    { 
-      icon: Bell, 
-      label: 'Notifications', 
-      value: '3', 
-      color: 'amber' 
+    {
+      icon: Bell,
+      label: 'Notifications',
+      value: stats?.notifications ?? '—',
+      color: 'amber',
     },
   ];
 
@@ -167,9 +178,23 @@ export function DashboardPage() {
         </div>
       )}
 
+      {/* Stats error banner */}
+      {statsError && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+          <p className="text-sm text-amber-800">Не удалось загрузить статистику.</p>
+          <button
+            type="button"
+            onClick={() => loadProfileAndStats()}
+            className="text-sm font-medium text-amber-700 hover:text-amber-900 underline"
+          >
+            Повторить
+          </button>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat) => {
+        {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
             <div

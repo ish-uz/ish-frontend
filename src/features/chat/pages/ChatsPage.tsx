@@ -3,16 +3,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, User as UserIcon, Clock, Check, CheckCheck } from 'lucide-react';
 import { chatService } from '../services/chatService';
 import { Conversation, Message } from '@/types';
+import { userService } from '@/features/users/services/userService';
 
 export function ChatsPage() {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const user = await userService.getCurrentUser();
+        setCurrentUserId(user.id);
+      } catch {
+        navigate('/login');
+      }
+    };
+    loadUser();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (currentUserId === null) return;
     loadConversations();
-  }, []);
+  }, [currentUserId]);
 
   const loadConversations = async () => {
     try {
@@ -59,10 +74,10 @@ export function ChatsPage() {
     }
   };
 
-  const getOtherParticipant = (conversation: Conversation, currentUserId: number) => {
-    // We need to determine if current user is employer or applicant
-    // For now, we'll show the other participant
-    return conversation.applicant || conversation.employer;
+  const getOtherParticipant = (conversation: Conversation) => {
+    if (currentUserId === null) return undefined;
+    // Show the other participant: if I'm employer → show applicant, else show employer
+    return conversation.employerId === currentUserId ? conversation.applicant : conversation.employer;
   };
 
   if (loading) {
@@ -102,7 +117,7 @@ export function ChatsPage() {
             <MessageCircle className="mx-auto h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No conversations yet</h3>
             <p className="text-gray-500 mb-4">
-              Conversations will appear here when your applications are accepted.
+              Conversations appear when your job applications are accepted or when you accept a chat invitation from the Employees page.
             </p>
             <Link
               to="/jobs"
@@ -114,7 +129,7 @@ export function ChatsPage() {
         ) : (
           <div className="bg-white rounded-xl shadow-md overflow-hidden divide-y divide-gray-100">
             {conversations.map((conversation) => {
-              const participant = conversation.applicant || conversation.employer;
+              const participant = getOtherParticipant(conversation);
               const lastMessage = conversation.lastMessage;
               
               return (

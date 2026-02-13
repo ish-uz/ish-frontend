@@ -6,7 +6,7 @@ import {
   ProfileSetupPage,
 } from '@/features/auth/pages';
 import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, SavedJobsPage } from '@/features/jobs/pages';
-import { EmployeesPage } from '@/features/users/pages';
+import { EmployeesPage, InvitationsPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
 import { CreateCompanyPage, MyCompaniesPage, EditCompanyPage } from '@/features/companies/pages';
@@ -54,6 +54,7 @@ export function AppRouter() {
         {/* Chat */}
         <Route path="/chat" element={<ChatsPage />} />
         <Route path="/chat/:id" element={<ChatPage />} />
+        <Route path="/invitations" element={<InvitationsPage />} />
       </Route>
 
       {/* 404 */}

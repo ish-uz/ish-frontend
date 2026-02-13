@@ -65,4 +65,23 @@ export const profileService = {
     const response = await api.delete('/v1/profiles/me/cv');
     return response.data;
   },
+
+  /**
+   * Get dashboard stats (profile views, jobs applied, connections, notifications)
+   */
+  getDashboardStats: async (): Promise<{
+    profileViews: number;
+    jobsApplied: number;
+    connections: number;
+    notifications: number;
+  }> => {
+    const response = await api.get('/v1/profiles/me/dashboard-stats');
+    const d = response.data as Record<string, number>;
+    return {
+      profileViews: Number(d.profileViews ?? d.profile_views ?? 0),
+      jobsApplied: Number(d.jobsApplied ?? d.jobs_applied ?? 0),
+      connections: Number(d.connections ?? 0),
+      notifications: Number(d.notifications ?? 0),
+    };
+  },
 };

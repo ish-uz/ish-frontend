@@ -1,5 +1,5 @@
 import api from '@/services/api';
-import { Conversation, Message, ConversationListResponse, MessageListResponse } from '@/types';
+import { Conversation, Message, ChatWithUserResponse } from '@/types';
 
 const toCamelCase = (data: any): any => {
   if (!data) return data;
@@ -63,6 +63,33 @@ export const chatService = {
   getConversationByApplication: async (applicationId: number): Promise<Conversation | null> => {
     const response = await api.get(`/v1/chat/application/${applicationId}`);
     return response.data ? toCamelCase(response.data) : null;
+  },
+
+  /**
+   * Get chat status with a user (conversation and/or pending invitations). Use for Employees/Profile to show Open chat vs Send invitation.
+   */
+  getChatWithUser: async (userId: number): Promise<ChatWithUserResponse> => {
+    const response = await api.get(`/v1/chat/with-user/${userId}`);
+    const d = response.data;
+    const mapInv = (inv: any) =>
+      inv
+        ? {
+            id: inv.id,
+            fromUserId: inv.from_user_id ?? inv.fromUserId,
+            toUserId: inv.to_user_id ?? inv.toUserId,
+            message: inv.message,
+            status: inv.status,
+            conversationId: inv.conversation_id ?? inv.conversationId,
+            createdAt: inv.created_at ?? inv.createdAt,
+            fromUser: inv.from_user ?? inv.fromUser,
+            toUser: inv.to_user ?? inv.toUser,
+          }
+        : undefined;
+    return {
+      conversation: d.conversation ? toCamelCase(d.conversation) : undefined,
+      pendingInvitationFromMe: mapInv(d.pending_invitation_from_me ?? d.pendingInvitationFromMe),
+      pendingInvitationFromThem: mapInv(d.pending_invitation_from_them ?? d.pendingInvitationFromThem),
+    };
   },
 
   /**

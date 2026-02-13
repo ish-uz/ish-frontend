@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { 
   User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp, MessageCircle
+  ChevronDown, ChevronUp, MessageCircle, Mail
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';
@@ -28,6 +28,7 @@ const navGroups: NavGroup[] = [
       { icon: Home, label: 'Dashboard', path: '/dashboard' },
       { icon: User, label: 'My Profile', path: '/profile' },
       { icon: MessageCircle, label: 'Messages', path: '/chat' },
+      { icon: Mail, label: 'Invitations', path: '/invitations' },
       { icon: Users, label: 'Employees', path: '/employees' },
     ],
     defaultOpen: true,
@@ -74,10 +75,34 @@ export function DashboardLayout() {
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     new Set(navGroups.filter(g => g.defaultOpen).map(g => g.label))
   );
+  const [messageUnreadCount, setMessageUnreadCount] = useState(0);
+
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const stats = await profileService.getDashboardStats();
+      setMessageUnreadCount(stats.notifications ?? 0);
+    } catch {
+      // ignore: user may be logged out or stats unavailable
+    }
+  }, []);
 
   useEffect(() => {
     loadProfile();
   }, []);
+
+  // Refetch when NOT on chat pages (initial load + when leaving Messages)
+  const isOnChatSection = location.pathname === '/chat' || location.pathname.startsWith('/chat/');
+  useEffect(() => {
+    if (isOnChatSection) return;
+    loadUnreadCount();
+  }, [location.pathname, isOnChatSection, loadUnreadCount]);
+
+  // Refetch when user opens a chat and marks as read (so badge updates immediately)
+  useEffect(() => {
+    const handler = () => loadUnreadCount();
+    window.addEventListener('ish:refresh-message-unread', handler);
+    return () => window.removeEventListener('ish:refresh-message-unread', handler);
+  }, [loadUnreadCount]);
 
   const loadProfile = async () => {
     try {
@@ -279,12 +304,15 @@ export function DashboardLayout() {
                 {isGroupOpen && (
                   <div className="space-y-1">
                     {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = isActiveRoute(item.path);
+                      const displayItem = item.path === '/chat'
+                        ? { ...item, badge: messageUnreadCount > 0 ? messageUnreadCount : undefined }
+                        : item;
+                      const Icon = displayItem.icon;
+                      const isActive = isActiveRoute(displayItem.path);
                       return (
                         <Link
-                          key={item.path}
-                          to={item.path}
+                          key={displayItem.path}
+                          to={displayItem.path}
                           onClick={() => setMobileMenuOpen(false)}
                           className={`
                             flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all
@@ -294,15 +322,15 @@ export function DashboardLayout() {
                             }
                             ${!sidebarOpen && 'justify-center'}
                           `}
-                          title={!sidebarOpen ? item.label : undefined}
+                          title={!sidebarOpen ? displayItem.label : undefined}
                         >
                           <Icon className="h-5 w-5 flex-shrink-0" />
                           {sidebarOpen && (
-                            <span className="font-medium">{item.label}</span>
+                            <span className="font-medium">{displayItem.label}</span>
                           )}
-                          {item.badge && sidebarOpen && (
-                            <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                              {item.badge}
+                          {displayItem.badge != null && displayItem.badge > 0 && sidebarOpen && (
+                            <span className="ml-auto bg-red-500 text-white text-xs min-w-[1.25rem] px-2 py-0.5 rounded-full text-center">
+                              {displayItem.badge > 99 ? '99+' : displayItem.badge}
                             </span>
                           )}
                         </Link>

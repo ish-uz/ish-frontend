@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { userService } from '../services/userService';
+import { invitationService } from '../services/invitationService';
+import { chatService } from '@/features/chat/services/chatService';
 import { User } from '@/types';
+import { ChatWithUserResponse } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
-import { User as UserIcon, Mail, Phone, Filter, Briefcase, Code, X } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, Filter, Briefcase, Code, X, MessageCircle } from 'lucide-react';
 
 export function EmployeesPage() {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,6 +18,14 @@ export function EmployeesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 20;
+
+  // Message / invite modal
+  const [messageModalUser, setMessageModalUser] = useState<User | null>(null);
+  const [chatStatus, setChatStatus] = useState<ChatWithUserResponse | null>(null);
+  const [messageModalLoading, setMessageModalLoading] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState('');
+  const [inviteSending, setInviteSending] = useState(false);
+  const [inviteError, setInviteError] = useState<string | null>(null);
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -55,6 +67,91 @@ export function EmployeesPage() {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleAddSkill();
+    }
+  };
+
+  const openMessageModal = async (user: User) => {
+    setMessageModalUser(user);
+    setChatStatus(null);
+    setInviteMessage('');
+    setInviteError(null);
+    setMessageModalLoading(true);
+    try {
+      const status = await chatService.getChatWithUser(user.id);
+      setChatStatus(status);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.detail || 'Failed to load');
+    } finally {
+      setMessageModalLoading(false);
+    }
+  };
+
+  const closeMessageModal = () => {
+    setMessageModalUser(null);
+    setChatStatus(null);
+    setInviteMessage('');
+    setInviteError(null);
+  };
+
+  const handleSendInvitation = async () => {
+    if (!messageModalUser) return;
+    setInviteSending(true);
+    setInviteError(null);
+    try {
+      await invitationService.create(messageModalUser.id, inviteMessage.trim() || undefined);
+      setChatStatus((prev) => ({
+        ...prev!,
+        pendingInvitationFromMe: {
+          id: 0,
+          fromUserId: 0,
+          toUserId: messageModalUser.id,
+          message: inviteMessage.trim() || undefined,
+          status: 'pending',
+          createdAt: new Date().toISOString(),
+        },
+      }));
+    } catch (err: any) {
+      setInviteError(err.response?.data?.detail || 'Failed to send invitation');
+    } finally {
+      setInviteSending(false);
+    }
+  };
+
+  const handleAcceptInvitation = async (invitationId: number) => {
+    setInviteSending(true);
+    setInviteError(null);
+    try {
+      const inv = await invitationService.accept(invitationId);
+      if (inv.conversationId) {
+        closeMessageModal();
+        navigate(`/chat/${inv.conversationId}`);
+      } else {
+        setChatStatus((prev) => prev ? { ...prev, conversation: undefined, pendingInvitationFromThem: undefined } : null);
+      }
+    } catch (err: any) {
+      setInviteError(err.response?.data?.detail || 'Failed to accept');
+    } finally {
+      setInviteSending(false);
+    }
+  };
+
+  const handleRejectInvitation = async (invitationId: number) => {
+    setInviteSending(true);
+    setInviteError(null);
+    try {
+      await invitationService.reject(invitationId);
+      setChatStatus((prev) => prev ? { ...prev, pendingInvitationFromThem: undefined } : null);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.detail || 'Failed to reject');
+    } finally {
+      setInviteSending(false);
+    }
+  };
+
+  const handleOpenChat = () => {
+    if (chatStatus?.conversation?.id) {
+      closeMessageModal();
+      navigate(`/chat/${chatStatus.conversation.id}`);
     }
   };
 
@@ -215,14 +312,107 @@ export function EmployeesPage() {
                   )}
                 </div>
 
-                <Link
-                  to={`/profile/${user.id}`}
-                  className="w-full inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  View Profile
-                </Link>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openMessageModal(user)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Message
+                  </button>
+                  <Link
+                    to={`/profile/${user.id}`}
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    View Profile
+                  </Link>
+                </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Message / Invite modal */}
+        {messageModalUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={closeMessageModal}>
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Message {messageModalUser.firstName} {messageModalUser.lastName}
+                </h3>
+                <button type="button" onClick={closeMessageModal} className="text-gray-400 hover:text-gray-600">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              {messageModalLoading ? (
+                <p className="text-gray-500 py-4">Loading...</p>
+              ) : inviteError ? (
+                <p className="text-red-600 py-2">{inviteError}</p>
+              ) : chatStatus?.conversation ? (
+                <div>
+                  <p className="text-gray-600 mb-4">You already have a chat with this person.</p>
+                  <button
+                    type="button"
+                    onClick={handleOpenChat}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  >
+                    Open chat
+                  </button>
+                </div>
+              ) : chatStatus?.pendingInvitationFromThem ? (
+                <div>
+                  <p className="text-gray-600 mb-4">They sent you a chat invitation. Accept to start chatting.</p>
+                  {chatStatus.pendingInvitationFromThem.message && (
+                    <p className="text-sm text-gray-500 mb-3 italic">&ldquo;{chatStatus.pendingInvitationFromThem.message}&rdquo;</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleAcceptInvitation(chatStatus.pendingInvitationFromThem!.id)}
+                      disabled={inviteSending}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                    >
+                      {inviteSending ? '...' : 'Accept'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRejectInvitation(chatStatus.pendingInvitationFromThem!.id)}
+                      disabled={inviteSending}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium disabled:opacity-50"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ) : chatStatus?.pendingInvitationFromMe ? (
+                <p className="text-gray-600">Your invitation has been sent. They can accept it to open a chat.</p>
+              ) : (
+                <div>
+                  <p className="text-gray-600 mb-3">Send an invitation to start a chat. They will need to accept before you can message.</p>
+                  <textarea
+                    value={inviteMessage}
+                    onChange={(e) => setInviteMessage(e.target.value)}
+                    placeholder="Optional message (e.g. why you're reaching out)"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSendInvitation}
+                      disabled={inviteSending}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                    >
+                      {inviteSending ? 'Sending...' : 'Send invitation'}
+                    </button>
+                    <button type="button" onClick={closeMessageModal} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
