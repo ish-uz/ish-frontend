@@ -1,50 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, Shield, Star, FileText, Lock, Zap } from 'lucide-react';
 
+const trustFeatureKeys = [
+  { icon: CheckCircle, titleKey: 'verifiedAccounts' as const, descKey: 'verifiedDesc' as const, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+  { icon: Shield, titleKey: 'noFakeJobs' as const, descKey: 'noFakeDesc' as const, color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+  { icon: Star, titleKey: 'reviews' as const, descKey: 'reviewsDesc' as const, color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+  { icon: FileText, titleKey: 'realProfiles' as const, descKey: 'realProfilesDesc' as const, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+  { icon: Lock, titleKey: 'security' as const, descKey: 'securityDesc' as const, color: 'text-red-600', bgColor: 'bg-red-50' },
+  { icon: Zap, titleKey: 'fastResponse' as const, descKey: 'fastResponseDesc' as const, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+];
+
 export function TrustSection() {
-  const features = [
-    {
-      icon: CheckCircle,
-      title: 'Tasdiqlangan akkauntlar',
-      description: 'Barcha foydalanuvchilar va kompaniyalar qo\'shimcha tekshiruvdan o\'tadi',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      icon: Shield,
-      title: "Soxta ishlar yo'q",
-      description: 'Har bir vakansiya avtomatik tekshiriladi. Faqat haqiqiy va tasdiqlangan ishlar',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
-    },
-    {
-      icon: Star,
-      title: 'Reyting va sharhlar',
-      description: 'Har bir ish beruvchi va xodim baholanadi. Shaffof va adolatli tizim',
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
-    },
-    {
-      icon: FileText,
-      title: 'Haqiqiy profillar',
-      description: 'To\'liq ma\'lumotlar, tajriba va portfolio. Hech qanday yolg\'on ma\'lumotlar',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      icon: Lock,
-      title: 'Xavfsizlik',
-      description: 'Barcha ma\'lumotlar shifrlangan. Maxfiylik kafolatlangan',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-    },
-    {
-      icon: Zap,
-      title: 'Tezkor javob',
-      description: 'O\'rtacha 2 soat ichida javob oling. Tezkor aloqa va suhbatlar',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-    },
-  ];
+  const { t } = useTranslation();
 
   return (
     <section className="py-12 bg-gradient-to-b from-gray-50 to-white">
@@ -52,21 +19,21 @@ export function TrustSection() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-xs text-blue-700 font-medium mb-4">
             <Shield className="h-3 w-3" />
-            <span>Ishonchli platforma</span>
+            <span>{t('landing.trust.trustedPlatform')}</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-            Nega ISH ishonchli?
+            {t('landing.trust.whyTrust')}
           </h2>
           <p className="text-base text-gray-600 max-w-2xl mx-auto">
-            Biz O'zbekistondagi eng xavfsiz va ishonchli ish topish platformasini yaratdik.
+            {t('landing.trust.whyTrustDesc')}
             <span className="block mt-1 text-sm text-gray-500">
-              Har bir qadamda sizning xavfsizligingiz va muvaffaqiyatingiz bizning ustuvor vazifamiz.
+              {t('landing.trust.whyTrustDesc2')}
             </span>
           </p>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {features.map((feature, index) => {
+          {trustFeatureKeys.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
@@ -79,10 +46,10 @@ export function TrustSection() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-base font-bold text-gray-900 mb-1">
-                      {feature.title}
+                      {t(`landing.trust.${feature.titleKey}`)}
                     </h3>
                     <p className="text-gray-600 text-xs leading-relaxed">
-                      {feature.description}
+                      {t(`landing.trust.${feature.descKey}`)}
                     </p>
                   </div>
                 </div>

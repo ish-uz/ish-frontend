@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search, Briefcase, Users, Wrench, LogIn, UserPlus, Menu, X, User, LogOut } from 'lucide-react';
 import { userService } from '@/features/users/services/userService';
 import { User as UserType } from '@/types';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Header() {
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [, setCurrentUser] = useState<UserType | null>(null);
@@ -74,7 +77,7 @@ export function Header() {
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-bold text-gray-900">ISH</span>
               <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
-                va mutaxassislar shu yerda
+                {t('nav.tagline')}
               </span>
             </div>
           </Link>
@@ -86,33 +89,34 @@ export function Header() {
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Search className="h-4 w-4" />
-              <span>Qidiruv</span>
+              <span>{t('nav.search')}</span>
             </Link>
             <Link
               to="/jobs"
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Briefcase className="h-4 w-4" />
-              <span>Ish qidirish</span>
+              <span>{t('nav.findJob')}</span>
             </Link>
             <Link
               to="/employees"
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Users className="h-4 w-4" />
-              <span>Xodimlar</span>
+              <span>{t('nav.employees')}</span>
             </Link>
             <Link
               to="/freelancers"
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Wrench className="h-4 w-4" />
-              <span>Freelancerlar</span>
+              <span>{t('nav.freelancers')}</span>
             </Link>
           </nav>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop: Language + Auth */}
           <div className="hidden md:flex items-center space-x-3">
+            <LanguageSwitcher />
             {loading ? (
               <div className="h-10 w-20 bg-gray-100 rounded animate-pulse"></div>
             ) : isAuthenticated ? (
@@ -122,14 +126,14 @@ export function Header() {
                   className="flex items-center space-x-1 px-4 py-2 text-gray-700 hover:text-[#0A66C2] transition-colors"
                 >
                   <User className="h-4 w-4" />
-                  <span>Dashboard</span>
+                  <span>{t('nav.dashboard')}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-1 px-4 py-2 text-gray-700 hover:text-red-600 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Chiqish</span>
+                  <span>{t('nav.logout')}</span>
                 </button>
               </>
             ) : (
@@ -139,14 +143,14 @@ export function Header() {
                   className="flex items-center space-x-1 px-4 py-2 text-gray-700 hover:text-[#0A66C2] transition-colors"
                 >
                   <LogIn className="h-4 w-4" />
-                  <span>Kirish</span>
+                  <span>{t('nav.login')}</span>
                 </Link>
                 <Link
                   to="/register"
                   className="flex items-center space-x-1 rounded-full bg-[#0A66C2] px-4 py-2 text-white hover:bg-[#004182] transition-colors"
                 >
                   <UserPlus className="h-4 w-4" />
-                  <span>Ro'yxatdan o'tish</span>
+                  <span>{t('nav.register')}</span>
                 </Link>
               </>
             )}
@@ -157,7 +161,7 @@ export function Header() {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-gray-700 hover:text-[#0A66C2] transition-colors"
-            aria-label="Menu"
+            aria-label={t('common.menu')}
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
@@ -178,7 +182,7 @@ export function Header() {
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Search className="h-4 w-4" />
-                <span>Qidiruv</span>
+                <span>{t('nav.search')}</span>
               </Link>
               <Link
                 to="/jobs"
@@ -186,7 +190,7 @@ export function Header() {
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Briefcase className="h-4 w-4" />
-                <span>Ish qidirish</span>
+                <span>{t('nav.findJob')}</span>
               </Link>
               <Link
                 to="/employees"
@@ -194,7 +198,7 @@ export function Header() {
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Users className="h-4 w-4" />
-                <span>Xodimlar</span>
+                <span>{t('nav.employees')}</span>
               </Link>
               <Link
                 to="/freelancers"
@@ -202,9 +206,10 @@ export function Header() {
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <Wrench className="h-4 w-4" />
-                <span>Freelancerlar</span>
+                <span>{t('nav.freelancers')}</span>
               </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+            <LanguageSwitcher className="px-4 py-2 md:hidden" />
                 {loading ? (
                   <div className="h-10 bg-gray-100 rounded animate-pulse"></div>
                 ) : isAuthenticated ? (
@@ -215,7 +220,7 @@ export function Header() {
                       className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <User className="h-4 w-4" />
-                      <span>Dashboard</span>
+                      <span>{t('nav.dashboard')}</span>
                     </Link>
                     <button
                       onClick={() => {
@@ -225,7 +230,7 @@ export function Header() {
                       className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>Chiqish</span>
+                      <span>{t('nav.logout')}</span>
                     </button>
                   </>
                 ) : (
@@ -236,7 +241,7 @@ export function Header() {
                       className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
                     >
                       <LogIn className="h-4 w-4" />
-                      <span>Kirish</span>
+                      <span>{t('nav.login')}</span>
                     </Link>
                     <Link
                       to="/register"
@@ -244,7 +249,7 @@ export function Header() {
                       className="flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-colors"
                     >
                       <UserPlus className="h-4 w-4" />
-                      <span>Ro'yxatdan o'tish</span>
+                      <span>{t('nav.register')}</span>
                     </Link>
                   </>
                 )}

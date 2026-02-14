@@ -1,12 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { Users, Building2, Briefcase, TrendingUp, Clock, Award } from 'lucide-react';
 
 export function StatsSection() {
+  const { t } = useTranslation();
   const stats = [
     {
       icon: Users,
       number: '120,000+',
-      label: 'ish qidiruvchi',
-      sublabel: 'Har oy 5,000+ yangi',
+      labelKey: 'jobSeekers' as const,
+      sublabelKey: 'jobSeekersSub' as const,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
       trend: '+12%',
@@ -14,8 +16,8 @@ export function StatsSection() {
     {
       icon: Building2,
       number: '8,000+',
-      label: 'kompaniya',
-      sublabel: 'Tasdiqlangan',
+      labelKey: 'companies' as const,
+      sublabelKey: 'companiesSub' as const,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
       trend: '+8%',
@@ -23,8 +25,8 @@ export function StatsSection() {
     {
       icon: Briefcase,
       number: '35,000+',
-      label: 'ish joylari',
-      sublabel: 'Faol vakansiyalar',
+      labelKey: 'jobs' as const,
+      sublabelKey: 'jobsSub' as const,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
       trend: '+15%',
@@ -39,10 +41,10 @@ export function StatsSection() {
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            ISH raqamlarda
+            {t('landing.stats.title')}
           </h2>
           <p className="text-base text-gray-600">
-            O'zbekistondagi eng tez o'sib borayotgan ish topish platformasi
+            {t('landing.stats.subtitle')}
           </p>
         </div>
 
@@ -70,11 +72,11 @@ export function StatsSection() {
                   {stat.number}
                 </div>
                 <div className="text-base font-semibold text-gray-900 mb-1">
-                  {stat.label}
+                  {t(`landing.stats.${stat.labelKey}`)}
                 </div>
                 <div className="text-xs text-gray-500 flex items-center gap-1">
                   <Clock className="h-2.5 w-2.5" />
-                  {stat.sublabel}
+                  {t(`landing.stats.${stat.sublabelKey}`)}
                 </div>
               </div>
             );
@@ -87,7 +89,7 @@ export function StatsSection() {
             <Award className="h-5 w-5 text-yellow-500" />
             <div>
               <div className="font-semibold text-gray-900 text-sm">4.8/5</div>
-              <div className="text-xs text-gray-600">Foydalanuvchilar reytingi</div>
+              <div className="text-xs text-gray-600">{t('landing.stats.rating')}</div>
             </div>
           </div>
           <div className="h-8 w-px bg-gray-200" />
@@ -95,7 +97,7 @@ export function StatsSection() {
             <Users className="h-5 w-5 text-blue-500" />
             <div>
               <div className="font-semibold text-gray-900 text-sm">98%</div>
-              <div className="text-xs text-gray-600">Mamnun foydalanuvchilar</div>
+              <div className="text-xs text-gray-600">{t('landing.stats.satisfied')}</div>
             </div>
           </div>
           <div className="h-8 w-px bg-gray-200" />
@@ -103,7 +105,7 @@ export function StatsSection() {
             <TrendingUp className="h-5 w-5 text-green-500" />
             <div>
               <div className="font-semibold text-gray-900 text-sm">24/7</div>
-              <div className="text-xs text-gray-600">Qo'llab-quvvatlash</div>
+              <div className="text-xs text-gray-600">{t('landing.stats.support')}</div>
             </div>
           </div>
         </div>

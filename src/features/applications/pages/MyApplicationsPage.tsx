@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FileText, MapPin, Calendar, Building2, Clock, CheckCircle2,
   XCircle, Eye, AlertCircle, Briefcase, Trash2
@@ -8,6 +9,7 @@ import { applicationService } from '../services/applicationService';
 import { Application } from '@/types';
 
 export function MyApplicationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ export function MyApplicationsPage() {
       if (err.response?.status === 401) {
         navigate('/login');
       } else {
-        setError(err.response?.data?.detail || 'Failed to load applications');
+        setError(err.response?.data?.detail || t('pages.myApplications.failedToLoad'));
       }
     } finally {
       setLoading(false);
@@ -34,13 +36,13 @@ export function MyApplicationsPage() {
   };
 
   const handleWithdraw = async (id: number) => {
-    if (!confirm('Are you sure you want to withdraw this application?')) return;
+    if (!confirm(t('pages.myApplications.confirmWithdraw'))) return;
     
     try {
       await applicationService.withdrawApplication(id);
       setApplications(applications.filter(app => app.id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to withdraw application');
+      setError(err.response?.data?.detail || t('pages.myApplications.failedToWithdraw'));
     }
   };
 
@@ -81,10 +83,10 @@ export function MyApplicationsPage() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: 'Pending Review',
-      reviewed: 'Under Review',
-      accepted: 'Accepted',
-      rejected: 'Not Selected',
+      pending: t('pages.myApplications.statusPending'),
+      reviewed: t('pages.myApplications.statusReviewed'),
+      accepted: t('pages.myApplications.statusAccepted'),
+      rejected: t('pages.myApplications.statusRejected'),
     };
     return labels[status] || status;
   };
@@ -114,10 +116,10 @@ export function MyApplicationsPage() {
         <div className="mb-6">
           <div className="flex items-center space-x-3 mb-2">
             <FileText className="h-7 w-7 lg:h-8 lg:w-8 text-blue-600" />
-            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">My Applications</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">{t('pages.myApplications.title')}</h1>
           </div>
           <p className="text-slate-600 text-sm lg:text-base">
-            Track the status of your job applications
+            {t('pages.myApplications.subtitle')}
           </p>
         </div>
 
@@ -133,16 +135,16 @@ export function MyApplicationsPage() {
         {applications.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 lg:p-12 text-center">
             <Briefcase className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No applications yet</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">{t('pages.myApplications.noApplications')}</h3>
             <p className="text-slate-600 mb-6">
-              Start applying to jobs to see your applications here
+              {t('pages.myApplications.noApplicationsDesc')}
             </p>
             <Link
               to="/jobs"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
             >
               <Briefcase className="h-5 w-5" />
-              Browse Jobs
+              {t('pages.myApplications.browseJobs')}
             </Link>
           </div>
         ) : (
@@ -180,7 +182,7 @@ export function MyApplicationsPage() {
                             )}
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              Applied {formatDate(application.createdAt)}
+                              {t('pages.myApplications.applied')} {formatDate(application.createdAt)}
                             </span>
                           </div>
                         </div>
@@ -200,7 +202,7 @@ export function MyApplicationsPage() {
                           className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
-                          Withdraw
+                          {t('pages.myApplications.withdraw')}
                         </button>
                       )}
                     </div>
@@ -209,7 +211,7 @@ export function MyApplicationsPage() {
                   {/* Cover Letter Preview */}
                   {application.coverLetter && (
                     <div className="mt-4 pt-4 border-t border-slate-100">
-                      <p className="text-sm text-slate-500 mb-1">Your cover letter:</p>
+                      <p className="text-sm text-slate-500 mb-1">{t('pages.myApplications.coverLetter')}</p>
                       <p className="text-sm text-slate-700 line-clamp-2">
                         {application.coverLetter}
                       </p>
@@ -226,25 +228,25 @@ export function MyApplicationsPage() {
           <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-slate-900">{applications.length}</p>
-              <p className="text-sm text-slate-500">Total Applied</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.totalApplied')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-amber-600">
                 {applications.filter(a => a.status === 'pending').length}
               </p>
-              <p className="text-sm text-slate-500">Pending</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusPending')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-blue-600">
                 {applications.filter(a => a.status === 'reviewed').length}
               </p>
-              <p className="text-sm text-slate-500">Under Review</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusReviewed')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-green-600">
                 {applications.filter(a => a.status === 'accepted').length}
               </p>
-              <p className="text-sm text-slate-500">Accepted</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusAccepted')}</p>
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { userService } from '../services/userService';
 import { invitationService } from '../services/invitationService';
 import { chatService } from '@/features/chat/services/chatService';
@@ -9,6 +10,7 @@ import { Pagination } from '@/components/ui/Pagination';
 import { User as UserIcon, Mail, Phone, Filter, Briefcase, Code, X, MessageCircle } from 'lucide-react';
 
 export function EmployeesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,7 @@ export function EmployeesPage() {
       setEmployees(result.users);
       setTotalItems(result.total);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load employees');
+      setError(err.response?.data?.detail || t('pages.employees.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export function EmployeesPage() {
       const status = await chatService.getChatWithUser(user.id);
       setChatStatus(status);
     } catch (err: any) {
-      setInviteError(err.response?.data?.detail || 'Failed to load');
+      setInviteError(err.response?.data?.detail || t('pages.employees.failedToLoad'));
     } finally {
       setMessageModalLoading(false);
     }
@@ -111,7 +113,7 @@ export function EmployeesPage() {
         },
       }));
     } catch (err: any) {
-      setInviteError(err.response?.data?.detail || 'Failed to send invitation');
+      setInviteError(err.response?.data?.detail || t('pages.employees.failedToSendInvite'));
     } finally {
       setInviteSending(false);
     }
@@ -160,7 +162,7 @@ export function EmployeesPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading employees...</p>
+          <p className="mt-4 text-gray-600">{t('pages.employees.loading')}</p>
         </div>
       </div>
     );
@@ -175,7 +177,7 @@ export function EmployeesPage() {
             onClick={loadEmployees}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Retry
+            {t('pages.jobs.retry')}
           </button>
         </div>
       </div>
@@ -189,10 +191,10 @@ export function EmployeesPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <Briefcase className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Talented Professionals</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('pages.employees.titleAlt')}</h1>
           </div>
           <p className="text-gray-600">
-            Find talented professionals who are open to work
+            {t('pages.employees.subtitleAlt')}
           </p>
         </div>
 
@@ -203,7 +205,7 @@ export function EmployeesPage() {
             <div className="flex items-center space-x-2">
               <Filter className="h-5 w-5 text-gray-400" />
               <span className="text-sm text-gray-600">
-                {totalItems} {totalItems === 1 ? 'professional' : 'professionals'} found
+                {totalItems} {totalItems === 1 ? t('pages.employees.professionalFound') : t('pages.employees.professionalsFound')}
               </span>
             </div>
           </div>
@@ -212,7 +214,7 @@ export function EmployeesPage() {
           <div className="border-t border-gray-200 pt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               <Code className="h-4 w-4 inline mr-1" />
-              Filter by Skills
+              {t('pages.employees.filterBySkills')}
             </label>
             <div className="flex flex-wrap gap-2 mb-2">
               {selectedSkills.map((skill) => (
@@ -236,14 +238,14 @@ export function EmployeesPage() {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Enter a skill (e.g., Python, React, SQL)..."
+                placeholder={t('pages.employees.skillPlaceholder')}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button
                 onClick={handleAddSkill}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
-                Add
+                {t('pages.employees.add')}
               </button>
             </div>
             {selectedSkills.length > 0 && (
@@ -251,7 +253,7 @@ export function EmployeesPage() {
                 onClick={() => setSelectedSkills([])}
                 className="mt-2 text-sm text-gray-600 hover:text-gray-800 underline"
               >
-                Clear all skills
+                {t('pages.employees.clearAllSkills')}
               </button>
             )}
           </div>
@@ -262,10 +264,10 @@ export function EmployeesPage() {
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <UserIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No employees found
+              {t('pages.employees.noResults')}
             </h3>
             <p className="text-gray-500">
-              There are no employees available at the moment.
+              {t('pages.employees.noResultsDesc')}
             </p>
           </div>
         ) : (
@@ -292,7 +294,7 @@ export function EmployeesPage() {
                       {user.firstName} {user.lastName}
                     </h3>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
-                      Open To Work
+                      {t('pages.employees.openToWork')}
                     </span>
                   </div>
                 </div>
@@ -319,13 +321,13 @@ export function EmployeesPage() {
                     className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    Message
+                    {t('pages.employees.message')}
                   </button>
                   <Link
                     to={`/profile/${user.id}`}
                     className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                   >
-                    View Profile
+                    {t('pages.employees.viewProfile')}
                   </Link>
                 </div>
               </div>
@@ -339,30 +341,30 @@ export function EmployeesPage() {
             <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Message {messageModalUser.firstName} {messageModalUser.lastName}
+                  {t('pages.employees.messageTitle', { name: `${messageModalUser.firstName} ${messageModalUser.lastName}` })}
                 </h3>
                 <button type="button" onClick={closeMessageModal} className="text-gray-400 hover:text-gray-600">
                   <X className="h-5 w-5" />
                 </button>
               </div>
               {messageModalLoading ? (
-                <p className="text-gray-500 py-4">Loading...</p>
+                <p className="text-gray-500 py-4">{t('pages.employees.loadingShort')}</p>
               ) : inviteError ? (
                 <p className="text-red-600 py-2">{inviteError}</p>
               ) : chatStatus?.conversation ? (
                 <div>
-                  <p className="text-gray-600 mb-4">You already have a chat with this person.</p>
+                  <p className="text-gray-600 mb-4">{t('pages.employees.alreadyHaveChat')}</p>
                   <button
                     type="button"
                     onClick={handleOpenChat}
                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                   >
-                    Open chat
+                    {t('pages.employees.openChat')}
                   </button>
                 </div>
               ) : chatStatus?.pendingInvitationFromThem ? (
                 <div>
-                  <p className="text-gray-600 mb-4">They sent you a chat invitation. Accept to start chatting.</p>
+                  <p className="text-gray-600 mb-4">{t('pages.employees.theySentInvitation')}</p>
                   {chatStatus.pendingInvitationFromThem.message && (
                     <p className="text-sm text-gray-500 mb-3 italic">&ldquo;{chatStatus.pendingInvitationFromThem.message}&rdquo;</p>
                   )}
@@ -373,7 +375,7 @@ export function EmployeesPage() {
                       disabled={inviteSending}
                       className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
                     >
-                      {inviteSending ? '...' : 'Accept'}
+                      {inviteSending ? '...' : t('pages.employees.accept')}
                     </button>
                     <button
                       type="button"
@@ -381,19 +383,19 @@ export function EmployeesPage() {
                       disabled={inviteSending}
                       className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium disabled:opacity-50"
                     >
-                      Reject
+                      {t('pages.employees.reject')}
                     </button>
                   </div>
                 </div>
               ) : chatStatus?.pendingInvitationFromMe ? (
-                <p className="text-gray-600">Your invitation has been sent. They can accept it to open a chat.</p>
+                <p className="text-gray-600">{t('pages.employees.invitationSent')}</p>
               ) : (
                 <div>
-                  <p className="text-gray-600 mb-3">Send an invitation to start a chat. They will need to accept before you can message.</p>
+                  <p className="text-gray-600 mb-3">{t('pages.employees.sendInvitationDesc')}</p>
                   <textarea
                     value={inviteMessage}
                     onChange={(e) => setInviteMessage(e.target.value)}
-                    placeholder="Optional message (e.g. why you're reaching out)"
+                    placeholder={t('pages.employees.optionalMessage')}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
                   />
@@ -404,10 +406,10 @@ export function EmployeesPage() {
                       disabled={inviteSending}
                       className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
                     >
-                      {inviteSending ? 'Sending...' : 'Send invitation'}
+                      {inviteSending ? t('pages.employees.sending') : t('pages.employees.sendInvite')}
                     </button>
                     <button type="button" onClick={closeMessageModal} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                      Cancel
+                      {t('pages.employees.cancel')}
                     </button>
                   </div>
                 </div>

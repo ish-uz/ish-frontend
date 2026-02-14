@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import { PhoneInput } from '../components/PhoneInput';
 import { authService } from '../services/authService';
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [phone, setPhone] = useState('+998 ');
   const [password, setPassword] = useState('');
@@ -19,11 +21,11 @@ export function LoginPage() {
     const newErrors: { phone?: string; password?: string } = {};
 
     if (!phone || phone.length < 15) {
-      newErrors.phone = "Telefon raqamini to'liq kiriting";
+      newErrors.phone = t('pages.auth.phoneRequired');
     }
 
     if (!password || password.length < 6) {
-      newErrors.password = "Parol kamida 6 ta belgi bo'lishi kerak";
+      newErrors.password = t('pages.auth.passwordMin');
     }
 
     setErrors(newErrors);
@@ -32,23 +34,16 @@ export function LoginPage() {
 
   const translateError = (errorMessage: string): string => {
     const errorLower = errorMessage.toLowerCase();
-    
-    // Common error translations
-    if (errorLower.includes('incorrect phone') || errorLower.includes('incorrect password')) {
-      return "Telefon raqami yoki parol noto'g'ri";
-    }
-    if (errorLower.includes('invalid') || errorLower.includes('incorrect')) {
-      return "Telefon raqami yoki parol noto'g'ri";
+    if (errorLower.includes('incorrect') || errorLower.includes('invalid')) {
+      return t('pages.auth.wrongCredentials');
     }
     if (errorLower.includes('not found')) {
-      return "Foydalanuvchi topilmadi";
+      return t('pages.auth.userNotFound');
     }
     if (errorLower.includes('unauthorized')) {
-      return "Kirish rad etildi. Iltimos, ma'lumotlaringizni tekshiring";
+      return t('pages.auth.unauthorized');
     }
-    
-    // Default message
-    return "Kirish muvaffaqiyatsiz. Iltimos, telefon raqami va parolni tekshiring";
+    return t('pages.auth.loginFailed');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +72,7 @@ export function LoginPage() {
       // After login, go to dashboard
       navigate('/dashboard');
     } catch (error: any) {
-      const rawErrorMessage = error.response?.data?.detail || 'Login failed. Please check your credentials.';
+      const rawErrorMessage = error.response?.data?.detail || t('pages.auth.loginFailed');
       const errorMessage = translateError(rawErrorMessage);
       
       // Show general error banner
@@ -103,14 +98,14 @@ export function LoginPage() {
             </div>
             <span className='text-2xl font-bold text-gray-900'>ISH</span>
           </Link>
-          <h2 className='text-3xl font-bold text-gray-900'>Kirish</h2>
+          <h2 className='text-3xl font-bold text-gray-900'>{t('pages.auth.login')}</h2>
           <p className='mt-2 text-sm text-gray-600'>
-            Yoki{' '}
+            {t('pages.auth.loginOrRegister')}{' '}
             <Link
               to='/register'
               className='font-medium text-[#0A66C2] hover:text-[#004182]'
             >
-              ro'yxatdan o'ting
+              {t('pages.auth.registerLink')}
             </Link>
           </p>
         </div>
@@ -124,9 +119,9 @@ export function LoginPage() {
               <div className='flex-1'>
                 <p className='text-sm font-medium text-red-800'>{generalError}</p>
                 <p className='text-xs text-red-600 mt-1'>
-                  Iltimos, telefon raqami va parolni tekshiring yoki{' '}
+                  {t('pages.auth.pleaseCheck')}{' '}
                   <Link to='/register' className='font-medium underline hover:text-red-800'>
-                    ro'yxatdan o'ting
+                    {t('pages.auth.registerLink')}
                   </Link>
                 </p>
               </div>
@@ -152,7 +147,7 @@ export function LoginPage() {
                 htmlFor='password'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Parol
+                {t('pages.auth.password')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -163,7 +158,7 @@ export function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder='Parolingizni kiriting'
+                  placeholder={t('pages.auth.passwordPlaceholder')}
                   className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.password
                       ? 'border-red-300 bg-red-50'
@@ -199,14 +194,14 @@ export function LoginPage() {
                   htmlFor='remember-me'
                   className='ml-2 block text-sm text-gray-700'
                 >
-                  Eslab qolish
+                  {t('pages.auth.rememberMe')}
                 </label>
               </div>
               <Link
                 to='/forgot-password'
                 className='text-sm font-medium text-[#0A66C2] hover:text-[#004182]'
               >
-                Parolni unutdingizmi?
+                {t('pages.auth.forgotPassword')}
               </Link>
             </div>
 
@@ -216,10 +211,10 @@ export function LoginPage() {
               className='w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0A66C2] text-white rounded-lg font-semibold hover:bg-[#004182] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isLoading ? (
-                <span>Kuting...</span>
+                <span>{t('pages.auth.loading')}</span>
               ) : (
                 <>
-                  <span>Kirish</span>
+                  <span>{t('pages.auth.signIn')}</span>
                   <ArrowRight className='h-5 w-5' />
                 </>
               )}
@@ -233,7 +228,7 @@ export function LoginPage() {
                 <div className='w-full border-t border-gray-300' />
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='px-2 bg-white text-gray-500'>Yoki</span>
+                <span className='px-2 bg-white text-gray-500'>{t('pages.auth.or')}</span>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { profileService } from '../services/profileService';
 import { Profile, Experience, Education } from '@/types';
 import { 
@@ -10,6 +11,7 @@ import {
 type TabType = 'basic' | 'skills' | 'experience' | 'education' | 'cv' | 'visibility';
 
 export function ProfileSettingsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -84,7 +86,7 @@ export function ProfileSettingsPage() {
       } else if (err.response?.status === 401) {
         navigate('/login');
       } else {
-        setError(err.response?.data?.detail || 'Failed to load profile');
+        setError(err.response?.data?.detail || t('pages.profileSettings.errors.failedLoad'));
       }
     } finally {
       setLoading(false);
@@ -97,10 +99,10 @@ export function ProfileSettingsPage() {
       setError(null);
       const updated = await profileService.updateProfile(basicData);
       setProfile(updated);
-      setSuccess('Basic information updated successfully!');
+      setSuccess(t('pages.profileSettings.basic.successBasic'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update profile');
+      setError(err.response?.data?.detail || t('pages.profileSettings.errors.failedUpdate'));
     } finally {
       setSaving(false);
     }
@@ -112,10 +114,10 @@ export function ProfileSettingsPage() {
       setError(null);
       const updated = await profileService.updateProfile({ skills });
       setProfile(updated);
-      setSuccess('Skills updated successfully!');
+      setSuccess(t('pages.profileSettings.skills.successSkills'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update skills');
+      setError(err.response?.data?.detail || t('pages.profileSettings.errors.failedSkills'));
     } finally {
       setSaving(false);
     }
@@ -127,10 +129,10 @@ export function ProfileSettingsPage() {
       setError(null);
       const updated = await profileService.updateProfile({ experience: experiences });
       setProfile(updated);
-      setSuccess('Work experience updated successfully!');
+      setSuccess(t('pages.profileSettings.experience.successExperience'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update experience');
+      setError(err.response?.data?.detail || t('pages.profileSettings.errors.failedExperience'));
     } finally {
       setSaving(false);
     }
@@ -142,10 +144,10 @@ export function ProfileSettingsPage() {
       setError(null);
       const updated = await profileService.updateProfile({ education: educations });
       setProfile(updated);
-      setSuccess('Education updated successfully!');
+      setSuccess(t('pages.profileSettings.education.successEducation'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update education');
+      setError(err.response?.data?.detail || t('pages.profileSettings.errors.failedEducation'));
     } finally {
       setSaving(false);
     }
@@ -209,12 +211,12 @@ export function ProfileSettingsPage() {
   };
 
   const tabs = [
-    { id: 'basic' as TabType, label: 'Basic Info', icon: User },
-    { id: 'skills' as TabType, label: 'Skills', icon: Briefcase },
-    { id: 'experience' as TabType, label: 'Experience', icon: Briefcase },
-    { id: 'education' as TabType, label: 'Education', icon: GraduationCap },
-    { id: 'cv' as TabType, label: 'CV', icon: FileText },
-    { id: 'visibility' as TabType, label: 'Visibility', icon: Eye },
+    { id: 'basic' as TabType, icon: User },
+    { id: 'skills' as TabType, icon: Briefcase },
+    { id: 'experience' as TabType, icon: Briefcase },
+    { id: 'education' as TabType, icon: GraduationCap },
+    { id: 'cv' as TabType, icon: FileText },
+    { id: 'visibility' as TabType, icon: Eye },
   ];
 
   const activeTabData = tabs.find(t => t.id === activeTab);
@@ -224,7 +226,7 @@ export function ProfileSettingsPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Loading profile...</p>
+          <p className="mt-4 text-slate-600">{t('pages.profileSettings.loading')}</p>
         </div>
       </div>
     );
@@ -239,7 +241,7 @@ export function ProfileSettingsPage() {
             onClick={loadProfile}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Retry
+            {t('pages.profileSettings.retry')}
           </button>
         </div>
       </div>
@@ -253,10 +255,10 @@ export function ProfileSettingsPage() {
         <div className="mb-6">
           <div className="flex items-center space-x-3 mb-2">
             <Settings className="h-7 w-7 lg:h-8 lg:w-8 text-blue-600" />
-            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">Profile Settings</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">{t('pages.profileSettings.title')}</h1>
           </div>
           <p className="text-slate-600 text-sm lg:text-base">
-            Manage your profile information and visibility settings
+            {t('pages.profileSettings.subtitle')}
           </p>
         </div>
 
@@ -291,12 +293,12 @@ export function ProfileSettingsPage() {
                 {profile.isComplete && (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                    Complete
+                    {t('pages.profileSettings.complete')}
                   </span>
                 )}
                 {profile.openToJobSeeker && (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Open To Work
+                    {t('pages.profileSettings.openToWork')}
                   </span>
                 )}
               </div>
@@ -314,7 +316,7 @@ export function ProfileSettingsPage() {
             >
               <div className="flex items-center space-x-2">
                 {activeTabData && <activeTabData.icon className="h-5 w-5 text-blue-600" />}
-                <span className="font-medium text-slate-900">{activeTabData?.label}</span>
+                <span className="font-medium text-slate-900">{activeTabData ? t(`pages.profileSettings.tabs.${activeTabData.id}`) : ''}</span>
               </div>
               <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${mobileTabsOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -339,7 +341,7 @@ export function ProfileSettingsPage() {
                       `}
                     >
                       <Icon className="h-5 w-5" />
-                      <span className="font-medium">{tab.label}</span>
+                      <span className="font-medium">{t(`pages.profileSettings.tabs.${tab.id}`)}</span>
                     </button>
                   );
                 })}
@@ -365,7 +367,7 @@ export function ProfileSettingsPage() {
                     `}
                   >
                     <Icon className="h-4 w-4" />
-                    <span>{tab.label}</span>
+                    <span>{t(`pages.profileSettings.tabs.${tab.id}`)}</span>
                   </button>
                 );
               })}
@@ -380,54 +382,54 @@ export function ProfileSettingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                      Full Name *
+                      {t('pages.profileSettings.basic.fullName')}
                     </label>
                     <input
                       type="text"
                       value={basicData.fullName}
                       onChange={(e) => setBasicData({ ...basicData, fullName: e.target.value })}
                       className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-base"
-                      placeholder="Your full name"
+                      placeholder={t('pages.profileSettings.basic.fullNamePlaceholder')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                      City *
+                      {t('pages.profileSettings.basic.city')}
                     </label>
                     <input
                       type="text"
                       value={basicData.city}
                       onChange={(e) => setBasicData({ ...basicData, city: e.target.value })}
                       className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-base"
-                      placeholder="Your city"
+                      placeholder={t('pages.profileSettings.basic.cityPlaceholder')}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Professional Title
+                    {t('pages.profileSettings.basic.professionalTitle')}
                   </label>
                   <input
                     type="text"
                     value={basicData.title}
                     onChange={(e) => setBasicData({ ...basicData, title: e.target.value })}
                     className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-base"
-                    placeholder="e.g., Senior Software Engineer"
+                    placeholder={t('pages.profileSettings.basic.titlePlaceholder')}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Bio
+                    {t('pages.profileSettings.basic.bio')}
                   </label>
                   <textarea
                     value={basicData.bio}
                     onChange={(e) => setBasicData({ ...basicData, bio: e.target.value })}
                     rows={4}
                     className="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm lg:text-base"
-                    placeholder="Tell us about yourself..."
+                    placeholder={t('pages.profileSettings.basic.bioPlaceholder')}
                   />
                   <p className="mt-1 text-xs text-slate-500">
-                    {basicData.bio.length} characters
+                    {t('pages.profileSettings.basic.characters', { count: basicData.bio.length })}
                   </p>
                 </div>
                 <button
@@ -436,7 +438,7 @@ export function ProfileSettingsPage() {
                   className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   <Save className="h-4 w-4" />
-                  <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+                  <span>{saving ? t('pages.profileSettings.basic.saving') : t('pages.profileSettings.basic.saveChanges')}</span>
                 </button>
               </div>
             )}
@@ -446,7 +448,7 @@ export function ProfileSettingsPage() {
               <div className="space-y-4 lg:space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Add Skill
+                    {t('pages.profileSettings.skills.addSkill')}
                   </label>
                   <div className="flex space-x-2">
                     <input
@@ -455,7 +457,7 @@ export function ProfileSettingsPage() {
                       onChange={(e) => setNewSkill(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && addSkill()}
                       className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm lg:text-base"
-                      placeholder="e.g., JavaScript, Python"
+                      placeholder={t('pages.profileSettings.skills.skillPlaceholder')}
                     />
                     <button
                       onClick={addSkill}
@@ -467,7 +469,7 @@ export function ProfileSettingsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Your Skills ({skills.length})
+                    {t('pages.profileSettings.skills.yourSkills', { count: skills.length })}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {skills.map((skill, index) => (
@@ -485,7 +487,7 @@ export function ProfileSettingsPage() {
                       </span>
                     ))}
                     {skills.length === 0 && (
-                      <p className="text-slate-500 text-sm">No skills added yet</p>
+                      <p className="text-slate-500 text-sm">{t('pages.profileSettings.skills.noSkills')}</p>
                     )}
                   </div>
                 </div>
@@ -495,7 +497,7 @@ export function ProfileSettingsPage() {
                   className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   <Save className="h-4 w-4" />
-                  <span>{saving ? 'Saving...' : 'Save Skills'}</span>
+                  <span>{saving ? t('pages.profileSettings.basic.saving') : t('pages.profileSettings.skills.saveSkills')}</span>
                 </button>
               </div>
             )}
@@ -504,13 +506,13 @@ export function ProfileSettingsPage() {
             {activeTab === 'experience' && (
               <div className="space-y-4 lg:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                  <h3 className="text-lg font-semibold text-slate-900">Work Experience</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">{t('pages.profileSettings.experience.workExperience')}</h3>
                   <button
                     onClick={addExperience}
                     className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Add Experience</span>
+                    <span>{t('pages.profileSettings.experience.addExperience')}</span>
                   </button>
                 </div>
                 <div className="space-y-4">
@@ -519,44 +521,44 @@ export function ProfileSettingsPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Job Title *
+                            {t('pages.profileSettings.experience.jobTitle')}
                           </label>
                           <input
                             type="text"
                             value={exp.title}
                             onChange={(e) => updateExperience(index, 'title', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="e.g., Software Engineer"
+                            placeholder={t('pages.profileSettings.experience.jobTitlePlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Company *
+                            {t('pages.profileSettings.experience.company')}
                           </label>
                           <input
                             type="text"
                             value={exp.company}
                             onChange={(e) => updateExperience(index, 'company', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="Company name"
+                            placeholder={t('pages.profileSettings.experience.companyPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Location
+                            {t('pages.profileSettings.experience.location')}
                           </label>
                           <input
                             type="text"
                             value={exp.location || ''}
                             onChange={(e) => updateExperience(index, 'location', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="City, Country"
+                            placeholder={t('pages.profileSettings.experience.locationPlaceholder')}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">
-                              Start *
+                              {t('pages.profileSettings.experience.start')}
                             </label>
                             <input
                               type="month"
@@ -567,7 +569,7 @@ export function ProfileSettingsPage() {
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">
-                              End
+                              {t('pages.profileSettings.experience.end')}
                             </label>
                             <input
                               type="month"
@@ -579,14 +581,14 @@ export function ProfileSettingsPage() {
                         </div>
                         <div className="sm:col-span-2">
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Description
+                            {t('pages.profileSettings.experience.description')}
                           </label>
                           <textarea
                             value={exp.description || ''}
                             onChange={(e) => updateExperience(index, 'description', e.target.value)}
                             rows={3}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-                            placeholder="Describe your responsibilities..."
+                            placeholder={t('pages.profileSettings.experience.descriptionPlaceholder')}
                           />
                         </div>
                       </div>
@@ -596,14 +598,14 @@ export function ProfileSettingsPage() {
                           className="flex items-center space-x-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm"
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span>Remove</span>
+                          <span>{t('pages.profileSettings.experience.remove')}</span>
                         </button>
                       </div>
                     </div>
                   ))}
                   {experiences.length === 0 && (
                     <p className="text-center text-slate-500 py-8 text-sm">
-                      No work experience added yet. Click "Add Experience" to get started.
+                      {t('pages.profileSettings.experience.noExperience')}
                     </p>
                   )}
                 </div>
@@ -614,7 +616,7 @@ export function ProfileSettingsPage() {
                     className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     <Save className="h-4 w-4" />
-                    <span>{saving ? 'Saving...' : 'Save Experience'}</span>
+                    <span>{saving ? t('pages.profileSettings.basic.saving') : t('pages.profileSettings.experience.saveExperience')}</span>
                   </button>
                 )}
               </div>
@@ -624,13 +626,13 @@ export function ProfileSettingsPage() {
             {activeTab === 'education' && (
               <div className="space-y-4 lg:space-y-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                  <h3 className="text-lg font-semibold text-slate-900">Education</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">{t('pages.profileSettings.education.title')}</h3>
                   <button
                     onClick={addEducation}
                     className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Add Education</span>
+                    <span>{t('pages.profileSettings.education.addEducation')}</span>
                   </button>
                 </div>
                 <div className="space-y-4">
@@ -639,44 +641,44 @@ export function ProfileSettingsPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            School/University *
+                            {t('pages.profileSettings.education.school')}
                           </label>
                           <input
                             type="text"
                             value={edu.school}
                             onChange={(e) => updateEducation(index, 'school', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="School name"
+                            placeholder={t('pages.profileSettings.education.schoolPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Degree *
+                            {t('pages.profileSettings.education.degree')}
                           </label>
                           <input
                             type="text"
                             value={edu.degree}
                             onChange={(e) => updateEducation(index, 'degree', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="e.g., Bachelor's"
+                            placeholder={t('pages.profileSettings.education.degreePlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-1">
-                            Field of Study
+                            {t('pages.profileSettings.education.fieldOfStudy')}
                           </label>
                           <input
                             type="text"
                             value={edu.field || ''}
                             onChange={(e) => updateEducation(index, 'field', e.target.value)}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="e.g., Computer Science"
+                            placeholder={t('pages.profileSettings.education.fieldPlaceholder')}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">
-                              Start *
+                              {t('pages.profileSettings.education.start')}
                             </label>
                             <input
                               type="month"
@@ -688,7 +690,7 @@ export function ProfileSettingsPage() {
                           {!edu.current && (
                             <div>
                               <label className="block text-sm font-medium text-slate-700 mb-1">
-                                End
+                                {t('pages.profileSettings.education.end')}
                               </label>
                               <input
                                 type="month"
@@ -716,7 +718,7 @@ export function ProfileSettingsPage() {
                               }}
                               className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                             />
-                            <span className="text-sm text-slate-700">Currently studying here</span>
+                            <span className="text-sm text-slate-700">{t('pages.profileSettings.education.currentlyStudying')}</span>
                           </label>
                         </div>
                       </div>
@@ -726,14 +728,14 @@ export function ProfileSettingsPage() {
                           className="flex items-center space-x-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg text-sm"
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span>Remove</span>
+                          <span>{t('pages.profileSettings.education.remove')}</span>
                         </button>
                       </div>
                     </div>
                   ))}
                   {educations.length === 0 && (
                     <p className="text-center text-slate-500 py-8 text-sm">
-                      No education added yet. Click "Add Education" to get started.
+                      {t('pages.profileSettings.education.noEducation')}
                     </p>
                   )}
                 </div>
@@ -744,7 +746,7 @@ export function ProfileSettingsPage() {
                     className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     <Save className="h-4 w-4" />
-                    <span>{saving ? 'Saving...' : 'Save Education'}</span>
+                    <span>{saving ? t('pages.profileSettings.basic.saving') : t('pages.profileSettings.education.saveEducation')}</span>
                   </button>
                 )}
               </div>
@@ -754,11 +756,11 @@ export function ProfileSettingsPage() {
             {activeTab === 'cv' && (
               <div className="space-y-4 lg:space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Upload Your CV</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">{t('pages.profileSettings.cv.uploadTitle')}</h3>
                   <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 lg:p-8 text-center">
                     <Upload className="h-10 w-10 lg:h-12 lg:w-12 text-slate-400 mx-auto mb-3" />
-                    <p className="text-slate-600 text-sm lg:text-base mb-1">Upload your CV (PDF, DOC, DOCX)</p>
-                    <p className="text-xs text-slate-500 mb-4">Max file size: 5MB</p>
+                    <p className="text-slate-600 text-sm lg:text-base mb-1">{t('pages.profileSettings.cv.uploadHint')}</p>
+                    <p className="text-xs text-slate-500 mb-4">{t('pages.profileSettings.cv.maxSize')}</p>
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx"
@@ -768,7 +770,7 @@ export function ProfileSettingsPage() {
                         const file = e.target.files?.[0];
                         if (file) {
                           if (file.size > 5 * 1024 * 1024) {
-                            setError('File size must be less than 5MB');
+                            setError(t('pages.profileSettings.cv.fileSizeError'));
                             return;
                           }
                           try {
@@ -776,10 +778,10 @@ export function ProfileSettingsPage() {
                             setError(null);
                             const updated = await profileService.uploadCV(file);
                             setProfile(updated);
-                            setSuccess('CV uploaded successfully!');
+                            setSuccess(t('pages.profileSettings.cv.successUpload'));
                             setTimeout(() => setSuccess(null), 3000);
                           } catch (err: any) {
-                            setError(err.response?.data?.detail || 'Failed to upload CV');
+                            setError(err.response?.data?.detail || t('pages.profileSettings.cv.failedUpload'));
                           } finally {
                             setSaving(false);
                             e.target.value = '';
@@ -795,7 +797,7 @@ export function ProfileSettingsPage() {
                       }`}
                     >
                       <Upload className="h-4 w-4" />
-                      <span>{saving ? 'Uploading...' : 'Choose File'}</span>
+                      <span>{saving ? t('pages.profileSettings.cv.uploading') : t('pages.profileSettings.cv.chooseFile')}</span>
                     </label>
                   </div>
                   {profile?.cvFile && (
@@ -804,22 +806,22 @@ export function ProfileSettingsPage() {
                         <div className="flex items-center space-x-2 min-w-0 flex-1">
                           <FileText className="h-5 w-5 text-green-600 flex-shrink-0" />
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-green-800">CV uploaded</p>
+                            <p className="text-sm font-medium text-green-800">{t('pages.profileSettings.cv.cvUploaded')}</p>
                             <p className="text-xs text-green-600 truncate">{profile.cvFile}</p>
                           </div>
                         </div>
                         <button
                           onClick={async () => {
-                            if (!confirm('Are you sure you want to delete your CV?')) return;
+                            if (!confirm(t('pages.profileSettings.cv.deleteConfirm'))) return;
                             try {
                               setSaving(true);
                               setError(null);
                               const updated = await profileService.deleteCV();
                               setProfile(updated);
-                              setSuccess('CV deleted successfully!');
-                              setTimeout(() => setSuccess(null), 3000);
+setSuccess(t('pages.profileSettings.cv.successDelete'));
+                            setTimeout(() => setSuccess(null), 3000);
                             } catch (err: any) {
-                              setError(err.response?.data?.detail || 'Failed to delete CV');
+                              setError(err.response?.data?.detail || t('pages.profileSettings.cv.failedDelete'));
                             } finally {
                               setSaving(false);
                             }
@@ -840,11 +842,11 @@ export function ProfileSettingsPage() {
             {activeTab === 'visibility' && profile && (
               <div className="space-y-4 lg:space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Profile Visibility</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">{t('pages.profileSettings.visibility.profileVisibility')}</h3>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 lg:p-6">
-                    <h4 className="font-semibold text-slate-900 mb-2">Open To Work</h4>
+                    <h4 className="font-semibold text-slate-900 mb-2">{t('pages.profileSettings.visibility.openToWork')}</h4>
                     <p className="text-sm text-slate-600 mb-4">
-                      Make your profile visible on the Employees page so employers can find you.
+                      {t('pages.profileSettings.visibility.openToWorkDesc')}
                     </p>
                     <label className="flex items-center space-x-3 cursor-pointer">
                       <input
@@ -854,16 +856,16 @@ export function ProfileSettingsPage() {
                           try {
                             const updated = await profileService.updateOpenToWork(e.target.checked);
                             setProfile(updated);
-                            setSuccess('Visibility settings updated!');
+                            setSuccess(t('pages.profileSettings.visibility.successVisibility'));
                             setTimeout(() => setSuccess(null), 3000);
                           } catch (err: any) {
-                            setError(err.response?.data?.detail || 'Failed to update visibility');
+                            setError(err.response?.data?.detail || t('pages.profileSettings.visibility.failedVisibility'));
                           }
                         }}
                         className="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                       />
                       <span className="text-sm font-medium text-slate-700">
-                        Show my profile on Employees page
+                        {t('pages.profileSettings.visibility.showOnEmployees')}
                       </span>
                     </label>
                   </div>

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { jobService } from '../services/jobService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
 import { BookmarkCheck, MapPin, DollarSign, Clock, Building2, Trash2 } from 'lucide-react';
 
 export function SavedJobsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export function SavedJobsPage() {
           ? errorDetail.map((e: any) => e.msg || JSON.stringify(e)).join(', ')
           : typeof errorDetail === 'string'
           ? errorDetail
-          : 'Failed to load saved jobs';
+          : t('pages.savedJobs.failedToLoad');
         setError(errorMessage);
       }
     } finally {
@@ -57,7 +59,7 @@ export function SavedJobsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading saved jobs...</p>
+          <p className="mt-4 text-gray-600">{t('pages.savedJobs.loading')}</p>
         </div>
       </div>
     );
@@ -72,7 +74,7 @@ export function SavedJobsPage() {
             onClick={loadSavedJobs}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Retry
+            {t('pages.jobs.retry')}
           </button>
         </div>
       </div>
@@ -86,10 +88,10 @@ export function SavedJobsPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <BookmarkCheck className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Saved Jobs</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('pages.savedJobs.title')}</h1>
           </div>
           <p className="text-gray-600">
-            Your saved job opportunities
+            {t('pages.savedJobs.subtitle')}
           </p>
         </div>
 
@@ -98,16 +100,16 @@ export function SavedJobsPage() {
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <BookmarkCheck className="mx-auto h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No saved jobs yet
+              {t('pages.savedJobs.noSaved')}
             </h3>
             <p className="text-gray-500 mb-4">
-              Start saving jobs you're interested in to view them later
+              {t('pages.savedJobs.noSavedDesc')}
             </p>
             <Link
               to="/jobs"
               className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Browse Jobs
+              {t('pages.savedJobs.browseJobs')}
             </Link>
           </div>
         ) : (
@@ -121,7 +123,7 @@ export function SavedJobsPage() {
                 <button
                   onClick={() => handleUnsave(job.id)}
                   className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  aria-label="Unsave job"
+                  aria-label={t('pages.savedJobs.unsave')}
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -135,14 +137,14 @@ export function SavedJobsPage() {
                       <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
                       <span className="truncate">
                         {job.company?.name || 
-                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : 'Company')}
+                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : t('pages.jobs.company'))}
                       </span>
                     </div>
                   </div>
                   {job.company?.logo && (
                     <img
                       src={job.company.logo}
-                      alt={job.company.name || 'Company'}
+                      alt={job.company.name || t('pages.jobs.company')}
                       className="h-12 w-12 rounded-lg object-cover ml-3 flex-shrink-0 border border-gray-200"
                     />
                   )}
@@ -160,8 +162,8 @@ export function SavedJobsPage() {
                         {job.salaryMin && job.salaryMax
                           ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}`
                           : job.salaryMin
-                          ? `From ${job.salaryMin.toLocaleString()}`
-                          : `Up to ${job.salaryMax?.toLocaleString()}`
+                          ? `${t('pages.jobDetails.from')} ${job.salaryMin.toLocaleString()}`
+                          : `${t('pages.jobDetails.upTo')} ${job.salaryMax?.toLocaleString()}`
                         }{' '}
                         {job.salaryCurrency}
                       </span>
@@ -179,7 +181,7 @@ export function SavedJobsPage() {
 
                 {job.requirements && job.requirements.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-gray-700 mb-2">Key Requirements:</p>
+                    <p className="text-xs font-medium text-gray-700 mb-2">{t('pages.jobs.keyRequirements')}</p>
                     <div className="flex flex-wrap gap-1">
                       {job.requirements.slice(0, 3).map((req, idx) => (
                         <span
@@ -191,7 +193,7 @@ export function SavedJobsPage() {
                       ))}
                       {job.requirements.length > 3 && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                          +{job.requirements.length - 3} more
+                          {t('pages.jobs.more', { count: job.requirements.length - 3 })}
                         </span>
                       )}
                     </div>
@@ -202,7 +204,7 @@ export function SavedJobsPage() {
                   to={`/jobs/${job.id}`}
                   className="w-full mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-center block"
                 >
-                  View Details
+                  {t('pages.jobs.viewDetails')}
                 </Link>
               </div>
             ))}

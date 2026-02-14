@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { User, MapPin, FileText, Upload, ArrowRight, X } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { userService } from '@/features/users/services/userService';
 
 export function ProfileSetupPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -63,7 +65,7 @@ export function ProfileSetupPage() {
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({
           ...prev,
-          avatar: "Rasm hajmi 5MB dan katta bo'lmasligi kerak",
+          avatar: t('pages.profileSetup.avatarSize'),
         }));
         return;
       }
@@ -84,17 +86,17 @@ export function ProfileSetupPage() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "To'liq ismingizni kiriting";
+      newErrors.fullName = t('pages.profileSetup.fullNameRequired');
     }
 
     if (!formData.city.trim()) {
-      newErrors.city = 'Shaharni tanlang yoki kiriting';
+      newErrors.city = t('pages.profileSetup.cityRequired');
     }
 
     if (!formData.bio.trim()) {
-      newErrors.bio = "Qisqa ma'lumot kiriting";
+      newErrors.bio = t('pages.profileSetup.bioRequired');
     } else if (formData.bio.trim().length < 20) {
-      newErrors.bio = 'Kamida 20 ta belgi kiriting';
+      newErrors.bio = t('pages.profileSetup.bioMin');
     }
 
     setErrors(newErrors);
@@ -118,7 +120,7 @@ export function ProfileSetupPage() {
       // After successful profile creation, redirect to profile settings
       navigate('/profile/settings');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Failed to create profile. Please try again.';
+      const errorMessage = error.response?.data?.detail || t('pages.profileSetup.createError');
       if (error.response?.status === 401) {
         // Not authenticated, redirect to login
         navigate('/login');
@@ -165,10 +167,10 @@ export function ProfileSetupPage() {
             <span className='text-2xl font-bold text-gray-900'>ISH</span>
           </div>
           <h2 className='text-3xl font-bold text-gray-900'>
-            Profilni to'ldiring
+            {t('pages.profileSetup.title')}
           </h2>
           <p className='mt-2 text-sm text-gray-600'>
-            Birinchi marta profilingizni to'ldiring va ish topishni boshlang
+            {t('pages.profileSetup.subtitle')}
           </p>
         </div>
 
@@ -178,7 +180,7 @@ export function ProfileSetupPage() {
             {/* Avatar Upload */}
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Profil rasmi
+                {t('pages.profileSetup.avatarLabel')}
               </label>
               <div className='flex items-center gap-6'>
                 <div className='relative'>
@@ -210,7 +212,7 @@ export function ProfileSetupPage() {
                   >
                     <Upload className='h-5 w-5 text-gray-400' />
                     <span className='text-sm font-medium text-gray-700'>
-                      Rasm yuklash
+                      {t('pages.profileSetup.uploadPhoto')}
                     </span>
                     <input
                       id='avatar'
@@ -221,7 +223,7 @@ export function ProfileSetupPage() {
                     />
                   </label>
                   <p className='mt-1 text-xs text-gray-500'>
-                    JPG, PNG yoki GIF (maks. 5MB)
+                    {t('pages.profileSetup.imageFormats')}
                   </p>
                   {errors.avatar && (
                     <p className='mt-1 text-sm text-red-600'>{errors.avatar}</p>
@@ -236,7 +238,7 @@ export function ProfileSetupPage() {
                 htmlFor='fullName'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                To'liq ism
+                {t('pages.profileSetup.fullName')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -247,7 +249,7 @@ export function ProfileSetupPage() {
                   type='text'
                   value={formData.fullName}
                   onChange={(e) => handleChange('fullName', e.target.value)}
-                  placeholder='Ism Familiya'
+                  placeholder={t('pages.profileSetup.fullNamePlaceholder')}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.fullName
                       ? 'border-red-300 bg-red-50'
@@ -266,7 +268,7 @@ export function ProfileSetupPage() {
                 htmlFor='city'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Shahar
+                {t('pages.profileSetup.city')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -278,7 +280,7 @@ export function ProfileSetupPage() {
                   list='cities'
                   value={formData.city}
                   onChange={(e) => handleChange('city', e.target.value)}
-                  placeholder='Shaharni tanlang yoki kiriting'
+                  placeholder={t('pages.profileSetup.cityPlaceholder')}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.city
                       ? 'border-red-300 bg-red-50'
@@ -302,7 +304,7 @@ export function ProfileSetupPage() {
                 htmlFor='bio'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Qisqa ma'lumot ish haqida
+                {t('pages.profileSetup.bio')}
               </label>
               <div className='relative'>
                 <div className='absolute top-3 left-3 pointer-events-none'>
@@ -312,7 +314,7 @@ export function ProfileSetupPage() {
                   id='bio'
                   value={formData.bio}
                   onChange={(e) => handleChange('bio', e.target.value)}
-                  placeholder="O'zingiz haqingizda qisqa ma'lumot bering (kamida 20 ta belgi)..."
+                  placeholder={t('pages.profileSetup.bioPlaceholder')}
                   rows={4}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent resize-none ${
                     errors.bio
@@ -326,11 +328,11 @@ export function ProfileSetupPage() {
                   <p className='text-sm text-red-600'>{errors.bio}</p>
                 ) : (
                   <p className='text-xs text-gray-500'>
-                    {formData.bio.length}/20 minimum belgi
+                    {t('pages.profileSetup.bioCounter', { count: formData.bio.length })}
                   </p>
                 )}
                 <p className='text-xs text-gray-400'>
-                  {formData.bio.length} belgi
+                  {t('pages.profileSetup.charCount', { count: formData.bio.length })}
                 </p>
               </div>
             </div>
@@ -342,10 +344,10 @@ export function ProfileSetupPage() {
               className='w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#0A66C2] text-white rounded-lg font-semibold hover:bg-[#004182] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isLoading ? (
-                <span>Saqlanmoqda...</span>
+                <span>{t('pages.profileSetup.saving')}</span>
               ) : (
                 <>
-                  <span>Davom etish</span>
+                  <span>{t('pages.profileSetup.continue')}</span>
                   <ArrowRight className='h-5 w-5' />
                 </>
               )}

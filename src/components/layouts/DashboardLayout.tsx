@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
@@ -7,65 +8,67 @@ import {
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { Profile } from '@/types';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: string;
   path: string;
   badge?: number;
 }
 
 interface NavGroup {
-  label: string;
+  labelKey: string;
   items: NavItem[];
   defaultOpen?: boolean;
 }
 
 const navGroups: NavGroup[] = [
   {
-    label: 'Main',
+    labelKey: 'main',
     items: [
-      { icon: Home, label: 'Dashboard', path: '/dashboard' },
-      { icon: User, label: 'My Profile', path: '/profile' },
-      { icon: MessageCircle, label: 'Messages', path: '/chat' },
-      { icon: Mail, label: 'Invitations', path: '/invitations' },
-      { icon: Users, label: 'Employees', path: '/employees' },
+      { icon: Home, labelKey: 'dashboard', path: '/dashboard' },
+      { icon: User, labelKey: 'myProfile', path: '/profile' },
+      { icon: MessageCircle, labelKey: 'messages', path: '/chat' },
+      { icon: Mail, labelKey: 'invitations', path: '/invitations' },
+      { icon: Users, labelKey: 'employees', path: '/employees' },
     ],
     defaultOpen: true,
   },
   {
-    label: 'Jobs',
+    labelKey: 'jobs',
     items: [
-      { icon: Briefcase, label: 'Browse Jobs', path: '/jobs' },
-      { icon: BookmarkCheck, label: 'Saved Jobs', path: '/jobs/saved' },
-      { icon: PlusCircle, label: 'Post a Job', path: '/jobs/create' },
-      { icon: FileText, label: 'My Jobs', path: '/jobs/my' },
+      { icon: Briefcase, labelKey: 'browseJobs', path: '/jobs' },
+      { icon: BookmarkCheck, labelKey: 'savedJobs', path: '/jobs/saved' },
+      { icon: PlusCircle, labelKey: 'postJob', path: '/jobs/create' },
+      { icon: FileText, labelKey: 'myJobs', path: '/jobs/my' },
     ],
     defaultOpen: true,
   },
   {
-    label: 'Applications',
+    labelKey: 'applications',
     items: [
-      { icon: Send, label: 'My Applications', path: '/applications' },
+      { icon: Send, labelKey: 'myApplications', path: '/applications' },
     ],
     defaultOpen: true,
   },
   {
-    label: 'Companies',
+    labelKey: 'companies',
     items: [
-      { icon: Building2, label: 'My Companies', path: '/companies' },
+      { icon: Building2, labelKey: 'myCompanies', path: '/companies' },
     ],
     defaultOpen: true,
   },
 ];
 
 const settingsNavItems: NavItem[] = [
-  { icon: Settings, label: 'Profile Settings', path: '/profile/settings' },
-  { icon: Eye, label: 'Visibility', path: '/profile/settings?tab=visibility' },
-  { icon: FileText, label: 'My CV', path: '/profile/settings?tab=cv' },
+  { icon: Settings, labelKey: 'profileSettings', path: '/profile/settings' },
+  { icon: Eye, labelKey: 'visibility', path: '/profile/settings?tab=visibility' },
+  { icon: FileText, labelKey: 'myCv', path: '/profile/settings?tab=cv' },
 ];
 
 export function DashboardLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -73,7 +76,7 @@ export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    new Set(navGroups.filter(g => g.defaultOpen).map(g => g.label))
+    new Set(navGroups.filter(g => g.defaultOpen).map(g => g.labelKey))
   );
   const [messageUnreadCount, setMessageUnreadCount] = useState(0);
 
@@ -122,13 +125,13 @@ export function DashboardLayout() {
     navigate('/');
   };
 
-  const toggleGroup = (groupLabel: string) => {
+  const toggleGroup = (groupLabelKey: string) => {
     setOpenGroups(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(groupLabel)) {
-        newSet.delete(groupLabel);
+      if (newSet.has(groupLabelKey)) {
+        newSet.delete(groupLabelKey);
       } else {
-        newSet.add(groupLabel);
+        newSet.add(groupLabelKey);
       }
       return newSet;
     });
@@ -225,7 +228,7 @@ export function DashboardLayout() {
               <div className="flex flex-col justify-center min-w-0 leading-tight">
                 <span className="text-lg font-bold text-slate-900">ISH</span>
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
-                  va mutaxassislar shu yerda
+                  {t('nav.tagline')}
                 </span>
               </div>
             )}
@@ -242,9 +245,12 @@ export function DashboardLayout() {
           </button>
         </div>
 
-        {/* Profile Card */}
-        {profile && (
-          <div className={`flex-shrink-0 p-4 ${sidebarOpen ? 'px-4' : 'px-2'}`}>
+        {/* Language + Profile */}
+        <div className={`flex-shrink-0 p-4 ${sidebarOpen ? 'px-4' : 'px-2'} flex flex-col gap-2`}>
+          <div className={!sidebarOpen ? 'flex justify-center' : ''}>
+            <LanguageSwitcher variant="sidebar" />
+          </div>
+          {profile && (
             <Link
               to="/profile"
               className={`
@@ -262,33 +268,33 @@ export function DashboardLayout() {
                     {profile.fullName}
                   </p>
                   <p className="text-xs text-slate-500 truncate">
-                    {profile.title || 'Add your title'}
+                    {profile.title || t('dashboard.sidebar.addYourTitle')}
                   </p>
                 </div>
               )}
             </Link>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Navigation — scrollable when content overflows */}
         <nav className="flex-1 min-h-0 px-3 py-2 space-y-1 overflow-y-auto">
           {/* Navigation Groups */}
           {navGroups.map((group) => {
-            const isGroupOpen = openGroups.has(group.label);
+            const isGroupOpen = openGroups.has(group.labelKey);
             const hasActiveItem = group.items.some(item => isActiveRoute(item.path));
             
             return (
-              <div key={group.label} className="space-y-1">
+              <div key={group.labelKey} className="space-y-1">
                 {sidebarOpen ? (
                   <button
-                    onClick={() => toggleGroup(group.label)}
+                    onClick={() => toggleGroup(group.labelKey)}
                     className={`
                       w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider
                       hover:text-slate-600 transition-colors
                       ${hasActiveItem ? 'text-slate-600' : ''}
                     `}
                   >
-                    <span>{group.label}</span>
+                    <span>{t(`dashboard.sidebar.${group.labelKey}`)}</span>
                     {isGroupOpen ? (
                       <ChevronUp className="h-3 w-3" />
                     ) : (
@@ -309,6 +315,7 @@ export function DashboardLayout() {
                         : item;
                       const Icon = displayItem.icon;
                       const isActive = isActiveRoute(displayItem.path);
+                      const itemLabel = t(`dashboard.sidebar.${displayItem.labelKey}`);
                       return (
                         <Link
                           key={displayItem.path}
@@ -322,11 +329,11 @@ export function DashboardLayout() {
                             }
                             ${!sidebarOpen && 'justify-center'}
                           `}
-                          title={!sidebarOpen ? displayItem.label : undefined}
+                          title={!sidebarOpen ? itemLabel : undefined}
                         >
                           <Icon className="h-5 w-5 flex-shrink-0" />
                           {sidebarOpen && (
-                            <span className="font-medium">{displayItem.label}</span>
+                            <span className="font-medium">{itemLabel}</span>
                           )}
                           {displayItem.badge != null && displayItem.badge > 0 && sidebarOpen && (
                             <span className="ml-auto bg-red-500 text-white text-xs min-w-[1.25rem] px-2 py-0.5 rounded-full text-center">
@@ -346,12 +353,13 @@ export function DashboardLayout() {
           <div className="pt-4 mt-4 border-t border-slate-200 space-y-1">
             {sidebarOpen && (
               <p className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Settings
+                {t('dashboard.sidebar.settings')}
               </p>
             )}
             {settingsNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveRoute(item.path);
+              const itemLabel = t(`dashboard.sidebar.${item.labelKey}`);
               return (
                 <Link
                   key={item.path}
@@ -365,11 +373,11 @@ export function DashboardLayout() {
                     }
                     ${!sidebarOpen && 'justify-center'}
                   `}
-                  title={!sidebarOpen ? item.label : undefined}
+                  title={!sidebarOpen ? itemLabel : undefined}
                 >
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   {sidebarOpen && (
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium">{itemLabel}</span>
                   )}
                 </Link>
               );
@@ -386,10 +394,10 @@ export function DashboardLayout() {
               text-red-600 hover:bg-red-50 transition-all
               ${!sidebarOpen && 'justify-center'}
             `}
-            title={!sidebarOpen ? 'Logout' : undefined}
+            title={!sidebarOpen ? t('dashboard.sidebar.logout') : undefined}
           >
             <LogOut className="h-5 w-5 flex-shrink-0" />
-            {sidebarOpen && <span className="font-medium">Logout</span>}
+            {sidebarOpen && <span className="font-medium">{t('dashboard.sidebar.logout')}</span>}
           </button>
         </div>
       </aside>

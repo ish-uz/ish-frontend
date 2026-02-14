@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Briefcase, Users, Eye, TrendingUp, Bell,
   ChevronRight, CheckCircle2, Clock
@@ -9,7 +10,7 @@ import { Profile } from '@/types';
 
 interface StatCard {
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: string;
   value: string | number;
   change?: string;
   trend?: 'up' | 'down';
@@ -24,6 +25,7 @@ interface DashboardStats {
 }
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [statsError, setStatsError] = useState(false);
@@ -55,49 +57,34 @@ export function DashboardPage() {
   const statCards: StatCard[] = [
     {
       icon: Eye,
-      label: 'Profile Views',
+      labelKey: 'profileViews' as const,
       value: stats?.profileViews ?? '—',
       color: 'blue',
     },
     {
       icon: Briefcase,
-      label: 'Jobs Applied',
+      labelKey: 'jobsApplied' as const,
       value: stats?.jobsApplied ?? '—',
       color: 'emerald',
     },
     {
       icon: Users,
-      label: 'Connections',
+      labelKey: 'connections' as const,
       value: stats?.connections ?? '—',
       color: 'violet',
     },
     {
       icon: Bell,
-      label: 'Notifications',
+      labelKey: 'notifications' as const,
       value: stats?.notifications ?? '—',
       color: 'amber',
     },
   ];
 
   const recentActivity = [
-    { 
-      type: 'view',
-      message: 'Your profile was viewed by a recruiter',
-      time: '2 hours ago',
-      icon: Eye
-    },
-    { 
-      type: 'application',
-      message: 'Your application for Senior Developer was reviewed',
-      time: '1 day ago',
-      icon: Briefcase
-    },
-    { 
-      type: 'profile',
-      message: 'Profile strength increased to 85%',
-      time: '3 days ago',
-      icon: TrendingUp
-    },
+    { type: 'view', messageKey: 'activityViewed' as const, timeKey: 'hoursAgo' as const, icon: Eye },
+    { type: 'application', messageKey: 'activityApplication' as const, timeKey: 'dayAgo' as const, icon: Briefcase },
+    { type: 'profile', messageKey: 'activityStrength' as const, timeKey: 'daysAgo' as const, icon: TrendingUp },
   ];
 
   if (loading) {
@@ -137,10 +124,10 @@ export function DashboardPage() {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
-          Welcome back, {profile?.fullName?.split(' ')[0] || 'User'}! 👋
+          {t('dashboard.welcome', { name: profile?.fullName?.split(' ')[0] || t('dashboard.user') })}
         </h1>
         <p className="text-slate-600 mt-1">
-          Here's what's happening with your profile today.
+          {t('dashboard.welcomeSub')}
         </p>
       </div>
 
@@ -149,15 +136,15 @@ export function DashboardPage() {
         <div className="mb-8 bg-gradient-to-r from-blue-600 to-violet-600 rounded-2xl p-6 text-white">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold mb-1">Complete your profile</h2>
+              <h2 className="text-lg font-semibold mb-1">{t('dashboard.completeProfile')}</h2>
               <p className="text-blue-100 text-sm">
-                A complete profile gets 3x more visibility from employers
+                {t('dashboard.completeProfileDesc')}
               </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex-1 lg:w-48">
                 <div className="flex justify-between text-sm mb-1">
-                  <span>Progress</span>
+                  <span>{t('dashboard.progress')}</span>
                   <span>{profileCompletion}%</span>
                 </div>
                 <div className="h-2 bg-white/30 rounded-full overflow-hidden">
@@ -171,7 +158,7 @@ export function DashboardPage() {
                 to="/profile/settings"
                 className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
               >
-                Complete Now
+                {t('dashboard.completeNow')}
               </Link>
             </div>
           </div>
@@ -181,13 +168,13 @@ export function DashboardPage() {
       {/* Stats error banner */}
       {statsError && (
         <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
-          <p className="text-sm text-amber-800">Не удалось загрузить статистику.</p>
+          <p className="text-sm text-amber-800">{t('dashboard.statsError')}</p>
           <button
             type="button"
             onClick={() => loadProfileAndStats()}
             className="text-sm font-medium text-amber-700 hover:text-amber-900 underline"
           >
-            Повторить
+            {t('dashboard.retry')}
           </button>
         </div>
       )}
@@ -198,7 +185,7 @@ export function DashboardPage() {
           const Icon = stat.icon;
           return (
             <div
-              key={stat.label}
+              key={stat.labelKey}
               className="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all group"
             >
               <div className="flex items-center justify-between mb-3">
@@ -221,7 +208,7 @@ export function DashboardPage() {
                 )}
               </div>
               <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="text-sm text-slate-500">{stat.label}</p>
+              <p className="text-sm text-slate-500">{t(`dashboard.${stat.labelKey}`)}</p>
             </div>
           );
         })}
@@ -232,12 +219,12 @@ export function DashboardPage() {
         {/* Recent Activity */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
           <div className="p-5 border-b border-slate-200 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Recent Activity</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.recentActivity')}</h2>
             <Link 
               to="/notifications"
               className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
             >
-              View All
+              {t('dashboard.viewAll')}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </div>
@@ -253,10 +240,10 @@ export function DashboardPage() {
                     <Icon className="h-5 w-5 text-slate-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-slate-900">{activity.message}</p>
+                    <p className="text-sm text-slate-900">{t(`dashboard.${activity.messageKey}`)}</p>
                     <p className="text-xs text-slate-500 mt-1 flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
-                      {activity.time}
+                      {t(`dashboard.${activity.timeKey}`)}
                     </p>
                   </div>
                 </div>
@@ -268,7 +255,7 @@ export function DashboardPage() {
         {/* Quick Actions */}
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <div className="p-5 border-b border-slate-200">
-            <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t('dashboard.quickActions')}</h2>
           </div>
           <div className="p-4 space-y-3">
             <Link
@@ -276,7 +263,7 @@ export function DashboardPage() {
               className="flex items-center p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors group"
             >
               <Briefcase className="h-5 w-5 mr-3 text-slate-400 group-hover:text-blue-600" />
-              <span className="font-medium">Browse Jobs</span>
+              <span className="font-medium">{t('dashboard.browseJobs')}</span>
               <ChevronRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-blue-600" />
             </Link>
             <Link
@@ -284,7 +271,7 @@ export function DashboardPage() {
               className="flex items-center p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors group"
             >
               <Users className="h-5 w-5 mr-3 text-slate-400 group-hover:text-blue-600" />
-              <span className="font-medium">Find Talent</span>
+              <span className="font-medium">{t('dashboard.findTalent')}</span>
               <ChevronRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-blue-600" />
             </Link>
             <Link
@@ -292,7 +279,7 @@ export function DashboardPage() {
               className="flex items-center p-3 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors group"
             >
               <CheckCircle2 className="h-5 w-5 mr-3 text-slate-400 group-hover:text-blue-600" />
-              <span className="font-medium">Update Profile</span>
+              <span className="font-medium">{t('dashboard.updateProfile')}</span>
               <ChevronRight className="h-4 w-4 ml-auto text-slate-300 group-hover:text-blue-600" />
             </Link>
           </div>
@@ -308,28 +295,28 @@ export function DashboardPage() {
                 }
               `}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-700">Open To Work</span>
+                  <span className="text-sm font-medium text-slate-700">{t('dashboard.openToWork')}</span>
                   {profile.openToJobSeeker ? (
                     <span className="text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      Active
+                      {t('dashboard.active')}
                     </span>
                   ) : (
                     <span className="text-xs font-medium text-slate-500 bg-slate-200 px-2 py-0.5 rounded-full">
-                      Inactive
+                      {t('dashboard.inactive')}
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-slate-500">
                   {profile.openToJobSeeker 
-                    ? 'Employers can find you on the Employees page'
-                    : 'Turn on to be visible to employers'
+                    ? t('dashboard.openToWorkDesc')
+                    : t('dashboard.openToWorkOff')
                   }
                 </p>
                 <Link
                   to="/profile/settings?tab=visibility"
                   className="text-xs text-blue-600 hover:text-blue-700 font-medium mt-2 inline-block"
                 >
-                  Manage visibility →
+                  {t('dashboard.manageVisibility')}
                 </Link>
               </div>
             </div>

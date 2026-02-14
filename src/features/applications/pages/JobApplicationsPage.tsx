@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, User, Calendar, FileText, Mail, Phone,
   CheckCircle2, XCircle, Clock, Eye, AlertCircle, Briefcase, MessageCircle
@@ -9,6 +10,7 @@ import { jobService } from '@/features/jobs/services/jobService';
 import { Application, Job } from '@/types';
 
 export function JobApplicationsPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [job, setJob] = useState<Job | null>(null);
@@ -28,7 +30,7 @@ export function JobApplicationsPage() {
       const data = await jobService.getJob(id!);
       setJob(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load job');
+      setError(err.response?.data?.detail || t('pages.jobApplications.failedToLoadJob'));
     }
   };
 
@@ -41,9 +43,9 @@ export function JobApplicationsPage() {
       if (err.response?.status === 401) {
         navigate('/login');
       } else if (err.response?.status === 403) {
-        setError('You do not have permission to view applications for this job');
+        setError(t('pages.jobApplications.noPermission'));
       } else {
-        setError(err.response?.data?.detail || 'Failed to load applications');
+        setError(err.response?.data?.detail || t('pages.jobApplications.failedToLoad'));
       }
     } finally {
       setLoading(false);
@@ -64,7 +66,7 @@ export function JobApplicationsPage() {
         app.id === applicationId ? { ...app, status: newStatus } : app
       ));
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to update application status');
+      setError(err.response?.data?.detail || t('pages.jobApplications.failedToUpdate'));
     }
   };
 
@@ -105,10 +107,10 @@ export function JobApplicationsPage() {
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      pending: 'Pending Review',
-      reviewed: 'Under Review',
-      accepted: 'Accepted',
-      rejected: 'Not Selected',
+      pending: t('pages.myApplications.statusPending'),
+      reviewed: t('pages.myApplications.statusReviewed'),
+      accepted: t('pages.myApplications.statusAccepted'),
+      rejected: t('pages.myApplications.statusRejected'),
     };
     return labels[status] || status;
   };
@@ -140,7 +142,7 @@ export function JobApplicationsPage() {
             to="/jobs/my"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Back to My Jobs
+            {t('pages.jobApplications.backToMyJobs')}
           </Link>
         </div>
       </div>
@@ -157,17 +159,17 @@ export function JobApplicationsPage() {
             className="inline-flex items-center text-slate-600 hover:text-slate-900 mb-4 group"
           >
             <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Job
+            {t('pages.jobApplications.backToJob')}
           </Link>
           
           <div className="flex items-center space-x-3 mb-2">
             <Briefcase className="h-7 w-7 lg:h-8 lg:w-8 text-blue-600" />
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
-                Applications for {job?.title || 'Job'}
+                {t('pages.jobApplications.applicationsFor', { jobTitle: job?.title || 'Job' })}
               </h1>
               <p className="text-slate-600 text-sm lg:text-base">
-                Review and manage applications for this position
+                {t('pages.jobApplications.subtitle')}
               </p>
             </div>
           </div>
@@ -185,16 +187,16 @@ export function JobApplicationsPage() {
         {applications.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 lg:p-12 text-center">
             <User className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No applications yet</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">{t('pages.jobApplications.noApplicationsYet')}</h3>
             <p className="text-slate-600 mb-6">
-              No one has applied to this job yet. Share the job posting to get more applicants.
+              {t('pages.jobApplications.noApplicationsDesc')}
             </p>
             <Link
               to={`/jobs/${id}`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
             >
               <Briefcase className="h-5 w-5" />
-              View Job Posting
+              {t('pages.jobApplications.viewJobPosting')}
             </Link>
           </div>
         ) : (
@@ -246,7 +248,7 @@ export function JobApplicationsPage() {
                           )}
                           <div className="flex items-center gap-2 text-sm text-slate-500 mt-2">
                             <Calendar className="h-4 w-4" />
-                            <span>Applied {formatDate(application.createdAt)}</span>
+                            <span>{t('pages.jobApplications.applied')} {formatDate(application.createdAt)}</span>
                           </div>
                         </div>
                       </div>
@@ -267,19 +269,19 @@ export function JobApplicationsPage() {
                               onClick={() => handleStatusChange(application.id, 'reviewed')}
                               className="px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
                             >
-                              Mark as Reviewed
+                              {t('pages.jobApplications.markAsReviewed')}
                             </button>
                             <button
                               onClick={() => handleStatusChange(application.id, 'accepted')}
                               className="px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
                             >
-                              Accept
+                              {t('pages.jobApplications.accept')}
                             </button>
                             <button
                               onClick={() => handleStatusChange(application.id, 'rejected')}
                               className="px-3 py-1.5 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors"
                             >
-                              Reject
+                              {t('pages.jobApplications.reject')}
                             </button>
                           </>
                         )}
@@ -289,13 +291,13 @@ export function JobApplicationsPage() {
                               onClick={() => handleStatusChange(application.id, 'accepted')}
                               className="px-3 py-1.5 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
                             >
-                              Accept
+                              {t('pages.jobApplications.accept')}
                             </button>
                             <button
                               onClick={() => handleStatusChange(application.id, 'rejected')}
                               className="px-3 py-1.5 text-sm bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors"
                             >
-                              Reject
+                              {t('pages.jobApplications.reject')}
                             </button>
                           </>
                         )}
@@ -305,7 +307,7 @@ export function JobApplicationsPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                           >
                             <MessageCircle className="h-4 w-4" />
-                            Open Chat
+                            {t('pages.jobApplications.openChat')}
                           </Link>
                         )}
                       </div>
@@ -332,7 +334,7 @@ export function JobApplicationsPage() {
                       className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
                     >
                       <User className="h-4 w-4" />
-                      View Full Profile
+                      {t('pages.jobApplications.viewFullProfile')}
                     </Link>
                   </div>
                 </div>
@@ -346,25 +348,25 @@ export function JobApplicationsPage() {
           <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-slate-900">{applications.length}</p>
-              <p className="text-sm text-slate-500">Total Applications</p>
+              <p className="text-sm text-slate-500">{t('pages.jobApplications.totalApplications')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-amber-600">
                 {applications.filter(a => a.status === 'pending').length}
               </p>
-              <p className="text-sm text-slate-500">Pending</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusPending')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-blue-600">
                 {applications.filter(a => a.status === 'reviewed').length}
               </p>
-              <p className="text-sm text-slate-500">Under Review</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusReviewed')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-green-600">
                 {applications.filter(a => a.status === 'accepted').length}
               </p>
-              <p className="text-sm text-slate-500">Accepted</p>
+              <p className="text-sm text-slate-500">{t('pages.myApplications.statusAccepted')}</p>
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Briefcase, Plus, MapPin, Eye, Users, Calendar,
   Edit2, Trash2, MoreVertical, CheckCircle2, Clock, XCircle, Send
@@ -8,7 +9,16 @@ import { jobService } from '../services/jobService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
 
+const JOB_TYPE_KEYS: Record<string, string> = {
+  'full-time': 'fullTime',
+  'part-time': 'partTime',
+  'contract': 'contract',
+  'internship': 'internship',
+  'remote': 'remote',
+};
+
 export function MyJobsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +43,7 @@ export function MyJobsPage() {
       if (err.response?.status === 401) {
         navigate('/login');
       } else {
-        setError(err.response?.data?.detail || 'Failed to load jobs');
+        setError(err.response?.data?.detail || t('pages.myJobs.failedToLoad'));
       }
     } finally {
       setLoading(false);
@@ -41,13 +51,13 @@ export function MyJobsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this job?')) return;
+    if (!confirm(t('pages.myJobs.confirmDelete'))) return;
     
     try {
       await jobService.deleteJob(id);
       setJobs(jobs.filter(job => job.id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to delete job');
+      setError(err.response?.data?.detail || t('pages.myJobs.failedToDelete'));
     }
   };
 
@@ -56,7 +66,7 @@ export function MyJobsPage() {
       const updated = await jobService.updateJob(id, { status: 'active' });
       setJobs(jobs.map(job => job.id === id ? updated : job));
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to publish job');
+      setError(err.response?.data?.detail || t('pages.myJobs.failedToPublish'));
     }
   };
 
@@ -65,7 +75,7 @@ export function MyJobsPage() {
       const updated = await jobService.updateJob(id, { status: 'closed' });
       setJobs(jobs.map(job => job.id === id ? updated : job));
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to close job');
+      setError(err.response?.data?.detail || t('pages.myJobs.failedToClose'));
     }
   };
 
@@ -84,33 +94,27 @@ export function MyJobsPage() {
         bg: 'bg-green-100',
         text: 'text-green-700',
         icon: <CheckCircle2 className="h-4 w-4" />,
-        label: 'Active',
+        label: t('pages.myJobs.statusActive'),
       },
       draft: {
         bg: 'bg-slate-100',
         text: 'text-slate-700',
         icon: <Clock className="h-4 w-4" />,
-        label: 'Draft',
+        label: t('pages.myJobs.statusDraft'),
       },
       closed: {
         bg: 'bg-red-100',
         text: 'text-red-700',
         icon: <XCircle className="h-4 w-4" />,
-        label: 'Closed',
+        label: t('pages.myJobs.statusClosed'),
       },
     };
     return badges[status] || badges.draft;
   };
 
   const getJobTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      'full-time': 'Full Time',
-      'part-time': 'Part Time',
-      'contract': 'Contract',
-      'internship': 'Internship',
-      'remote': 'Remote',
-    };
-    return labels[type] || type;
+    const key = JOB_TYPE_KEYS[type];
+    return key ? t(`pages.jobType.${key}`) : type;
   };
 
   if (loading) {
@@ -139,10 +143,10 @@ export function MyJobsPage() {
           <div>
             <div className="flex items-center space-x-3 mb-2">
               <Briefcase className="h-7 w-7 lg:h-8 lg:w-8 text-blue-600" />
-              <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">My Jobs</h1>
+              <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">{t('pages.myJobs.title')}</h1>
             </div>
             <p className="text-slate-600 text-sm lg:text-base">
-              Manage your job postings
+              {t('pages.myJobs.subtitle')}
             </p>
           </div>
           <Link
@@ -150,7 +154,7 @@ export function MyJobsPage() {
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
           >
             <Plus className="h-5 w-5" />
-            Post New Job
+            {t('pages.myJobs.postNew')}
           </Link>
         </div>
 
@@ -165,16 +169,16 @@ export function MyJobsPage() {
         {jobs.length === 0 ? (
           <div className="bg-white rounded-2xl border border-slate-200 p-8 lg:p-12 text-center">
             <Briefcase className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No jobs posted yet</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">{t('pages.myJobs.noJobs')}</h3>
             <p className="text-slate-600 mb-6">
-              Create your first job posting to start finding candidates
+              {t('pages.myJobs.noJobsDesc')}
             </p>
             <Link
               to="/jobs/create"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
             >
               <Plus className="h-5 w-5" />
-              Post Your First Job
+              {t('pages.myJobs.postFirst')}
             </Link>
           </div>
         ) : (
@@ -235,7 +239,7 @@ export function MyJobsPage() {
                                   onClick={() => setActiveMenu(null)}
                                 >
                                   <Eye className="h-4 w-4" />
-                                  View Job
+                                  {t('pages.myJobs.viewJob')}
                                 </Link>
                                 <Link
                                   to={`/jobs/${job.id}/edit`}
@@ -243,7 +247,7 @@ export function MyJobsPage() {
                                   onClick={() => setActiveMenu(null)}
                                 >
                                   <Edit2 className="h-4 w-4" />
-                                  Edit Job
+                                  {t('pages.myJobs.editJob')}
                                 </Link>
                                 {job.status === 'draft' && (
                                   <button
@@ -254,7 +258,7 @@ export function MyJobsPage() {
                                     className="flex items-center gap-2 px-4 py-2 text-sm text-green-600 hover:bg-green-50 w-full"
                                   >
                                     <Send className="h-4 w-4" />
-                                    Publish Job
+                                    {t('pages.myJobs.publishJob')}
                                   </button>
                                 )}
                                 {job.status === 'active' && (
@@ -266,7 +270,7 @@ export function MyJobsPage() {
                                     className="flex items-center gap-2 px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 w-full"
                                   >
                                     <XCircle className="h-4 w-4" />
-                                    Close Job
+                                    {t('pages.myJobs.closeJob')}
                                   </button>
                                 )}
                                 <div className="border-t border-slate-100 my-1"></div>
@@ -278,7 +282,7 @@ export function MyJobsPage() {
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full"
                                 >
                                   <Trash2 className="h-4 w-4" />
-                                  Delete Job
+                                  {t('pages.myJobs.deleteJob')}
                                 </button>
                               </div>
                             </>
@@ -298,7 +302,7 @@ export function MyJobsPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
                           >
                             <Send className="h-3.5 w-3.5" />
-                            Publish
+                            {t('pages.myJobs.publish')}
                           </button>
                         )}
                         {job.status === 'active' && (
@@ -307,12 +311,12 @@ export function MyJobsPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors"
                           >
                             <XCircle className="h-3.5 w-3.5" />
-                            Close
+                            {t('pages.myJobs.close')}
                           </button>
                         )}
                         <span className="flex items-center gap-1 text-sm text-slate-500">
                           <Eye className="h-4 w-4" />
-                          {job.viewsCount} views
+                          {job.viewsCount} {t('pages.myJobs.views')}
                         </span>
                         {job.status === 'active' && (
                           <Link
@@ -320,7 +324,7 @@ export function MyJobsPage() {
                             className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
                           >
                             <Users className="h-4 w-4" />
-                            Applications
+                            {t('pages.myJobs.applications')}
                           </Link>
                         )}
                       </div>
@@ -337,25 +341,25 @@ export function MyJobsPage() {
           <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-slate-900">{jobs.length}</p>
-              <p className="text-sm text-slate-500">Total Jobs</p>
+              <p className="text-sm text-slate-500">{t('pages.myJobs.totalJobs')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-green-600">
                 {jobs.filter(j => j.status === 'active').length}
               </p>
-              <p className="text-sm text-slate-500">Active</p>
+              <p className="text-sm text-slate-500">{t('pages.myJobs.activeLabel')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-slate-600">
                 {jobs.filter(j => j.status === 'draft').length}
               </p>
-              <p className="text-sm text-slate-500">Drafts</p>
+              <p className="text-sm text-slate-500">{t('pages.myJobs.draftsLabel')}</p>
             </div>
             <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
               <p className="text-2xl font-bold text-blue-600">
                 {jobs.reduce((acc, job) => acc + job.viewsCount, 0)}
               </p>
-              <p className="text-sm text-slate-500">Total Views</p>
+              <p className="text-sm text-slate-500">{t('pages.myJobs.totalViews')}</p>
             </div>
           </div>
         )}

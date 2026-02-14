@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { invitationService } from '../services/invitationService';
 import { ChatInvitation } from '@/types';
 import { User as UserIcon, Mail, Check, X, MessageCircle, Send } from 'lucide-react';
@@ -7,6 +8,7 @@ import { User as UserIcon, Mail, Check, X, MessageCircle, Send } from 'lucide-re
 type Tab = 'received' | 'sent';
 
 export function InvitationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('received');
   const [received, setReceived] = useState<ChatInvitation[]>([]);
@@ -31,7 +33,7 @@ export function InvitationsPage() {
     setError(null);
     Promise.all([loadReceived(), loadSent()])
       .catch((err) => {
-        if (!cancelled) setError(err.response?.data?.detail || 'Failed to load invitations');
+        if (!cancelled) setError(err.response?.data?.detail || t('pages.invitations.failedToLoad'));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -48,7 +50,7 @@ export function InvitationsPage() {
         navigate(`/chat/${updated.conversationId}`);
       }
     } catch (err) {
-      setError((err as any)?.response?.data?.detail || 'Failed to accept');
+      setError((err as any)?.response?.data?.detail || t('pages.invitations.failedToAccept'));
     } finally {
       setActionLoading(null);
     }
@@ -60,7 +62,7 @@ export function InvitationsPage() {
       await invitationService.reject(inv.id);
       setReceived((prev) => prev.filter((i) => i.id !== inv.id));
     } catch (err) {
-      setError((err as any)?.response?.data?.detail || 'Failed to reject');
+      setError((err as any)?.response?.data?.detail || t('pages.invitations.failedToReject'));
     } finally {
       setActionLoading(null);
     }
@@ -77,7 +79,7 @@ export function InvitationsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading invitations...</p>
+          <p className="mt-4 text-gray-600">{t('pages.invitations.loading')}</p>
         </div>
       </div>
     );
@@ -88,10 +90,10 @@ export function InvitationsPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-3 mb-6">
           <MessageCircle className="h-8 w-8 text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Chat invitations</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('pages.invitations.title')}</h1>
         </div>
         <p className="text-gray-600 mb-6">
-          When someone sends you an invitation from the Employees page, you can accept to open a chat. You can also see invitations you sent.
+          {t('pages.invitations.subtitle')}
         </p>
 
         {error && (
@@ -110,7 +112,7 @@ export function InvitationsPage() {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            Received ({received.length})
+            {t('pages.invitations.received')} ({received.length})
           </button>
           <button
             type="button"
@@ -121,7 +123,7 @@ export function InvitationsPage() {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            Sent ({sent.length})
+            {t('pages.invitations.sent')} ({sent.length})
           </button>
         </div>
 
@@ -130,8 +132,8 @@ export function InvitationsPage() {
             {received.length === 0 ? (
               <div className="bg-white rounded-xl shadow-md p-8 text-center">
                 <Mail className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                <p className="text-gray-600">No pending invitations</p>
-                <p className="text-sm text-gray-500 mt-1">When someone invites you to chat, it will appear here.</p>
+                <p className="text-gray-600">{t('pages.invitations.noPending')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('pages.invitations.noPendingDesc')}</p>
               </div>
             ) : (
               received.map((inv) => (
@@ -143,7 +145,7 @@ export function InvitationsPage() {
                     <UserIcon className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900">{displayUser(inv, true)} wants to chat</p>
+                    <p className="font-medium text-gray-900">{displayUser(inv, true)} {t('pages.invitations.wantsToChat')}</p>
                     {inv.message && (
                       <p className="text-sm text-gray-600 mt-1">&ldquo;{inv.message}&rdquo;</p>
                     )}
@@ -159,7 +161,7 @@ export function InvitationsPage() {
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
                     >
                       <Check className="h-4 w-4" />
-                      {actionLoading === inv.id ? '...' : 'Accept'}
+                      {actionLoading === inv.id ? '...' : t('pages.invitations.accept')}
                     </button>
                     <button
                       type="button"
@@ -168,7 +170,7 @@ export function InvitationsPage() {
                       className="inline-flex items-center gap-1 px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium disabled:opacity-50"
                     >
                       <X className="h-4 w-4" />
-                      Reject
+                      {t('pages.invitations.reject')}
                     </button>
                   </div>
                 </div>
@@ -182,8 +184,8 @@ export function InvitationsPage() {
             {sent.length === 0 ? (
               <div className="bg-white rounded-xl shadow-md p-8 text-center">
                 <Send className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                <p className="text-gray-600">No sent invitations</p>
-                <p className="text-sm text-gray-500 mt-1">Invitations you send from the Employees page will appear here.</p>
+                <p className="text-gray-600">{t('pages.invitations.noSent')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('pages.invitations.noSentDesc')}</p>
               </div>
             ) : (
               sent.map((inv) => (
@@ -195,12 +197,12 @@ export function InvitationsPage() {
                     <UserIcon className="h-6 w-6 text-gray-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900">Invitation to {displayUser(inv, false)}</p>
+                    <p className="font-medium text-gray-900">{t('pages.invitations.invitationTo')} {displayUser(inv, false)}</p>
                     {inv.message && (
                       <p className="text-sm text-gray-600 mt-1">&ldquo;{inv.message}&rdquo;</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
-                      Sent {new Date(inv.createdAt).toLocaleDateString()} · Pending
+                      {t('pages.invitations.sentDatePending', { date: new Date(inv.createdAt).toLocaleDateString() })}
                     </p>
                   </div>
                 </div>

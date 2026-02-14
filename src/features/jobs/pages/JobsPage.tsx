@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { jobService } from '../services/jobService';
 import { Job, JobType } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
@@ -9,6 +10,7 @@ import {
 } from 'lucide-react';
 
 export function JobsPage() {
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,12 +40,12 @@ export function JobsPage() {
   const [appliedIsRemote, setAppliedIsRemote] = useState<boolean | null>(null);
   const [appliedDateFrom, setAppliedDateFrom] = useState('');
 
-  const jobTypes: { value: JobType; label: string }[] = [
-    { value: 'full-time', label: 'Full Time' },
-    { value: 'part-time', label: 'Part Time' },
-    { value: 'contract', label: 'Contract' },
-    { value: 'internship', label: 'Internship' },
-    { value: 'remote', label: 'Remote' },
+  const jobTypes: { value: JobType; labelKey: string }[] = [
+    { value: 'full-time', labelKey: 'fullTime' },
+    { value: 'part-time', labelKey: 'partTime' },
+    { value: 'contract', labelKey: 'contract' },
+    { value: 'internship', labelKey: 'internship' },
+    { value: 'remote', labelKey: 'remote' },
   ];
 
   // Debounce search query
@@ -99,7 +101,7 @@ export function JobsPage() {
         ? errorDetail.map((e: any) => e.msg || JSON.stringify(e)).join(', ')
         : typeof errorDetail === 'string'
         ? errorDetail
-        : 'Failed to load jobs';
+        : t('pages.jobs.failedToLoad');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -188,7 +190,7 @@ export function JobsPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading jobs...</p>
+          <p className="mt-4 text-gray-600">{t('pages.jobs.loading')}</p>
         </div>
       </div>
     );
@@ -203,7 +205,7 @@ export function JobsPage() {
             onClick={loadJobs}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Retry
+            {t('pages.jobs.retry')}
           </button>
         </div>
       </div>
@@ -217,10 +219,10 @@ export function JobsPage() {
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-2">
             <Briefcase className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Job Vacancies</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('pages.jobs.title')}</h1>
           </div>
           <p className="text-gray-600">
-            Find your next opportunity
+            {t('pages.jobs.subtitle')}
           </p>
         </div>
 
@@ -233,7 +235,7 @@ export function JobsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search jobs by title, company, or location..."
+              placeholder={t('pages.jobs.searchPlaceholder')}
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
             />
             {searchQuery && (
@@ -250,7 +252,7 @@ export function JobsPage() {
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-4">
             <div className="flex items-center gap-2 text-sm font-medium text-gray-700 flex-shrink-0">
               <Code className="h-4 w-4 text-blue-600" />
-              <span>Skills:</span>
+              <span>{t('pages.jobs.skills')}</span>
             </div>
             
             <div className="flex-1 flex flex-wrap gap-2 min-w-0">
@@ -263,7 +265,7 @@ export function JobsPage() {
                   <button
                     onClick={() => handleRemoveSkill(skill)}
                     className="hover:bg-blue-100 rounded-full p-0.5 transition-colors"
-                    aria-label={`Remove ${skill}`}
+                    aria-label={t('pages.jobs.removeSkill', { skill })}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -276,7 +278,7 @@ export function JobsPage() {
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Add skill..."
+                  placeholder={t('pages.jobs.addSkill')}
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
                 <button
@@ -284,7 +286,7 @@ export function JobsPage() {
                   disabled={!skillInput.trim()}
                   className="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                 >
-                  Add
+                  {t('pages.jobs.add')}
                 </button>
               </div>
             </div>
@@ -297,7 +299,7 @@ export function JobsPage() {
           >
             <div className="flex items-center gap-2">
               <SlidersHorizontal className="h-4 w-4" />
-              <span>Advanced Filters</span>
+              <span>{t('pages.jobs.advancedFilters')}</span>
               {getActiveFiltersCount() > 0 && (
                 <span className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
                   {getActiveFiltersCount()}
@@ -319,17 +321,17 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <Briefcase className="h-4 w-4 inline mr-1" />
-                    Job Type
+                    {t('pages.jobs.jobType')}
                   </label>
                   <select
                     value={jobType}
                     onChange={(e) => setJobType(e.target.value as JobType | '')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <option value="">All Types</option>
+                    <option value="">{t('pages.jobs.allTypes')}</option>
                     {jobTypes.map((type) => (
                       <option key={type.value} value={type.value}>
-                        {type.label}
+                        {t(`pages.jobType.${type.labelKey}`)}
                       </option>
                     ))}
                   </select>
@@ -339,13 +341,13 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <MapPin className="h-4 w-4 inline mr-1" />
-                    Location
+                    {t('pages.jobs.location')}
                   </label>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g., Tashkent"
+                    placeholder={t('pages.jobs.locationPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
@@ -354,7 +356,7 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <Globe className="h-4 w-4 inline mr-1" />
-                    Remote Work
+                    {t('pages.jobs.remoteWork')}
                   </label>
                   <select
                     value={isRemote === null ? '' : isRemote ? 'true' : 'false'}
@@ -364,9 +366,9 @@ export function JobsPage() {
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <option value="">All</option>
-                    <option value="true">Remote Only</option>
-                    <option value="false">On-site Only</option>
+                    <option value="">{t('pages.jobs.all')}</option>
+                    <option value="true">{t('pages.jobs.remoteOnly')}</option>
+                    <option value="false">{t('pages.jobs.onSiteOnly')}</option>
                   </select>
                 </div>
 
@@ -374,13 +376,13 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <DollarSign className="h-4 w-4 inline mr-1" />
-                    Min Salary (UZS)
+                    {t('pages.jobs.minSalary')}
                   </label>
                   <input
                     type="number"
                     value={salaryMin}
                     onChange={(e) => setSalaryMin(e.target.value ? Number(e.target.value) : '')}
-                    placeholder="e.g., 5000000"
+                    placeholder={t('pages.jobs.salaryPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
@@ -389,13 +391,13 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <DollarSign className="h-4 w-4 inline mr-1" />
-                    Max Salary (UZS)
+                    {t('pages.jobs.maxSalary')}
                   </label>
                   <input
                     type="number"
                     value={salaryMax}
                     onChange={(e) => setSalaryMax(e.target.value ? Number(e.target.value) : '')}
-                    placeholder="e.g., 10000000"
+                    placeholder={t('pages.jobs.salaryPlaceholder')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
@@ -404,7 +406,7 @@ export function JobsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     <Calendar className="h-4 w-4 inline mr-1" />
-                    Posted After
+                    {t('pages.jobs.postedAfter')}
                   </label>
                   <input
                     type="date"
@@ -419,7 +421,7 @@ export function JobsPage() {
               <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                 <div className="text-sm text-gray-600">
                   {hasUnsavedFilters && (
-                    <span className="text-orange-600 font-medium">You have unsaved filter changes</span>
+                    <span className="text-orange-600 font-medium">{t('pages.jobs.unsavedFilters')}</span>
                   )}
                 </div>
                 <button
@@ -428,7 +430,7 @@ export function JobsPage() {
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
                 >
                   <Filter className="h-4 w-4" />
-                  Apply Filters
+                  {t('pages.jobs.applyFilters')}
                 </button>
               </div>
             </div>
@@ -440,8 +442,8 @@ export function JobsPage() {
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Filter className="h-4 w-4" />
                 <span>
-                  {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
-                  {getActiveFiltersCount() > 0 && ` (${getActiveFiltersCount()} filter${getActiveFiltersCount() > 1 ? 's' : ''} active)`}
+                  {jobs.length === 1 ? t('pages.jobs.jobsFoundOne', { count: jobs.length }) : t('pages.jobs.jobsFoundMany', { count: jobs.length })}
+                  {getActiveFiltersCount() > 0 && ` (${getActiveFiltersCount() === 1 ? t('pages.jobs.filtersActiveOne', { count: getActiveFiltersCount() }) : t('pages.jobs.filtersActiveMany', { count: getActiveFiltersCount() })})`}
                 </span>
               </div>
               <button
@@ -449,7 +451,7 @@ export function JobsPage() {
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
               >
                 <X className="h-4 w-4" />
-                Clear all
+                {t('pages.jobs.clearAll')}
               </button>
             </div>
           )}
@@ -457,7 +459,7 @@ export function JobsPage() {
           {!hasActiveFilters && (
             <div className="mt-4 pt-4 border-t border-gray-200 flex items-center gap-2 text-sm text-gray-600">
               <Filter className="h-4 w-4" />
-              <span>{jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} available</span>
+              <span>{jobs.length === 1 ? t('pages.jobs.jobsAvailableOne', { count: jobs.length }) : t('pages.jobs.jobsAvailableMany', { count: jobs.length })}</span>
             </div>
           )}
         </div>
@@ -467,7 +469,7 @@ export function JobsPage() {
           <div className="mb-4 text-center">
             <div className="inline-flex items-center gap-2 text-sm text-gray-600">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              <span>Searching...</span>
+              <span>{t('pages.jobs.searching')}</span>
             </div>
           </div>
         )}
@@ -477,19 +479,19 @@ export function JobsPage() {
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <Briefcase className="mx-auto h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {hasActiveFilters ? 'No results found' : 'No jobs found'}
+              {hasActiveFilters ? t('pages.jobs.noResults') : t('pages.jobs.noJobsFound')}
             </h3>
             <p className="text-gray-500 mb-4">
               {hasActiveFilters
-                ? 'Try adjusting your search or filters'
-                : 'There are no job vacancies available at the moment.'}
+                ? t('pages.jobs.tryAdjusting')
+                : t('pages.jobs.noVacancies')}
             </p>
             {hasActiveFilters && (
               <button
                 onClick={clearAllFilters}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Clear filters
+                {t('pages.jobs.clearFilters')}
               </button>
             )}
           </div>
@@ -509,14 +511,14 @@ export function JobsPage() {
                       <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
                       <span className="truncate">
                         {job.company?.name || 
-                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : 'Company')}
+                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : t('pages.jobs.company'))}
                       </span>
                     </div>
                   </div>
                   {job.company?.logo && (
                     <img
                       src={job.company.logo}
-                      alt={job.company.name || 'Company'}
+                      alt={job.company.name || t('pages.jobs.company')}
                       className="h-12 w-12 rounded-lg object-cover ml-3 flex-shrink-0 border border-gray-200"
                     />
                   )}
@@ -553,7 +555,7 @@ export function JobsPage() {
 
                 {job.requirements && job.requirements.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs font-medium text-gray-700 mb-2">Key Requirements:</p>
+                    <p className="text-xs font-medium text-gray-700 mb-2">{t('pages.jobs.keyRequirements')}</p>
                     <div className="flex flex-wrap gap-1">
                       {job.requirements.slice(0, 3).map((req, idx) => (
                         <span
@@ -565,7 +567,7 @@ export function JobsPage() {
                       ))}
                       {job.requirements.length > 3 && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                          +{job.requirements.length - 3} more
+                          {t('pages.jobs.more', { count: job.requirements.length - 3 })}
                         </span>
                       )}
                     </div>
@@ -576,7 +578,7 @@ export function JobsPage() {
                   to={`/jobs/${job.id}`}
                   className="w-full mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-center block"
                 >
-                  View Details
+                  {t('pages.jobs.viewDetails')}
                 </Link>
               </div>
             ))}

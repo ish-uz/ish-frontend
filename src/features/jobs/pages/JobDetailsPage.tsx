@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, MapPin, Briefcase, DollarSign, Eye, Building2,
   Calendar, CheckCircle2, Send, X, User, Globe, Users, Bookmark, BookmarkCheck
@@ -9,7 +10,16 @@ import { applicationService } from '@/features/applications/services/application
 import { userService } from '@/features/users/services/userService';
 import { Job, User as UserType } from '@/types';
 
+const JOB_TYPE_KEYS: Record<string, string> = {
+  'full-time': 'fullTime',
+  'part-time': 'partTime',
+  'contract': 'contract',
+  'internship': 'internship',
+  'remote': 'remote',
+};
+
 export function JobDetailsPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [job, setJob] = useState<Job | null>(null);
@@ -61,7 +71,7 @@ export function JobDetailsPage() {
       const data = await jobService.getJob(id!);
       setJob(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load job');
+      setError(err.response?.data?.detail || t('pages.jobDetails.failedToLoad'));
     } finally {
       setLoading(false);
       // Only reset if this is still the current job being loaded
@@ -159,20 +169,20 @@ export function JobDetailsPage() {
       setShowApplyModal(false);
       setCoverLetter('');
     } catch (err: any) {
-      setApplyError(err.response?.data?.detail || 'Failed to submit application');
+      setApplyError(err.response?.data?.detail || t('pages.jobDetails.failedToSubmit'));
     } finally {
       setApplying(false);
     }
   };
 
   const formatSalary = (min?: number, max?: number, currency: string = 'UZS') => {
-    if (!min && !max) return 'Salary not specified';
+    if (!min && !max) return t('pages.jobDetails.salaryNotSpecified');
     if (min && max) {
       return `${min.toLocaleString()} - ${max.toLocaleString()} ${currency}`;
     }
-    if (min) return `From ${min.toLocaleString()} ${currency}`;
-    if (max) return `Up to ${max.toLocaleString()} ${currency}`;
-    return 'Salary not specified';
+    if (min) return `${t('pages.jobDetails.from')} ${min.toLocaleString()} ${currency}`;
+    if (max) return `${t('pages.jobDetails.upTo')} ${max.toLocaleString()} ${currency}`;
+    return t('pages.jobDetails.salaryNotSpecified');
   };
 
   const formatDate = (dateStr: string) => {
@@ -185,14 +195,8 @@ export function JobDetailsPage() {
   };
 
   const getJobTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      'full-time': 'Full Time',
-      'part-time': 'Part Time',
-      'contract': 'Contract',
-      'internship': 'Internship',
-      'remote': 'Remote',
-    };
-    return labels[type] || type;
+    const key = JOB_TYPE_KEYS[type];
+    return key ? t(`pages.jobType.${key}`) : type;
   };
 
   const getJobTypeBadgeColor = (type: string) => {
@@ -231,12 +235,12 @@ export function JobDetailsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Job not found'}</p>
+          <p className="text-red-600 mb-4">{error || t('pages.jobDetails.jobNotFound')}</p>
           <Link
             to="/jobs"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Back to Jobs
+            {t('pages.jobDetails.backToJobs')}
           </Link>
         </div>
       </div>
@@ -252,7 +256,7 @@ export function JobDetailsPage() {
           className="inline-flex items-center text-slate-600 hover:text-slate-900 mb-6 group"
         >
           <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to Jobs
+          {t('pages.jobDetails.backToJobs')}
         </Link>
 
         {/* Main Content */}
@@ -272,7 +276,7 @@ export function JobDetailsPage() {
                     </h1>
                     <p className="text-slate-600">
                       {job.company?.name || 
-                       (job.author ? `${job.author.firstName} ${job.author.lastName}` : 'Company')}
+                       (job.author ? `${job.author.firstName} ${job.author.lastName}` : t('pages.jobs.company'))}
                     </p>
                   </div>
                 </div>
@@ -286,7 +290,7 @@ export function JobDetailsPage() {
                   {job.isRemote && (
                     <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-teal-100 text-teal-700">
                       <Globe className="h-4 w-4 mr-1.5" />
-                      Remote
+                      {t('pages.jobType.remote')}
                     </span>
                   )}
                   <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 text-slate-700">
@@ -301,13 +305,13 @@ export function JobDetailsPage() {
                 {isJobOwner && (
                   <div className="flex items-center text-sm text-slate-500">
                     <Eye className="h-4 w-4 mr-1" />
-                    {job.viewsCount} views
+                    {job.viewsCount} {t('pages.jobDetails.views')}
                   </div>
                 )}
                 {!isJobOwner && applied && (
                   <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg font-medium text-sm">
                     <CheckCircle2 className="h-4 w-4" />
-                    Applied!
+                    {t('pages.jobDetails.applied')}
                   </div>
                 )}
                 {!isJobOwner && currentUser && (
@@ -323,12 +327,12 @@ export function JobDetailsPage() {
                     {isSaved ? (
                       <>
                         <BookmarkCheck className="h-4 w-4" />
-                        Saved
+                        {t('pages.jobDetails.saved')}
                       </>
                     ) : (
                       <>
                         <Bookmark className="h-4 w-4" />
-                        Save
+                        {t('pages.jobDetails.save')}
                       </>
                     )}
                   </button>
@@ -344,7 +348,7 @@ export function JobDetailsPage() {
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Salary</p>
+                <p className="text-xs text-slate-500">{t('pages.jobDetails.salary')}</p>
                 <p className="font-medium text-slate-900 text-sm">
                   {formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}
                 </p>
@@ -355,7 +359,7 @@ export function JobDetailsPage() {
                 <Briefcase className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Job Type</p>
+                <p className="text-xs text-slate-500">{t('pages.jobDetails.jobType')}</p>
                 <p className="font-medium text-slate-900 text-sm">{getJobTypeLabel(job.jobType)}</p>
               </div>
             </div>
@@ -364,7 +368,7 @@ export function JobDetailsPage() {
                 <MapPin className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Location</p>
+                <p className="text-xs text-slate-500">{t('pages.jobDetails.location')}</p>
                 <p className="font-medium text-slate-900 text-sm">{job.location}</p>
               </div>
             </div>
@@ -373,7 +377,7 @@ export function JobDetailsPage() {
                 <Calendar className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Posted</p>
+                <p className="text-xs text-slate-500">{t('pages.jobDetails.posted')}</p>
                 <p className="font-medium text-slate-900 text-sm">{formatDate(job.createdAt)}</p>
               </div>
             </div>
@@ -381,7 +385,7 @@ export function JobDetailsPage() {
 
           {/* Description */}
           <div className="p-6 lg:p-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Job Description</h2>
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('pages.jobDetails.jobDescription')}</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-slate-700 whitespace-pre-line">{job.description}</p>
             </div>
@@ -390,7 +394,7 @@ export function JobDetailsPage() {
           {/* Requirements */}
           {job.requirements && job.requirements.length > 0 && (
             <div className="p-6 lg:p-8 border-t border-slate-100">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Requirements</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">{t('pages.jobDetails.requirements')}</h2>
               <ul className="space-y-2">
                 {job.requirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-3">
@@ -407,15 +411,15 @@ export function JobDetailsPage() {
             <div className="p-6 lg:p-8 bg-[#0A66C2] border-t border-slate-100 rounded-b-2xl">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="text-white">
-                  <h3 className="font-semibold text-lg mb-1">Interested in this job?</h3>
-                  <p className="text-sm text-blue-100">Submit your application and get noticed by employers</p>
+                  <h3 className="font-semibold text-lg mb-1">{t('pages.jobDetails.interested')}</h3>
+                  <p className="text-sm text-blue-100">{t('pages.jobDetails.submitGetNoticed')}</p>
                 </div>
                 <button
                   onClick={() => setShowApplyModal(true)}
                   className="flex items-center justify-center gap-2 px-8 py-3.5 bg-white text-[#0A66C2] rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
                 >
                   <Send className="h-5 w-5" />
-                  Apply Now
+                  {t('pages.jobDetails.applyNow')}
                 </button>
               </div>
             </div>
@@ -427,8 +431,8 @@ export function JobDetailsPage() {
               <div className="flex items-center justify-center gap-3">
                 <CheckCircle2 className="h-6 w-6 text-green-600" />
                 <div className="text-center">
-                  <h3 className="font-semibold text-slate-900">Application Submitted!</h3>
-                  <p className="text-sm text-slate-600">The employer will review your application</p>
+                  <h3 className="font-semibold text-slate-900">{t('pages.jobDetails.applicationSubmitted')}</h3>
+                  <p className="text-sm text-slate-600">{t('pages.jobDetails.employerWillReview')}</p>
                 </div>
               </div>
             </div>
@@ -439,15 +443,15 @@ export function JobDetailsPage() {
             <div className="p-6 lg:p-8 bg-gradient-to-r from-slate-50 to-blue-50 border-t border-slate-100 rounded-b-2xl">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h3 className="font-semibold text-slate-900">Manage your job posting</h3>
-                  <p className="text-sm text-slate-600">View applications and manage this job</p>
+                  <h3 className="font-semibold text-slate-900">{t('pages.jobDetails.managePosting')}</h3>
+                  <p className="text-sm text-slate-600">{t('pages.jobDetails.viewApplicationsDesc')}</p>
                 </div>
                 <Link
                   to={`/jobs/${job.id}/applications`}
                   className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-600 text-white rounded-xl font-medium hover:bg-slate-700 transition-colors"
                 >
                   <Users className="h-5 w-5" />
-                  View Applications
+                  {t('pages.jobDetails.viewApplications')}
                 </Link>
               </div>
             </div>
@@ -466,7 +470,7 @@ export function JobDetailsPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-200">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Apply for this job</h2>
+                <h2 className="text-xl font-semibold text-slate-900">{t('pages.jobDetails.applyForJob')}</h2>
                 <p className="text-sm text-slate-600 mt-1">{job.title}</p>
               </div>
               <button
@@ -487,17 +491,17 @@ export function JobDetailsPage() {
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Cover Letter (Optional)
+                  {t('pages.jobDetails.coverLetterOptional')}
                 </label>
                 <textarea
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={6}
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
-                  placeholder="Tell the employer why you're a great fit for this role..."
+                  placeholder={t('pages.jobDetails.coverLetterPlaceholder')}
                 />
                 <p className="mt-2 text-xs text-slate-500">
-                  A good cover letter can help you stand out from other applicants
+                  {t('pages.jobDetails.coverLetterHint')}
                 </p>
               </div>
 
@@ -505,8 +509,8 @@ export function JobDetailsPage() {
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-slate-900">Your profile will be shared</p>
-                    <p className="text-slate-600">The employer will see your profile information, skills, and experience</p>
+                    <p className="font-medium text-slate-900">{t('pages.jobDetails.profileShared')}</p>
+                    <p className="text-slate-600">{t('pages.jobDetails.employerWillSee')}</p>
                   </div>
                 </div>
               </div>
@@ -518,7 +522,7 @@ export function JobDetailsPage() {
                 onClick={() => setShowApplyModal(false)}
                 className="px-4 py-2.5 text-slate-700 hover:bg-slate-200 rounded-lg font-medium transition-colors"
               >
-                Cancel
+                {t('pages.jobDetails.cancel')}
               </button>
               <button
                 onClick={handleApply}
@@ -528,12 +532,12 @@ export function JobDetailsPage() {
                 {applying ? (
                   <>
                     <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Applying...
+                    {t('pages.jobDetails.applying')}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Submit Application
+                    {t('pages.jobDetails.submitApplication')}
                   </>
                 )}
               </button>

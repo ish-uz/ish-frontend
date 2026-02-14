@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { User, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { PhoneInput } from '../components/PhoneInput';
 import { authService } from '../services/authService';
 
 export function RegisterPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -24,31 +26,31 @@ export function RegisterPage() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'Ismni kiriting';
+      newErrors.firstName = t('pages.auth.firstNameRequired');
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Familiyani kiriting';
+      newErrors.lastName = t('pages.auth.lastNameRequired');
     }
 
     if (!formData.phone || formData.phone.length < 15) {
-      newErrors.phone = "Telefon raqamini to'liq kiriting";
+      newErrors.phone = t('pages.auth.phoneRequired');
     }
 
     if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "To'g'ri email kiriting";
+      newErrors.email = t('pages.auth.emailInvalid');
     }
 
     if (!formData.password || formData.password.length < 6) {
-      newErrors.password = "Parol kamida 6 ta belgi bo'lishi kerak";
+      newErrors.password = t('pages.auth.passwordMin');
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Parollar mos kelmaydi';
+      newErrors.confirmPassword = t('pages.auth.passwordsMismatch');
     }
 
     if (!acceptedTerms) {
-      newErrors.terms = 'Shartlarni qabul qilishingiz kerak';
+      newErrors.terms = t('pages.auth.termsRequired');
     }
 
     setErrors(newErrors);
@@ -83,7 +85,7 @@ export function RegisterPage() {
       // Always go to profile setup after registration
       navigate('/profile-setup');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Registration failed. Please try again.';
+      const errorMessage = error.response?.data?.detail || t('pages.auth.registerFailed');
       if (error.response?.data?.detail?.includes('Email')) {
         setErrors({ email: errorMessage });
       } else if (error.response?.data?.detail?.includes('Phone')) {
@@ -115,15 +117,15 @@ export function RegisterPage() {
             <span className='text-2xl font-bold text-gray-900'>ISH</span>
           </Link>
           <h2 className='text-3xl font-bold text-gray-900'>
-            Ro'yxatdan o'tish
+            {t('pages.auth.register')}
           </h2>
           <p className='mt-2 text-sm text-gray-600'>
-            Yoki{' '}
+            {t('pages.auth.registerOrLogin')}{' '}
             <Link
               to='/login'
               className='font-medium text-[#0A66C2] hover:text-[#004182]'
             >
-              kirish
+              {t('pages.auth.loginLink')}
             </Link>
           </p>
         </div>
@@ -137,7 +139,7 @@ export function RegisterPage() {
                   htmlFor='firstName'
                   className='block text-sm font-medium text-gray-700 mb-2'
                 >
-                  Ism
+                  {t('pages.auth.firstName')}
                 </label>
                 <div className='relative'>
                   <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -148,7 +150,7 @@ export function RegisterPage() {
                     type='text'
                     value={formData.firstName}
                     onChange={(e) => handleChange('firstName', e.target.value)}
-                    placeholder='Ismingiz'
+                    placeholder={t('pages.auth.firstNamePlaceholder')}
                     className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                       errors.firstName
                         ? 'border-red-300 bg-red-50'
@@ -168,7 +170,7 @@ export function RegisterPage() {
                   htmlFor='lastName'
                   className='block text-sm font-medium text-gray-700 mb-2'
                 >
-                  Familiya
+                  {t('pages.auth.lastName')}
                 </label>
                 <div className='relative'>
                   <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -179,7 +181,7 @@ export function RegisterPage() {
                     type='text'
                     value={formData.lastName}
                     onChange={(e) => handleChange('lastName', e.target.value)}
-                    placeholder='Familiyangiz'
+                    placeholder={t('pages.auth.lastNamePlaceholder')}
                     className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                       errors.lastName
                         ? 'border-red-300 bg-red-50'
@@ -204,7 +206,7 @@ export function RegisterPage() {
                 htmlFor='email'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Email
+                {t('pages.auth.email')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -215,7 +217,7 @@ export function RegisterPage() {
                   type='email'
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
-                  placeholder='email@example.com'
+                  placeholder={t('pages.auth.emailPlaceholder')}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.email
                       ? 'border-red-300 bg-red-50'
@@ -233,7 +235,7 @@ export function RegisterPage() {
                 htmlFor='password'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Parol
+                {t('pages.auth.password')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -244,7 +246,7 @@ export function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => handleChange('password', e.target.value)}
-                  placeholder='Kamida 6 ta belgi'
+                  placeholder={t('pages.auth.passwordMin')}
                   className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.password
                       ? 'border-red-300 bg-red-50'
@@ -273,7 +275,7 @@ export function RegisterPage() {
                 htmlFor='confirmPassword'
                 className='block text-sm font-medium text-gray-700 mb-2'
               >
-                Parolni tasdiqlash
+                {t('pages.auth.confirmPassword')}
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -286,7 +288,7 @@ export function RegisterPage() {
                   onChange={(e) =>
                     handleChange('confirmPassword', e.target.value)
                   }
-                  placeholder='Parolni takrorlang'
+                  placeholder={t('pages.auth.confirmPasswordPlaceholder')}
                   className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
                     errors.confirmPassword
                       ? 'border-red-300 bg-red-50'
@@ -330,21 +332,20 @@ export function RegisterPage() {
                 </div>
                 <div className='ml-3 text-sm'>
                   <label htmlFor='terms' className='text-gray-700'>
-                    Men{' '}
+                    {t('pages.auth.termsLabel')}{' '}
                     <Link
                       to='/terms'
                       className='text-[#0A66C2] hover:text-[#004182]'
                     >
-                      foydalanish shartlari
+                      {t('pages.auth.termsLink')}
                     </Link>{' '}
-                    va{' '}
+                    {t('pages.auth.and')}{' '}
                     <Link
                       to='/privacy'
                       className='text-[#0A66C2] hover:text-[#004182]'
                     >
-                      maxfiylik siyosati
-                    </Link>{' '}
-                    bilan tanishdim va qabul qilaman
+                      {t('pages.auth.privacyLink')}
+                    </Link>
                   </label>
                 </div>
               </div>
@@ -359,10 +360,10 @@ export function RegisterPage() {
               className='w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#0A66C2] text-white rounded-lg font-semibold hover:bg-[#004182] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
             >
               {isLoading ? (
-                <span>Kuting...</span>
+                <span>{t('pages.auth.loading')}</span>
               ) : (
                 <>
-                  <span>Ro'yxatdan o'tish</span>
+                  <span>{t('pages.auth.signUp')}</span>
                   <ArrowRight className='h-5 w-5' />
                 </>
               )}

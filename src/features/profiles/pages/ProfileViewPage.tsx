@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   User, MapPin, Briefcase, GraduationCap,
   Calendar, ExternalLink, Edit2, FileText, CheckCircle2,
@@ -10,6 +11,7 @@ import { userService } from '@/features/users/services/userService';
 import { Profile } from '@/types';
 
 export function ProfileViewPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -33,7 +35,7 @@ export function ProfileViewPage() {
         // Load profile by user ID
         const userId = parseInt(id, 10);
         if (isNaN(userId)) {
-          setError('Invalid user ID');
+          setError(t('pages.profile.invalidUserId'));
           return;
         }
         data = await profileService.getProfileByUserId(userId);
@@ -62,10 +64,10 @@ export function ProfileViewPage() {
         if (!id) {
           navigate('/profile-setup');
         } else {
-          setError('Profile not found');
+          setError(t('pages.profile.profileNotFound'));
         }
       } else {
-        setError(err.response?.data?.detail || 'Failed to load profile');
+        setError(err.response?.data?.detail || t('pages.profile.failedToLoad'));
       }
     } finally {
       setLoading(false);
@@ -103,12 +105,12 @@ export function ProfileViewPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Profile not found'}</p>
+          <p className="text-red-600 mb-4">{error || t('pages.profile.profileNotFound')}</p>
           <button
             onClick={loadProfile}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Retry
+            {t('pages.profile.retry')}
           </button>
         </div>
       </div>
@@ -141,7 +143,7 @@ export function ProfileViewPage() {
                     className="inline-flex items-center px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
-                    Edit Profile
+                    {t('pages.profile.editProfile')}
                   </Link>
                 </div>
               )}
@@ -169,7 +171,7 @@ export function ProfileViewPage() {
               {profile.openToJobSeeker && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span>
-                  Open To Work
+                  {t('pages.profile.openToWork')}
                 </span>
               )}
             </div>
@@ -188,7 +190,7 @@ export function ProfileViewPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
             <div className="flex items-center space-x-2 mb-4">
               <Code className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Skills</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('pages.profile.skills')}</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               {profile.skills.map((skill, index) => (
@@ -208,7 +210,7 @@ export function ProfileViewPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
             <div className="flex items-center space-x-2 mb-6">
               <Briefcase className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Work Experience</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('pages.profile.workExperience')}</h2>
             </div>
             <div className="space-y-6">
               {profile.experience.map((exp, index) => (
@@ -241,7 +243,7 @@ export function ProfileViewPage() {
                     </div>
                     <div className="flex items-center text-sm text-slate-500 mt-1">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
+                      {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : t('pages.profile.present')}
                     </div>
                     {exp.description && (
                       <p className="mt-3 text-slate-600 text-sm whitespace-pre-line">
@@ -260,7 +262,7 @@ export function ProfileViewPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
             <div className="flex items-center space-x-2 mb-6">
               <GraduationCap className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Education</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('pages.profile.education')}</h2>
             </div>
             <div className="space-y-6">
               {profile.education.map((edu, index) => (
@@ -281,7 +283,7 @@ export function ProfileViewPage() {
                     </p>
                     <div className="flex items-center text-sm text-slate-500 mt-1">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {formatDate(edu.startDate)} - {edu.current ? 'Present' : (edu.endDate ? formatDate(edu.endDate) : 'N/A')}
+                      {formatDate(edu.startDate)} - {edu.current ? t('pages.profile.present') : (edu.endDate ? formatDate(edu.endDate) : t('pages.profile.na'))}
                     </div>
                   </div>
                 </div>
@@ -295,7 +297,7 @@ export function ProfileViewPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center space-x-2 mb-4">
               <FileText className="h-5 w-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-slate-900">Resume / CV</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t('pages.profile.resumeCv')}</h2>
             </div>
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
               <div className="flex items-center space-x-3">
@@ -303,8 +305,8 @@ export function ProfileViewPage() {
                   <FileText className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900">Resume.pdf</p>
-                  <p className="text-sm text-slate-500">Uploaded CV</p>
+                  <p className="font-medium text-slate-900">{t('pages.profile.resumePdf')}</p>
+                  <p className="text-sm text-slate-500">{t('pages.profile.uploadedCv')}</p>
                 </div>
               </div>
               <a
@@ -314,7 +316,7 @@ export function ProfileViewPage() {
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
-                <span>View</span>
+                <span>{t('pages.profile.view')}</span>
               </a>
             </div>
           </div>
@@ -325,17 +327,17 @@ export function ProfileViewPage() {
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-6 text-center">
             <Award className="h-12 w-12 text-amber-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-slate-900 mb-2">
-              Make your profile stand out!
+              {t('pages.profile.makeStandOut')}
             </h3>
             <p className="text-slate-600 mb-4">
-              Add your skills, experience, and education to increase your visibility to employers.
+              {t('pages.profile.addSkillsExperience')}
             </p>
             <Link
               to="/profile/settings"
               className="inline-flex items-center px-6 py-2.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium"
             >
               <Edit2 className="h-4 w-4 mr-2" />
-              Complete Profile
+              {t('pages.profile.completeProfile')}
             </Link>
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Send, Check, CheckCheck, AlertCircle } from 'lucide-react';
 import { chatService } from '../services/chatService';
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
@@ -7,6 +8,7 @@ import { Conversation, Message } from '@/types';
 import { userService } from '@/features/users/services/userService';
 
 export function ChatPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const conversationId = parseInt(id || '0');
@@ -222,7 +224,7 @@ export function ChatPage() {
         const message = await chatService.sendMessage(conversationId, content);
         setMessages(prev => [...prev, message]);
       } catch (err: any) {
-        setError('Failed to send message');
+        setError(t('pages.chat.sendError'));
         setNewMessage(content); // Restore message
       }
     }
@@ -251,10 +253,10 @@ export function ChatPage() {
     yesterday.setDate(yesterday.getDate() - 1);
     
     if (date.toDateString() === today.toDateString()) {
-      return 'Today';
+      return t('pages.chat.today');
     }
     if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
+      return t('pages.chat.yesterday');
     }
     return date.toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long', year: 'numeric' });
   };
@@ -302,7 +304,7 @@ export function ChatPage() {
       <div className="h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading conversation...</p>
+          <p className="mt-4 text-gray-600">{t('pages.chat.loading')}</p>
         </div>
       </div>
     );
@@ -339,7 +341,7 @@ export function ChatPage() {
           
           <div className="min-w-0">
             <h2 className="font-semibold text-slate-900 truncate">
-              {participant ? `${participant.firstName} ${participant.lastName}` : 'Unknown User'}
+              {participant ? `${participant.firstName} ${participant.lastName}` : t('pages.chat.unknownUser')}
             </h2>
             {conversation?.jobTitle && (
               <p className="text-xs text-blue-600 truncate">{conversation.jobTitle}</p>
@@ -426,7 +428,7 @@ export function ChatPage() {
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
+              placeholder={t('pages.chat.placeholder')}
               rows={1}
               className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none max-h-32"
               style={{ minHeight: '48px' }}

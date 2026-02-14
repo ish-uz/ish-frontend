@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   User,
   Briefcase,
@@ -8,51 +9,48 @@ import {
 } from 'lucide-react';
 
 export function MainBlocks() {
+  const { t } = useTranslation();
   const blocks = [
     {
       icon: User,
-      title: 'Ish qidiryapsizmi?',
-      description: 'Ish toping, ariza bering, suhbatlashing',
+      titleKey: 'lookingForJob' as const,
+      descKey: 'lookingDesc' as const,
       link: '/jobs',
       gradient: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       textColor: 'text-blue-700',
       buttonColor: 'bg-[#0A66C2] hover:bg-[#004182]',
-      features: [
-        '120,000+ ish qidiruvchi',
-        '35,000+ vakansiyalar',
-        'Bepul ariza',
-      ],
-      badge: 'Eng mashhur',
+      featureKeys: ['jobSeekers', 'vacancies', 'freeApply'] as const,
+      badgeKey: 'mostPopular' as const,
       badgeColor: 'bg-blue-100 text-blue-700',
     },
     {
       icon: Briefcase,
-      title: 'Xodim kerakmi?',
-      description: "E'lon joylang, nomzod toping, tezda yollang",
+      titleKey: 'needEmployee' as const,
+      descKey: 'needEmployeeDesc' as const,
       link: '/employers',
       gradient: 'from-emerald-500 to-emerald-600',
       bgColor: 'bg-emerald-50',
       borderColor: 'border-emerald-200',
       textColor: 'text-emerald-700',
       buttonColor: 'bg-emerald-600 hover:bg-emerald-700',
-      features: ['8,000+ kompaniya', 'Tezkor topish', "Bepul e'lon"],
-      badge: 'Yangi',
+      featureKeys: ['companies', 'quickFind', 'freePost'] as const,
+      badgeKey: 'new' as const,
       badgeColor: 'bg-emerald-100 text-emerald-700',
     },
     {
       icon: Wrench,
-      title: 'Freelancermisiz?',
-      description: 'Xizmatlaringizni soting va loyihalar toping',
+      titleKey: 'freelancer' as const,
+      descKey: 'freelancerDesc' as const,
       link: '/freelancers',
       gradient: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       textColor: 'text-purple-700',
       buttonColor: 'bg-purple-600 hover:bg-purple-700',
-      features: ['Loyihalar', 'Mijozlar', 'Erkin grafik'],
-      badge: 'Tezkor',
+      featureKeys: ['projects', 'clients', 'flexSchedule'] as const,
+      badgeKey: 'fast' as const,
       badgeColor: 'bg-purple-100 text-purple-700',
     },
   ];
@@ -62,11 +60,10 @@ export function MainBlocks() {
       <div className='container mx-auto px-4'>
         <div className='text-center mb-10'>
           <h2 className='text-2xl md:text-3xl font-bold text-gray-900 mb-2'>
-            Qanday ishlaymiz?
+            {t('landing.mainBlocks.title')}
           </h2>
           <p className='text-base text-gray-600 max-w-2xl mx-auto'>
-            Har bir uchun alohida yechim — ish qidiruvchilar, ish beruvchilar va
-            freelancerlar
+            {t('landing.mainBlocks.subtitle')}
           </p>
         </div>
 
@@ -79,11 +76,11 @@ export function MainBlocks() {
                 className={`relative group ${block.bgColor} rounded-xl border-2 ${block.borderColor} p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
               >
                 {/* Badge */}
-                {block.badge && (
+                {block.badgeKey && (
                   <div
                     className={`absolute -top-2 right-4 px-2 py-0.5 ${block.badgeColor} rounded-full text-xs font-semibold`}
                   >
-                    {block.badge}
+                    {t(`landing.mainBlocks.${block.badgeKey}`)}
                   </div>
                 )}
 
@@ -95,16 +92,16 @@ export function MainBlocks() {
                     <Icon className='h-8 w-8' />
                   </div>
                   <h3 className={`text-xl font-bold mb-2 ${block.textColor}`}>
-                    {block.title}
+                    {t(`landing.mainBlocks.${block.titleKey}`)}
                   </h3>
                   <p className='text-sm text-gray-600 mb-4'>
-                    {block.description}
+                    {t(`landing.mainBlocks.${block.descKey}`)}
                   </p>
                 </div>
 
                 {/* Features list */}
                 <ul className='space-y-2 mb-4'>
-                  {block.features.map((feature, idx) => (
+                  {block.featureKeys.map((key, idx) => (
                     <li
                       key={idx}
                       className='flex items-center gap-2 text-xs text-gray-700'
@@ -112,7 +109,7 @@ export function MainBlocks() {
                       <CheckCircle2
                         className={`h-3.5 w-3.5 ${block.textColor} flex-shrink-0`}
                       />
-                      <span>{feature}</span>
+                      <span>{t(`landing.mainBlocks.${key}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -122,7 +119,7 @@ export function MainBlocks() {
                   to={block.link}
                   className={`inline-flex items-center justify-between w-full ${block.buttonColor} text-white px-4 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg group/btn text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white`}
                 >
-                  <span>Boshlash</span>
+                  <span>{t('landing.mainBlocks.learnMore')}</span>
                   <ArrowRight className='h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform' />
                 </Link>
               </div>
