@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MessageCircle, Check, CheckCheck } from 'lucide-react';
 import { chatService } from '../services/chatService';
+import { getUploadsUrl } from '@/lib/utils';
 import { Conversation } from '@/types';
 import { userService } from '@/features/users/services/userService';
 
@@ -142,9 +143,9 @@ export function ChatsPage() {
                 >
                   {/* Avatar */}
                   <div className="flex-shrink-0 mr-4">
-                    {participant?.avatar ? (
-                      <img
-                        src={participant.avatar}
+{participant?.avatar ? (
+                    <img
+                      src={getUploadsUrl(participant.avatar)}
                         alt={`${participant.firstName} ${participant.lastName}`}
                         className="w-12 h-12 rounded-full object-cover"
                       />

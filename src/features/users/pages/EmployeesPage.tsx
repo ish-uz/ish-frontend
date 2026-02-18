@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { userService } from '../services/userService';
 import { invitationService } from '../services/invitationService';
 import { chatService } from '@/features/chat/services/chatService';
+import { getUploadsUrl } from '@/lib/utils';
 import { User } from '@/types';
 import { ChatWithUserResponse } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
@@ -280,7 +281,7 @@ export function EmployeesPage() {
                 <div className="flex items-start space-x-4 mb-4">
                   {user.avatar ? (
                     <img
-                      src={user.avatar}
+                      src={getUploadsUrl(user.avatar)}
                       alt={`${user.firstName} ${user.lastName}`}
                       className="h-16 w-16 rounded-full object-cover border-2 border-blue-100"
                     />

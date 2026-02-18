@@ -22,13 +22,14 @@ i18n
       ru: { translation: ru },
       uz: { translation: uz },
     },
-    fallbackLng: 'en',
+    lng: 'uz',
+    fallbackLng: 'uz',
     supportedLngs: ['en', 'ru', 'uz'],
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
     },

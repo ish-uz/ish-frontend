@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, MapPin, FileText, Upload, ArrowRight, X } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
+import ishLogo from '@/assets/images/ish-logo.PNG';
 import { userService } from '@/features/users/services/userService';
 
 export function ProfileSetupPage() {
@@ -161,9 +162,7 @@ export function ProfileSetupPage() {
         {/* Logo */}
         <div className='text-center mb-8'>
           <div className='inline-flex items-center space-x-2 mb-4'>
-            <div className='flex h-12 w-12 items-center justify-center rounded-lg bg-[#0A66C2] text-white font-bold text-xl'>
-              ISH
-            </div>
+            <img src={ishLogo} alt="ISH" className="h-12 w-auto object-contain rounded-lg" />
             <span className='text-2xl font-bold text-gray-900'>ISH</span>
           </div>
           <h2 className='text-3xl font-bold text-gray-900'>

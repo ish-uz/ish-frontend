@@ -13,9 +13,9 @@
   "landing": {
     "hero": {
       "badge": "35,000+ faol vakansiyalar",
-      "title1": "ISH —",
-      "title2": "Ish va mutaxassislar",
-      "title3": "topishning eng oson yo'li",
+      "title1Rest": "va mutaxassislar shu yerda",
+      "title2": "",
+      "title3": "",
       "subtitle": "O'zbekistondagi eng ishonchli ish topish platformasi.",
       "subtitle2": "Soxta ishlar yo'q, faqat haqiqiy imkoniyatlar.",
       "searchLabel": "Ish qidirish",
@@ -32,7 +32,7 @@
       "title": "Qanday ishlaymiz?",
       "subtitle": "Har bir uchun alohida yechim — ish qidiruvchilar, ish beruvchilar va freelancerlar",
       "lookingForJob": "Ish qidiryapsizmi?",
-      "lookingDesc": "Ish toping, ariza bering, suhbatlashing",
+      "lookingDesc": "Ish toping, ariza bering, suhbat oling",
       "needEmployee": "Xodim kerakmi?",
       "needEmployeeDesc": "E'lon joylang, nomzod toping, tezda yollang",
       "freelancer": "Freelancermisiz?",
@@ -72,11 +72,11 @@
       "reviews": "Reyting va sharhlar",
       "reviewsDesc": "Har bir ish beruvchi va xodim baholanadi. Shaffof va adolatli tizim",
       "realProfiles": "Haqiqiy profillar",
-      "realProfilesDesc": "To'liq ma'lumotlar, tajriba va portfolio. Hech qanday yolg'on ma'lumotlar",
+      "realProfilesDesc": "To'liq ma'lumotlar, tajriba va portfolio. Yolg'on ma'lumotlar yo'q",
       "security": "Xavfsizlik",
       "securityDesc": "Barcha ma'lumotlar shifrlangan. Maxfiylik kafolatlangan",
       "fastResponse": "Tezkor javob",
-      "fastResponseDesc": "O'rtacha 2 soat ichida javob oling. Tezkor aloqa va suhbatlar",
+      "fastResponseDesc": "O'rtacha 2 soat ichida javob oling. Tezkor aloqa va suhbatlar mumkin",
     "trustedPlatform": "Ishonchli platforma",
     "whyTrust": "Nega ISH ishonchli?",
     "whyTrustDesc": "Biz O'zbekistondagi eng xavfsiz va ishonchli ish topish platformasini yaratdik.",
@@ -247,6 +247,7 @@
     },
     "profile": {
       "editProfile": "Profilni tahrirlash",
+      "changePhoto": "Rasmni o'zgartirish",
       "openToWork": "Ishga ochiq",
       "skills": "Ko'nikmalar",
       "workExperience": "Ish tajribasi",
@@ -605,6 +606,8 @@
     }
   },
   "common": {
-    "menu": "Menyu"
+    "menu": "Menyu",
+    "remove": "O'chirish",
+    "loading": "Yuklanmoqda..."
   }
 }

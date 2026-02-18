@@ -7,8 +7,10 @@ import {
   ChevronDown, ChevronUp, MessageCircle, Mail
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
+import { getUploadsUrl } from '@/lib/utils';
 import { Profile } from '@/types';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import ishLogo from '@/assets/images/ish-logo.PNG';
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -107,6 +109,13 @@ export function DashboardLayout() {
     return () => window.removeEventListener('ish:refresh-message-unread', handler);
   }, [loadUnreadCount]);
 
+  // Refetch profile when avatar (or profile) is updated elsewhere (e.g. profile/settings)
+  useEffect(() => {
+    const handler = () => loadProfile();
+    window.addEventListener('ish:profile-updated', handler);
+    return () => window.removeEventListener('ish:profile-updated', handler);
+  }, []);
+
   const loadProfile = async () => {
     try {
       const data = await profileService.getCurrentProfile();
@@ -188,9 +197,7 @@ export function DashboardLayout() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold">
-              ISH
-            </div>
+            <img src={ishLogo} alt="ISH" className="h-9 w-auto object-contain rounded-lg" />
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -221,9 +228,7 @@ export function DashboardLayout() {
         {/* Logo */}
         <div className="h-16 flex-shrink-0 flex items-center justify-between px-4 border-b border-slate-200">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/20">
-              ISH
-            </div>
+            <img src={ishLogo} alt="ISH" className="h-10 w-auto object-contain flex-shrink-0 rounded-lg" />
             {sidebarOpen && (
               <div className="flex flex-col justify-center min-w-0 leading-tight">
                 <span className="text-lg font-bold text-slate-900">ISH</span>
@@ -259,8 +264,18 @@ export function DashboardLayout() {
                 ${!sidebarOpen && 'justify-center'}
               `}
             >
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                <User className="h-5 w-5 text-white" />
+              <div className="h-10 w-10 rounded-full overflow-hidden bg-slate-200 flex-shrink-0 group-hover:scale-105 transition-transform flex items-center justify-center">
+                {profile.avatar ? (
+                  <img
+                    src={getUploadsUrl(profile.avatar)}
+                    alt={profile.fullName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
+                    <User className="h-5 w-5 text-white" />
+                  </div>
+                )}
               </div>
               {sidebarOpen && (
                 <div className="flex-1 min-w-0">

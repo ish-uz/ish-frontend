@@ -82,6 +82,7 @@ export interface Profile {
   userId: number
   fullName: string
   city: string
+  avatar?: string
   title?: string
   bio?: string
   skills?: string[]

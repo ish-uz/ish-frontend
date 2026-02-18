@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { profileService } from '../services/profileService';
+import { userService } from '@/features/users/services/userService';
+import { getUploadsUrl } from '@/lib/utils';
 import { Profile, Experience, Education } from '@/types';
 import { 
   Settings, User, Briefcase, GraduationCap, FileText, 
@@ -32,6 +34,8 @@ export function ProfileSettingsPage() {
   
   const [activeTab, setActiveTab] = useState<TabType>(getInitialTab());
   const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
   const [basicData, setBasicData] = useState({
@@ -90,6 +94,23 @@ export function ProfileSettingsPage() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return;
+    const ext = (file.name || '').toLowerCase();
+    if (!['.jpg', '.jpeg', '.png', '.gif', '.webp'].some((e) => ext.endsWith(e))) return;
+    setAvatarUploading(true);
+    try {
+      await userService.uploadAvatar(file);
+      await loadProfile();
+      window.dispatchEvent(new Event('ish:profile-updated'));
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -279,9 +300,35 @@ export function ProfileSettingsPage() {
         {profile && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 lg:p-6 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="h-16 w-16 lg:h-20 lg:w-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                <User className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
-              </div>
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="relative h-16 w-16 lg:h-20 lg:w-20 rounded-full overflow-hidden bg-slate-200 flex items-center justify-center flex-shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                  disabled={avatarUploading}
+                />
+                {profile.avatar ? (
+                  <img
+                    src={getUploadsUrl(profile.avatar)}
+                    alt={profile.fullName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
+                    <User className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
+                  </div>
+                )}
+                <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity text-white text-xs font-medium text-center px-1">
+                  {avatarUploading ? t('common.loading') : t('pages.profile.changePhoto')}
+                </span>
+              </button>
               <div className="flex-1 min-w-0">
                 <h2 className="text-xl lg:text-2xl font-bold text-slate-900 truncate">{profile.fullName}</h2>
                 <p className="text-slate-600 text-sm lg:text-base">{profile.city}</p>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, Briefcase, Users, Wrench, LogIn, UserPlus, Menu, X, User, LogOut } from 'lucide-react';
+import ishLogo from '@/assets/images/ish-logo.PNG';
 import { userService } from '@/features/users/services/userService';
 import { User as UserType } from '@/types';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -71,9 +72,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0A66C2] text-white font-bold text-xl">
-              ISH
-            </div>
+            <img src={ishLogo} alt="ISH" className="h-10 w-auto object-contain rounded-lg" />
             <div className="flex flex-col leading-tight">
               <span className="text-lg font-bold text-gray-900">ISH</span>
               <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
@@ -106,7 +105,7 @@ export function Header() {
               <span>{t('nav.employees')}</span>
             </Link>
             <Link
-              to="/freelancers"
+              to="/jobs"
               className="flex items-center space-x-1 text-gray-700 hover:text-[#0A66C2] transition-colors"
             >
               <Wrench className="h-4 w-4" />
@@ -201,7 +200,7 @@ export function Header() {
                 <span>{t('nav.employees')}</span>
               </Link>
               <Link
-                to="/freelancers"
+                to="/jobs"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-[#0A66C2] hover:bg-blue-50 rounded-lg transition-colors"
               >

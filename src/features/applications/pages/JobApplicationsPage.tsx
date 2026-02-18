@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { applicationService } from '../services/applicationService';
 import { jobService } from '@/features/jobs/services/jobService';
+import { getUploadsUrl } from '@/lib/utils';
 import { Application, Job } from '@/types';
 
 export function JobApplicationsPage() {
@@ -217,7 +218,7 @@ export function JobApplicationsPage() {
                         <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
                           {applicant?.avatar ? (
                             <img
-                              src={applicant.avatar}
+                              src={getUploadsUrl(applicant.avatar)}
                               alt={applicant.firstName}
                               className="h-16 w-16 rounded-xl object-cover"
                             />

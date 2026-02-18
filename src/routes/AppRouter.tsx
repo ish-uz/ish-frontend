@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { HomePage, NotFoundPage, DashboardPage } from '@/pages';
 import {
   LoginPage,
@@ -23,6 +23,20 @@ export function AppRouter() {
       <Route path='/login' element={<LoginPage />} />
       <Route path='/register' element={<RegisterPage />} />
       <Route path='/profile-setup' element={<ProfileSetupPage />} />
+
+      {/* Redirects from old/marketing URLs to existing routes */}
+      <Route path='/employers' element={<Navigate to="/employees" replace />} />
+      <Route path='/employers/post' element={<Navigate to="/jobs/create" replace />} />
+      <Route path='/employers/pricing' element={<Navigate to="/" replace />} />
+      <Route path='/freelancers' element={<Navigate to="/jobs" replace />} />
+      <Route path='/freelancers/services' element={<Navigate to="/jobs" replace />} />
+      <Route path='/freelancers/support' element={<Navigate to="/" replace />} />
+      <Route path='/about' element={<Navigate to="/" replace />} />
+      <Route path='/how-it-works' element={<Navigate to="/" replace />} />
+      <Route path='/contact' element={<Navigate to="/" replace />} />
+      <Route path='/privacy' element={<Navigate to="/" replace />} />
+      <Route path='/terms' element={<Navigate to="/" replace />} />
+      <Route path='/cookies' element={<Navigate to="/" replace />} />
 
       {/* Dashboard routes - with sidebar */}
       <Route element={<DashboardLayout />}>

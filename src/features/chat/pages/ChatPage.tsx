@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Send, Check, CheckCheck, AlertCircle } from 'lucide-react';
 import { chatService } from '../services/chatService';
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
+import { getUploadsUrl } from '@/lib/utils';
 import { Conversation, Message } from '@/types';
 import { userService } from '@/features/users/services/userService';
 
@@ -327,7 +328,7 @@ export function ChatPage() {
         <div className="flex items-center flex-1 min-w-0">
           {participant?.avatar ? (
             <img
-              src={participant.avatar}
+              src={getUploadsUrl(participant.avatar)}
               alt={`${participant.firstName} ${participant.lastName}`}
               className="w-10 h-10 rounded-full object-cover mr-3"
             />

@@ -13,9 +13,9 @@
   "landing": {
     "hero": {
       "badge": "35,000+ active vacancies",
-      "title1": "ISH —",
-      "title2": "Jobs and talent",
-      "title3": "easiest way to find",
+      "title1Rest": "the easiest way to find jobs and talent",
+      "title2": "",
+      "title3": "",
       "subtitle": "The most trusted job platform in Uzbekistan.",
       "subtitle2": "No fake jobs, only real opportunities.",
       "searchLabel": "Search jobs",
@@ -55,7 +55,7 @@
       "title": "ISH in numbers",
       "subtitle": "The fastest growing job platform in Uzbekistan",
       "jobSeekers": "job seekers",
-      "jobSeekersSub": "5,000+ new monthly",
+      "jobSeekersSub": "5,000+ new every month",
       "companies": "companies",
       "companiesSub": "Verified",
       "jobs": "job openings",
@@ -70,7 +70,7 @@
       "noFakeJobs": "No fake jobs",
       "noFakeDesc": "Every vacancy is checked. Only real and verified jobs",
       "reviews": "Ratings and reviews",
-      "reviewsDesc": "Every employer and employee is rated. Transparent system",
+      "reviewsDesc": "Every employer and employee gets rated. Transparent system",
       "realProfiles": "Real profiles",
       "realProfilesDesc": "Full info, experience and portfolio. No fake data",
       "security": "Security",
@@ -247,6 +247,7 @@
     },
     "profile": {
       "editProfile": "Edit Profile",
+      "changePhoto": "Change photo",
       "openToWork": "Open To Work",
       "skills": "Skills",
       "workExperience": "Work Experience",
@@ -605,6 +606,8 @@
     }
   },
   "common": {
-    "menu": "Menu"
+    "menu": "Menu",
+    "remove": "Remove",
+    "loading": "Loading..."
   }
 }

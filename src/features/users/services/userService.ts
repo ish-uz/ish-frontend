@@ -26,6 +26,26 @@ export const userService = {
   },
 
   /**
+   * Upload avatar image (replaces existing). Returns updated user.
+   */
+  uploadAvatar: async (file: File): Promise<User> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('/v1/users/me/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return toCamelCase(response.data);
+  },
+
+  /**
+   * Remove current user's avatar
+   */
+  deleteAvatar: async (): Promise<User> => {
+    const response = await api.delete('/v1/users/me/avatar');
+    return toCamelCase(response.data);
+  },
+
+  /**
    * Update current user
    */
   updateCurrentUser: async (data: Partial<User>): Promise<User> => {

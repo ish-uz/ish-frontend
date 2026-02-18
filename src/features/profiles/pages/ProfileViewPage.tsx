@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import { userService } from '@/features/users/services/userService';
+import { getUploadsUrl } from '@/lib/utils';
 import { Profile } from '@/types';
 
 export function ProfileViewPage() {
@@ -18,6 +19,8 @@ export function ProfileViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadProfile();
@@ -80,6 +83,23 @@ export function ProfileViewPage() {
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
+    if (file.size > 5 * 1024 * 1024) return;
+    const ext = (file.name || '').toLowerCase();
+    if (!['.jpg', '.jpeg', '.png', '.gif', '.webp'].some((e) => ext.endsWith(e))) return;
+    setAvatarUploading(true);
+    try {
+      await userService.uploadAvatar(file);
+      await loadProfile();
+      window.dispatchEvent(new Event('ish:profile-updated'));
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 p-6">
@@ -122,17 +142,45 @@ export function ProfileViewPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Profile Header Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 mb-6">
-          {/* Cover Image */}
-          <div className="h-40 bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 relative rounded-t-2xl">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJWMGgydjM0em0tNCAwSDh2LTJoMjR2MnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30 rounded-t-2xl"></div>
-          </div>
+          {/* Cover - neutral white (no LinkedIn-style gradient) */}
+          <div className="h-40 bg-white border-b border-slate-200 rounded-t-2xl" />
 
           {/* Profile Info */}
           <div className="px-6 pb-6 relative">
             <div className="flex flex-col sm:flex-row sm:items-end mb-4">
               {/* Avatar - positioned to overlap cover */}
-              <div className="h-32 w-32 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 border-4 border-white shadow-lg flex items-center justify-center flex-shrink-0 -mt-16 relative z-10">
-                <User className="h-16 w-16 text-white" />
+              <div className="h-32 w-32 rounded-2xl border-4 border-white shadow-lg flex-shrink-0 -mt-16 relative z-10 overflow-hidden bg-slate-200">
+                {profile.avatar ? (
+                  <img
+                    src={getUploadsUrl(profile.avatar)}
+                    alt={profile.fullName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
+                    <User className="h-16 w-16 text-white" />
+                  </div>
+                )}
+                {isOwnProfile && (
+                  <>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                      disabled={avatarUploading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={avatarUploading}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity text-white text-sm font-medium"
+                    >
+                      {avatarUploading ? t('common.loading') : t('pages.profile.changePhoto')}
+                    </button>
+                  </>
+                )}
               </div>
               
               {/* Edit Button - Only for own profile */}
@@ -310,7 +358,7 @@ export function ProfileViewPage() {
                 </div>
               </div>
               <a
-                href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'}/uploads/${profile.cvFile}`}
+                href={getUploadsUrl(profile.cvFile)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

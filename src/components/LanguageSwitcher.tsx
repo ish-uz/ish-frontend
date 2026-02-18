@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className, variant = 'header' }: LanguageSwit
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLang = i18n.language?.split('-')[0] || 'en';
+  const currentLang = i18n.language?.split('-')[0] || 'uz';
   const current = supportedLanguages.find((l) => l.code === currentLang) ?? supportedLanguages[0];
 
   const handleSelect = (code: SupportedLocale) => {
