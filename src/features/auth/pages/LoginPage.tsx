@@ -5,6 +5,7 @@ import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import { PhoneInput } from '../components/PhoneInput';
 import ishLogo from '@/assets/images/ish-logo.PNG';
 import { authService } from '../services/authService';
+import { TELEGRAM_BOT_URL } from '@/constants';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -17,6 +18,9 @@ export function LoginPage() {
   );
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showTelegramLogin, setShowTelegramLogin] = useState(false);
+  const [telegramCode, setTelegramCode] = useState('');
+  const [telegramError, setTelegramError] = useState<string | null>(null);
 
   const validate = () => {
     const newErrors: { phone?: string; password?: string } = {};
@@ -45,6 +49,27 @@ export function LoginPage() {
       return t('pages.auth.unauthorized');
     }
     return t('pages.auth.loginFailed');
+  };
+
+  const handleTelegramLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = telegramCode.trim();
+    if (!code || code.length < 6) {
+      setTelegramError(t('pages.auth.telegram.codeRequired') || 'Enter the 6-digit code from the bot.');
+      return;
+    }
+    setTelegramError(null);
+    setIsLoading(true);
+    try {
+      const authResponse = await authService.telegramLogin(code);
+      localStorage.setItem('token', authResponse.access_token);
+      window.dispatchEvent(new Event('tokenChanged'));
+      navigate('/dashboard');
+    } catch (error: any) {
+      setTelegramError(error.response?.data?.detail || t('pages.auth.telegram.loginFailed') || 'Invalid or expired code.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,6 +136,53 @@ export function LoginPage() {
 
         {/* Form */}
         <div className='bg-white rounded-2xl shadow-xl p-8'>
+          {showTelegramLogin ? (
+            <>
+              <p className='text-sm text-gray-600 mb-4'>
+                {t('pages.auth.telegram.instruction') || 'Open the Telegram bot, tap "Kirish kodi", then enter the code below.'}
+              </p>
+              <a
+                href={TELEGRAM_BOT_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='inline-flex items-center gap-2 text-[#0A66C2] font-medium mb-4 hover:underline'
+              >
+                <svg className='h-5 w-5' fill='currentColor' viewBox='0 0 24 24'>
+                  <path d='M12 0C5.374 0 0 5.373 0 12s5.374 12 12 12 12-5.373 12-12S18.626 0 12 0zm5.568 8.16c-.169 1.858-.896 3.305-2.051 4.348-.577.523-1.314.923-2.076 1.23-.752.304-1.551.456-2.441.456-.89 0-1.689-.152-2.441-.456-.762-.307-1.499-.707-2.076-1.23-1.155-1.043-1.882-2.49-2.051-4.348C3.936 7.776 4.224 7.2 4.6 6.72c.376-.48.84-.864 1.368-1.152.528-.288 1.104-.432 1.728-.432.624 0 1.2.144 1.728.432.528.288.992.672 1.368 1.152.376.48.664 1.056.832 1.44z' />
+                </svg>
+                {t('pages.auth.telegram.openBot') || 'Open Telegram bot'}
+              </a>
+              <form onSubmit={handleTelegramLogin} className='space-y-4'>
+                <input
+                  type='text'
+                  inputMode='numeric'
+                  maxLength={6}
+                  value={telegramCode}
+                  onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder={t('pages.auth.telegram.codePlaceholder') || '123456'}
+                  className='block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent'
+                />
+                {telegramError && <p className='text-sm text-red-600'>{telegramError}</p>}
+                <div className='flex gap-3'>
+                  <button
+                    type='button'
+                    onClick={() => { setShowTelegramLogin(false); setTelegramCode(''); setTelegramError(null); }}
+                    className='px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50'
+                  >
+                    {t('pages.auth.telegram.back') || 'Back'}
+                  </button>
+                  <button
+                    type='submit'
+                    disabled={isLoading || telegramCode.length < 6}
+                    className='flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#0A66C2] text-white rounded-lg font-semibold hover:bg-[#004182] disabled:opacity-50'
+                  >
+                    {isLoading ? t('pages.auth.loading') : t('pages.auth.signIn')}
+                  </button>
+                </div>
+              </form>
+            </>
+          ) : (
+          <>
           {/* Error Banner */}
           {generalError && (
             <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3'>
@@ -260,6 +332,7 @@ export function LoginPage() {
             </button>
             <button
               type='button'
+              onClick={() => setShowTelegramLogin(true)}
               className='w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'
             >
               <svg className='h-5 w-5' fill='currentColor' viewBox='0 0 24 24'>
@@ -268,6 +341,8 @@ export function LoginPage() {
               <span className='ml-2'>Telegram</span>
             </button>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ const toCamelCase = (data: any): User => ({
   firstName: data.first_name,
   lastName: data.last_name,
   avatar: data.avatar,
+  telegramId: data.telegram_id ?? undefined,
   role: data.role,
   isActive: data.is_active,
   isVerified: data.is_verified,

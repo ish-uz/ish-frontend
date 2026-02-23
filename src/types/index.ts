@@ -6,6 +6,7 @@ export interface User {
   firstName: string
   lastName: string
   avatar?: string
+  telegramId?: string | null
   role: UserRole
   isActive: boolean
   isVerified: boolean

@@ -3,7 +3,7 @@ export const USER_ROLES = {
   USER: 'user',
   EMPLOYER: 'employer',
   ADMIN: 'admin',
-} as const
+} as const;
 
 // Job types
 export const JOB_TYPES = {
@@ -12,28 +12,28 @@ export const JOB_TYPES = {
   CONTRACT: 'contract',
   INTERNSHIP: 'internship',
   REMOTE: 'remote',
-} as const
+} as const;
 
 export const JOB_TYPE_LABELS: Record<string, string> = {
   'full-time': 'Full Time',
   'part-time': 'Part Time',
-  'contract': 'Contract',
-  'internship': 'Internship',
-  'remote': 'Remote',
-}
+  contract: 'Contract',
+  internship: 'Internship',
+  remote: 'Remote',
+};
 
 // Job statuses
 export const JOB_STATUSES = {
   ACTIVE: 'active',
   CLOSED: 'closed',
   DRAFT: 'draft',
-} as const
+} as const;
 
 export const JOB_STATUS_LABELS: Record<string, string> = {
-  'active': 'Active',
-  'closed': 'Closed',
-  'draft': 'Draft',
-}
+  active: 'Active',
+  closed: 'Closed',
+  draft: 'Draft',
+};
 
 // Company sizes
 export const COMPANY_SIZES = {
@@ -42,7 +42,7 @@ export const COMPANY_SIZES = {
   LARGE: '51-200',
   ENTERPRISE: '201-500',
   CORPORATION: '500+',
-} as const
+} as const;
 
 export const COMPANY_SIZE_LABELS: Record<string, string> = {
   '1-10': '1-10 employees',
@@ -50,7 +50,11 @@ export const COMPANY_SIZE_LABELS: Record<string, string> = {
   '51-200': '51-200 employees',
   '201-500': '201-500 employees',
   '500+': '500+ employees',
-}
+};
+
+// Telegram bot for link/login codes (replace with your bot username)
+export const TELEGRAM_BOT_USERNAME = 'ishjobs_bot';
+export const TELEGRAM_BOT_URL = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
 
 // Routes
 export const ROUTES = {
@@ -66,4 +70,4 @@ export const ROUTES = {
   COMPANY_DETAIL: '/companies/:id',
   DASHBOARD: '/dashboard',
   SETTINGS: '/settings',
-} as const
+} as const;

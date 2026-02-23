@@ -7,10 +7,12 @@ import { getUploadsUrl } from '@/lib/utils';
 import { Profile, Experience, Education } from '@/types';
 import { 
   Settings, User, Briefcase, GraduationCap, FileText, 
-  Eye, Save, Plus, X, Trash2, Upload, CheckCircle2, ChevronDown
+  Eye, Save, Plus, X, Trash2, Upload, CheckCircle2, ChevronDown, Link2
 } from 'lucide-react';
+import { authService } from '@/features/auth/services/authService';
+import { TELEGRAM_BOT_URL } from '@/constants';
 
-type TabType = 'basic' | 'skills' | 'experience' | 'education' | 'cv' | 'visibility';
+type TabType = 'basic' | 'skills' | 'experience' | 'education' | 'cv' | 'visibility' | 'account';
 
 export function ProfileSettingsPage() {
   const { t } = useTranslation();
@@ -25,7 +27,7 @@ export function ProfileSettingsPage() {
   // Get initial tab from URL query parameter
   const getInitialTab = (): TabType => {
     const tabParam = searchParams.get('tab');
-    const validTabs: TabType[] = ['basic', 'skills', 'experience', 'education', 'cv', 'visibility'];
+    const validTabs: TabType[] = ['basic', 'skills', 'experience', 'education', 'cv', 'visibility', 'account'];
     if (tabParam && validTabs.includes(tabParam as TabType)) {
       return tabParam as TabType;
     }
@@ -49,6 +51,12 @@ export function ProfileSettingsPage() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [educations, setEducations] = useState<Education[]>([]);
 
+  // Telegram link (account tab)
+  const [telegramCode, setTelegramCode] = useState('');
+  const [telegramLinking, setTelegramLinking] = useState(false);
+  const [telegramLinkError, setTelegramLinkError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<{ telegramId?: string | null } | null>(null);
+
   // Update tab from URL when it changes
   useEffect(() => {
     const tabFromUrl = getInitialTab();
@@ -67,6 +75,12 @@ export function ProfileSettingsPage() {
   useEffect(() => {
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'account') {
+      userService.getCurrentUser().then(setCurrentUser).catch(() => setCurrentUser(null));
+    }
+  }, [activeTab]);
 
   const loadProfile = async () => {
     try {
@@ -231,6 +245,23 @@ export function ProfileSettingsPage() {
     setEducations(educations.filter((_, i) => i !== index));
   };
 
+  const handleTelegramLink = async () => {
+    if (!telegramCode.trim()) return;
+    setTelegramLinkError(null);
+    setTelegramLinking(true);
+    try {
+      await authService.telegramLink(telegramCode.trim());
+      setSuccess(t('pages.profileSettings.telegram.linked') || 'Telegram linked successfully.');
+      setTelegramCode('');
+      userService.getCurrentUser().then(setCurrentUser);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err: any) {
+      setTelegramLinkError(err.response?.data?.detail || t('pages.profileSettings.telegram.linkError') || 'Failed to link.');
+    } finally {
+      setTelegramLinking(false);
+    }
+  };
+
   const tabs = [
     { id: 'basic' as TabType, icon: User },
     { id: 'skills' as TabType, icon: Briefcase },
@@ -238,6 +269,7 @@ export function ProfileSettingsPage() {
     { id: 'education' as TabType, icon: GraduationCap },
     { id: 'cv' as TabType, icon: FileText },
     { id: 'visibility' as TabType, icon: Eye },
+    { id: 'account' as TabType, icon: Link2 },
   ];
 
   const activeTabData = tabs.find(t => t.id === activeTab);
@@ -917,6 +949,69 @@ setSuccess(t('pages.profileSettings.cv.successDelete'));
                     </label>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Account / Telegram Tab */}
+            {activeTab === 'account' && (
+              <div className="space-y-4 lg:space-y-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                  {t('pages.profileSettings.telegram.title') || 'Telegram'}
+                </h3>
+                {currentUser?.telegramId ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
+                    <p className="text-sm text-green-800">
+                      {t('pages.profileSettings.telegram.alreadyLinked') || 'Telegram is linked. You can log in with Telegram.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 lg:p-6 space-y-4">
+                    <p className="text-sm text-slate-600">
+                      {t('pages.profileSettings.telegram.description') ||
+                        'Link your Telegram to log in with a code from the bot (no password).'}
+                    </p>
+                    <ol className="list-decimal list-inside text-sm text-slate-700 space-y-2">
+                      <li>
+                        <a
+                          href={TELEGRAM_BOT_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {t('pages.profileSettings.telegram.openBot') || 'Open the Telegram bot'}
+                        </a>
+                        {' '}
+                        {t('pages.profileSettings.telegram.andGetLinkCode') || 'and tap "Link kodi".'}
+                      </li>
+                      <li>
+                        {t('pages.profileSettings.telegram.enterCodeBelow') || 'Enter the code below.'}
+                      </li>
+                    </ol>
+                    <div className="flex flex-col sm:flex-row gap-3 max-w-sm">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={telegramCode}
+                        onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder={t('pages.profileSettings.telegram.codePlaceholder') || '123456'}
+                        className="px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleTelegramLink}
+                        disabled={telegramLinking || telegramCode.length < 6}
+                        className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+                      >
+                        {telegramLinking ? t('common.loading') : (t('pages.profileSettings.telegram.linkButton') || 'Link')}
+                      </button>
+                    </div>
+                    {telegramLinkError && (
+                      <p className="text-sm text-red-600">{telegramLinkError}</p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

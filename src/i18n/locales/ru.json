@@ -310,7 +310,15 @@
       "wrongCredentials": "Неверный телефон или пароль",
       "userNotFound": "Пользователь не найден",
       "unauthorized": "Доступ запрещён. Проверьте данные.",
-      "or": "Или"
+      "or": "Или",
+      "telegram": {
+        "instruction": "Откройте бота в Telegram, нажмите «Kirish kodi», затем введите код ниже.",
+        "openBot": "Открыть бота в Telegram",
+        "codePlaceholder": "123456",
+        "codeRequired": "Введите 6-значный код из бота.",
+        "loginFailed": "Неверный или истёкший код. Получите новый код в боте.",
+        "back": "Назад"
+      }
     },
     "profileSetup": {
       "title": "Заполните профиль",
@@ -348,7 +356,8 @@
         "experience": "Опыт",
         "education": "Образование",
         "cv": "Резюме",
-        "visibility": "Видимость"
+        "visibility": "Видимость",
+        "account": "Аккаунт"
       },
       "basic": {
         "fullName": "Полное имя *",
@@ -428,6 +437,18 @@
         "showOnEmployees": "Показывать мой профиль на странице Сотрудники",
         "successVisibility": "Настройки видимости обновлены!",
         "failedVisibility": "Не удалось обновить видимость"
+      },
+      "telegram": {
+        "title": "Telegram",
+        "description": "Привяжите Telegram, чтобы входить по коду из бота (без пароля).",
+        "openBot": "Откройте бота в Telegram",
+        "andGetLinkCode": "и нажмите «Link kodi».",
+        "enterCodeBelow": "Введите код ниже.",
+        "codePlaceholder": "123456",
+        "linkButton": "Привязать",
+        "linked": "Telegram успешно привязан.",
+        "alreadyLinked": "Telegram привязан. Вы можете входить через Telegram.",
+        "linkError": "Неверный или истёкший код. Получите новый код в боте."
       },
       "errors": {
         "failedLoad": "Не удалось загрузить профиль",

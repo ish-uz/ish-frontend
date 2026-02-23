@@ -28,6 +28,22 @@ export const authService = {
   },
 
   /**
+   * Login with Telegram code (from bot)
+   */
+  telegramLogin: async (code: string): Promise<AuthResponse> => {
+    const response = await api.post('/v1/auth/telegram/login', { code: code.trim() });
+    return response.data;
+  },
+
+  /**
+   * Link Telegram to current account (requires auth). Submit code from bot.
+   */
+  telegramLink: async (code: string): Promise<any> => {
+    const response = await api.post('/v1/auth/telegram/link', { code: code.trim() });
+    return response.data;
+  },
+
+  /**
    * Register user
    * Converts camelCase to snake_case for backend
    */

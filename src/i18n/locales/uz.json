@@ -310,7 +310,15 @@
       "wrongCredentials": "Telefon yoki parol noto'g'ri",
       "userNotFound": "Foydalanuvchi topilmadi",
       "unauthorized": "Kirish rad etildi. Ma'lumotlarni tekshiring.",
-      "or": "Yoki"
+      "or": "Yoki",
+      "telegram": {
+        "instruction": "Telegram botini oching, «Kirish kodi»ni bosing va kodni quyiga kiriting.",
+        "openBot": "Telegram botini ochish",
+        "codePlaceholder": "123456",
+        "codeRequired": "Botdan 6 xonali kodni kiriting.",
+        "loginFailed": "Kod noto'g'ri yoki muddati tugagan. Botdan yangi kod oling.",
+        "back": "Orqaga"
+      }
     },
     "profileSetup": {
       "title": "Profilni to'ldiring",
@@ -348,7 +356,8 @@
         "experience": "Tajriba",
         "education": "Ta'lim",
         "cv": "Rezyume",
-        "visibility": "Ko'rinish"
+        "visibility": "Ko'rinish",
+        "account": "Akkaunt"
       },
       "basic": {
         "fullName": "To'liq ism *",
@@ -428,6 +437,18 @@
         "showOnEmployees": "Profilimni Xodimlar sahifasida ko'rsatish",
         "successVisibility": "Ko'rinish sozlamalari yangilandi!",
         "failedVisibility": "Ko'rinish yangilanmadi"
+      },
+      "telegram": {
+        "title": "Telegram",
+        "description": "Telegramni ulang — bot orqali kod bilan kiring (parolsiz).",
+        "openBot": "Telegram botini oching",
+        "andGetLinkCode": "va «Link kodi»ni bosing.",
+        "enterCodeBelow": "Kodni quyida kiriting.",
+        "codePlaceholder": "123456",
+        "linkButton": "Ulash",
+        "linked": "Telegram muvaffaqiyatli ulandi.",
+        "alreadyLinked": "Telegram ulangan. Telegram orqali kira olasiz.",
+        "linkError": "Kod noto'g'ri yoki muddati tugagan. Botdan yangi kod oling."
       },
       "errors": {
         "failedLoad": "Profil yuklanmadi",

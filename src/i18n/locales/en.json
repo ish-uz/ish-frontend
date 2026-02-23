@@ -310,7 +310,15 @@
       "wrongCredentials": "Phone or password is incorrect",
       "userNotFound": "User not found",
       "unauthorized": "Access denied. Please check your credentials.",
-      "or": "Or"
+      "or": "Or",
+      "telegram": {
+        "instruction": "Open the Telegram bot, tap \"Kirish kodi\", then enter the code below.",
+        "openBot": "Open Telegram bot",
+        "codePlaceholder": "123456",
+        "codeRequired": "Enter the 6-digit code from the bot.",
+        "loginFailed": "Invalid or expired code. Get a new code from the bot.",
+        "back": "Back"
+      }
     },
     "profileSetup": {
       "title": "Complete your profile",
@@ -348,7 +356,8 @@
         "experience": "Experience",
         "education": "Education",
         "cv": "CV",
-        "visibility": "Visibility"
+        "visibility": "Visibility",
+        "account": "Account"
       },
       "basic": {
         "fullName": "Full Name *",
@@ -428,6 +437,18 @@
         "showOnEmployees": "Show my profile on Employees page",
         "successVisibility": "Visibility settings updated!",
         "failedVisibility": "Failed to update visibility"
+      },
+      "telegram": {
+        "title": "Telegram",
+        "description": "Link your Telegram to log in with a code from the bot (no password).",
+        "openBot": "Open the Telegram bot",
+        "andGetLinkCode": "and tap \"Link kodi\".",
+        "enterCodeBelow": "Enter the code below.",
+        "codePlaceholder": "123456",
+        "linkButton": "Link",
+        "linked": "Telegram linked successfully.",
+        "alreadyLinked": "Telegram is linked. You can log in with Telegram.",
+        "linkError": "Invalid or expired code. Get a new code from the bot."
       },
       "errors": {
         "failedLoad": "Failed to load profile",
