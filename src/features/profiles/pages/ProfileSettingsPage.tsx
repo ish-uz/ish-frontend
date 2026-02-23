@@ -254,6 +254,7 @@ export function ProfileSettingsPage() {
       setSuccess(t('pages.profileSettings.telegram.linked') || 'Telegram linked successfully.');
       setTelegramCode('');
       userService.getCurrentUser().then(setCurrentUser);
+      window.dispatchEvent(new Event('ish:profile-updated'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
       setTelegramLinkError(err.response?.data?.detail || t('pages.profileSettings.telegram.linkError') || 'Failed to link.');

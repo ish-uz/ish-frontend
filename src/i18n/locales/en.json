@@ -125,6 +125,10 @@
       "logout": "Logout",
       "addYourTitle": "Add your title"
     },
+    "telegramBanner": {
+      "message": "Link your Telegram to sign in quickly with a code (no password) and get the most out of your account.",
+      "cta": "Link Telegram"
+    },
     "welcome": "Welcome back, {{name}}! 👋",
     "welcomeSub": "Here's what's happening with your profile today.",
     "completeProfile": "Complete your profile",

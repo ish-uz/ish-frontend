@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
-  User, Settings, Briefcase, Users, FileText, Send, PlusCircle,
+  User as UserIcon, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp, MessageCircle, Mail
+  ChevronDown, ChevronUp, MessageCircle, Mail, Link2
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
+import { userService } from '@/features/users/services/userService';
 import { getUploadsUrl } from '@/lib/utils';
-import { Profile } from '@/types';
+import { Profile, User } from '@/types';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import ishLogo from '@/assets/images/ish-logo.PNG';
 
@@ -30,7 +31,7 @@ const navGroups: NavGroup[] = [
     labelKey: 'main',
     items: [
       { icon: Home, labelKey: 'dashboard', path: '/dashboard' },
-      { icon: User, labelKey: 'myProfile', path: '/profile' },
+      { icon: UserIcon, labelKey: 'myProfile', path: '/profile' },
       { icon: MessageCircle, labelKey: 'messages', path: '/chat' },
       { icon: Mail, labelKey: 'invitations', path: '/invitations' },
       { icon: Users, labelKey: 'employees', path: '/employees' },
@@ -74,6 +75,7 @@ export function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -118,8 +120,12 @@ export function DashboardLayout() {
 
   const loadProfile = async () => {
     try {
-      const data = await profileService.getCurrentProfile();
-      setProfile(data);
+      const [profileData, userData] = await Promise.all([
+        profileService.getCurrentProfile(),
+        userService.getCurrentUser(),
+      ]);
+      setProfile(profileData);
+      setCurrentUser(userData);
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -273,7 +279,7 @@ export function DashboardLayout() {
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600">
-                    <User className="h-5 w-5 text-white" />
+                    <UserIcon className="h-5 w-5 text-white" />
                   </div>
                 )}
               </div>
@@ -424,6 +430,29 @@ export function DashboardLayout() {
           ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}
         `}
       >
+        {/* Telegram link banner — show when user is logged in but has not linked Telegram */}
+        {currentUser && !currentUser.telegramId && (
+          <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg">
+            <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Link2 className="h-5 w-5" />
+                  </div>
+                  <p className="text-sm sm:text-base font-medium text-white/95">
+                    {t('dashboard.telegramBanner.message')}
+                  </p>
+                </div>
+                <Link
+                  to="/profile/settings?tab=account"
+                  className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-blue-600 font-semibold text-sm hover:bg-blue-50 transition-colors shadow-sm"
+                >
+                  {t('dashboard.telegramBanner.cta')}
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <Outlet />
       </main>
     </div>

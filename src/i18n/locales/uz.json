@@ -125,6 +125,10 @@
       "logout": "Chiqish",
       "addYourTitle": "Lavozimingizni qo'shing"
     },
+    "telegramBanner": {
+      "message": "Telegramni akkauntingizga ulang — bot orqali kod bilan tez kirish va barcha imkoniyatlardan foydalanish mumkin.",
+      "cta": "Telegramni ulash"
+    },
     "welcome": "Xush kelibsiz, {{name}}! 👋",
     "welcomeSub": "Profilingiz bilan bugun nimalar bo'layotganini ko'ring.",
     "completeProfile": "Profilni to'ldiring",
