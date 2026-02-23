@@ -5,7 +5,7 @@ import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
 import { PhoneInput } from '../components/PhoneInput';
 import ishLogo from '@/assets/images/ish-logo.PNG';
 import { authService } from '../services/authService';
-import { TELEGRAM_BOT_URL } from '@/constants';
+import { TELEGRAM_BOT_URL_LOGIN } from '@/constants';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -142,7 +142,7 @@ export function LoginPage() {
                 {t('pages.auth.telegram.instruction') || 'Open the Telegram bot, tap "Kirish kodi", then enter the code below.'}
               </p>
               <a
-                href={TELEGRAM_BOT_URL}
+                href={TELEGRAM_BOT_URL_LOGIN}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='inline-flex items-center gap-2 text-[#0A66C2] font-medium mb-4 hover:underline'

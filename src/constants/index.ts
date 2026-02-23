@@ -55,6 +55,10 @@ export const COMPANY_SIZE_LABELS: Record<string, string> = {
 // Telegram bot for link/login codes (replace with your bot username)
 export const TELEGRAM_BOT_USERNAME = 'ishjobs_bot';
 export const TELEGRAM_BOT_URL = `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+/** Deep link so opening from login page sends /start and shows main menu */
+export const TELEGRAM_BOT_URL_LOGIN = `https://t.me/${TELEGRAM_BOT_USERNAME}?start=login`;
+/** Deep link so opening from profile settings sends /start and shows main menu */
+export const TELEGRAM_BOT_URL_LINK = `https://t.me/${TELEGRAM_BOT_USERNAME}?start=link`;
 
 // Routes
 export const ROUTES = {

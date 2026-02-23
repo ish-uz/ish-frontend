@@ -10,7 +10,7 @@ import {
   Eye, Save, Plus, X, Trash2, Upload, CheckCircle2, ChevronDown, Link2
 } from 'lucide-react';
 import { authService } from '@/features/auth/services/authService';
-import { TELEGRAM_BOT_URL } from '@/constants';
+import { TELEGRAM_BOT_URL_LINK } from '@/constants';
 
 type TabType = 'basic' | 'skills' | 'experience' | 'education' | 'cv' | 'visibility' | 'account';
 
@@ -975,7 +975,7 @@ setSuccess(t('pages.profileSettings.cv.successDelete'));
                     <ol className="list-decimal list-inside text-sm text-slate-700 space-y-2">
                       <li>
                         <a
-                          href={TELEGRAM_BOT_URL}
+                          href={TELEGRAM_BOT_URL_LINK}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
