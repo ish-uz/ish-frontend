@@ -52,6 +52,21 @@ export function formatSalary(
   return `${formatter.format(min)} - ${formatter.format(max)}`;
 }
 
+/** Format number for salary input with dots as thousand separators (e.g. 2500000 -> "2.500.000") */
+export function formatSalaryForInput(value: number | undefined | null): string {
+  if (value === undefined || value === null) return '';
+  const s = String(Math.max(0, Math.floor(value)));
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/** Parse salary from input: "2.500.000", "2 500 000", "2500000" -> 2500000 */
+export function parseSalaryInput(input: string): number | undefined {
+  const s = input.replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '').trim();
+  if (!s) return undefined;
+  const n = parseInt(s, 10);
+  return Number.isNaN(n) ? undefined : n;
+}
+
 // Validation
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

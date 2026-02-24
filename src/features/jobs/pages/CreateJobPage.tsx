@@ -7,6 +7,7 @@ import {
 import { jobService } from '../services/jobService';
 import { companyService } from '../../companies/services/companyService';
 import { JobType, JobCreate, Company } from '@/types';
+import { formatSalaryForInput, parseSalaryInput } from '@/utils';
 
 export function CreateJobPage() {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ export function CreateJobPage() {
     companyId: undefined,
   });
   const [newRequirement, setNewRequirement] = useState('');
+  // Salary inputs as text so user can type "2.500.000"
+  const [salaryMinDisplay, setSalaryMinDisplay] = useState('');
+  const [salaryMaxDisplay, setSalaryMaxDisplay] = useState('');
 
   // Load user's companies
   useEffect(() => {
@@ -94,8 +98,14 @@ export function CreateJobPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      const job = await jobService.createJob(formData);
+      const salaryMin = parseSalaryInput(salaryMinDisplay);
+      const salaryMax = parseSalaryInput(salaryMaxDisplay);
+      const payload: JobCreate = {
+        ...formData,
+        salaryMin: salaryMin ?? undefined,
+        salaryMax: salaryMax ?? undefined,
+      };
+      const job = await jobService.createJob(payload);
       navigate(`/jobs/${job.id}`);
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -269,11 +279,12 @@ export function CreateJobPage() {
                   Minimum
                 </label>
                 <input
-                  type="number"
-                  value={formData.salaryMin || ''}
-                  onChange={(e) => setFormData({ ...formData, salaryMin: e.target.value ? Number(e.target.value) : undefined })}
+                  type="text"
+                  inputMode="numeric"
+                  value={salaryMinDisplay}
+                  onChange={(e) => setSalaryMinDisplay(e.target.value)}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 5000000"
+                  placeholder="e.g., 2.500.000"
                 />
               </div>
 
@@ -282,11 +293,12 @@ export function CreateJobPage() {
                   Maximum
                 </label>
                 <input
-                  type="number"
-                  value={formData.salaryMax || ''}
-                  onChange={(e) => setFormData({ ...formData, salaryMax: e.target.value ? Number(e.target.value) : undefined })}
+                  type="text"
+                  inputMode="numeric"
+                  value={salaryMaxDisplay}
+                  onChange={(e) => setSalaryMaxDisplay(e.target.value)}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 10000000"
+                  placeholder="e.g., 5.000.000"
                 />
               </div>
 

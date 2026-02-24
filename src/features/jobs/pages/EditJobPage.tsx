@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
 import { JobType, JobCreate } from '@/types';
+import { formatSalaryForInput, parseSalaryInput } from '@/utils';
 
 export function EditJobPage() {
   const navigate = useNavigate();
@@ -27,6 +28,8 @@ export function EditJobPage() {
     isRemote: false,
   });
   const [newRequirement, setNewRequirement] = useState('');
+  const [salaryMinDisplay, setSalaryMinDisplay] = useState('');
+  const [salaryMaxDisplay, setSalaryMaxDisplay] = useState('');
 
   const jobTypes: { value: JobType; label: string }[] = [
     { value: 'full-time', label: 'Full Time' },
@@ -60,6 +63,8 @@ export function EditJobPage() {
         requirements: job.requirements || [],
         isRemote: job.isRemote || false,
       });
+      setSalaryMinDisplay(formatSalaryForInput(job.salaryMin));
+      setSalaryMaxDisplay(formatSalaryForInput(job.salaryMax));
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -115,8 +120,14 @@ export function EditJobPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      await jobService.updateJob(Number(id), formData);
+      const salaryMin = parseSalaryInput(salaryMinDisplay);
+      const salaryMax = parseSalaryInput(salaryMaxDisplay);
+      const payload: JobCreate = {
+        ...formData,
+        salaryMin: salaryMin ?? undefined,
+        salaryMax: salaryMax ?? undefined,
+      };
+      await jobService.updateJob(Number(id), payload);
       navigate(`/jobs/${id}`);
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -273,11 +284,12 @@ export function EditJobPage() {
                   Minimum
                 </label>
                 <input
-                  type="number"
-                  value={formData.salaryMin || ''}
-                  onChange={(e) => setFormData({ ...formData, salaryMin: e.target.value ? Number(e.target.value) : undefined })}
+                  type="text"
+                  inputMode="numeric"
+                  value={salaryMinDisplay}
+                  onChange={(e) => setSalaryMinDisplay(e.target.value)}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 5000000"
+                  placeholder="e.g., 2.500.000"
                 />
               </div>
 
@@ -286,11 +298,12 @@ export function EditJobPage() {
                   Maximum
                 </label>
                 <input
-                  type="number"
-                  value={formData.salaryMax || ''}
-                  onChange={(e) => setFormData({ ...formData, salaryMax: e.target.value ? Number(e.target.value) : undefined })}
+                  type="text"
+                  inputMode="numeric"
+                  value={salaryMaxDisplay}
+                  onChange={(e) => setSalaryMaxDisplay(e.target.value)}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., 10000000"
+                  placeholder="e.g., 5.000.000"
                 />
               </div>
 
