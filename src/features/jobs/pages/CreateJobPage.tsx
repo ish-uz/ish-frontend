@@ -7,7 +7,7 @@ import {
 import { jobService } from '../services/jobService';
 import { companyService } from '../../companies/services/companyService';
 import { JobType, JobCreate, Company } from '@/types';
-import { formatSalaryForInput, parseSalaryInput } from '@/utils';
+import { parseSalaryInput } from '@/utils';
 
 export function CreateJobPage() {
   const navigate = useNavigate();
