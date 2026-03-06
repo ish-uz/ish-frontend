@@ -18,6 +18,7 @@ const toCamelCase = (data: any): any => {
     readAt: data.read_at ?? data.readAt,
     unreadCount: data.unread_count ?? data.unreadCount ?? 0,
     jobTitle: data.job_title ?? data.jobTitle,
+    jobId: data.job_id ?? data.jobId,
     employer: data.employer ? {
       id: data.employer.id,
       firstName: data.employer.first_name ?? data.employer.firstName,

@@ -616,7 +616,9 @@
       "sendError": "Failed to send message",
       "today": "Today",
       "yesterday": "Yesterday",
-      "unknownUser": "Unknown User"
+      "unknownUser": "Unknown User",
+      "vacancy": "Vacancy",
+      "goToJob": "Go"
     },
     "myApplications": {
       "title": "My Applications",

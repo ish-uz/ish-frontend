@@ -196,6 +196,7 @@ export interface Conversation {
   lastMessage?: Message
   unreadCount: number
   jobTitle?: string
+  jobId?: number
 }
 
 export interface ConversationListResponse {

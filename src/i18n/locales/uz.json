@@ -616,7 +616,9 @@
       "sendError": "Xabar yuborib bo'lmadi",
       "today": "Bugun",
       "yesterday": "Kecha",
-      "unknownUser": "Noma'lum foydalanuvchi"
+      "unknownUser": "Noma'lum foydalanuvchi",
+      "vacancy": "Vakansiya",
+      "goToJob": "O'tish"
     },
     "myApplications": {
       "title": "Mening arizalarim",

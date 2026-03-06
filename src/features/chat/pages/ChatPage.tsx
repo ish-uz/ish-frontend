@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Send, Check, CheckCheck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Send, Check, CheckCheck, AlertCircle, ExternalLink } from 'lucide-react';
 import { chatService } from '../services/chatService';
 import { useChatWebSocket } from '../hooks/useChatWebSocket';
 import { getUploadsUrl } from '@/lib/utils';
@@ -353,6 +353,25 @@ export function ChatPage() {
         {/* Connection status */}
         <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
       </div>
+
+      {/* Job vacancy card - link to job when chat is from an application */}
+      {conversation?.jobId && conversation?.jobTitle && (
+        <div className="px-4 pt-3 pb-1">
+          <Link
+            to={`/jobs/${conversation.jobId}`}
+            className="flex items-center justify-between gap-3 w-full p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:border-gray-300 hover:shadow transition-colors text-left"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-gray-500 mb-0.5">{t('pages.chat.vacancy')}</p>
+              <p className="font-medium text-slate-900 truncate">{conversation.jobTitle}</p>
+            </div>
+            <span className="flex items-center gap-1.5 text-blue-600 font-medium shrink-0">
+              {t('pages.chat.goToJob')}
+              <ExternalLink className="h-4 w-4" />
+            </span>
+          </Link>
+        </div>
+      )}
 
       {/* Messages */}
       <div 
