@@ -8,7 +8,7 @@ import {
 import { jobService } from '../services/jobService';
 import { applicationService } from '@/features/applications/services/applicationService';
 import { userService } from '@/features/users/services/userService';
-import { Job, User as UserType } from '@/types';
+import { Application, Job, User as UserType } from '@/types';
 
 const JOB_TYPE_KEYS: Record<string, string> = {
   'full-time': 'fullTime',
@@ -16,6 +16,13 @@ const JOB_TYPE_KEYS: Record<string, string> = {
   'contract': 'contract',
   'internship': 'internship',
   'remote': 'remote',
+};
+
+const APPLICATION_STATUS_KEYS: Record<string, string> = {
+  pending: 'statusPending',
+  reviewed: 'statusReviewed',
+  accepted: 'statusAccepted',
+  rejected: 'statusRejected',
 };
 
 export function JobDetailsPage() {
@@ -34,6 +41,7 @@ export function JobDetailsPage() {
   const [coverLetter, setCoverLetter] = useState('');
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [existingApplication, setExistingApplication] = useState<Application | null>(null);
   const [applyError, setApplyError] = useState<string | null>(null);
   
   // Save job state
@@ -120,6 +128,25 @@ export function JobDetailsPage() {
     }
   };
 
+  // When job is loaded and user is logged in (and not owner), check if already applied
+  useEffect(() => {
+    if (!id || !job || !currentUser || currentUser.id === job.authorId) {
+      return;
+    }
+    applicationService.getMyApplicationForJob(Number(id)).then((app) => {
+      if (app) {
+        setApplied(true);
+        setExistingApplication(app);
+      } else {
+        setApplied(false);
+        setExistingApplication(null);
+      }
+    }).catch(() => {
+      setApplied(false);
+      setExistingApplication(null);
+    });
+  }, [id, job, currentUser]);
+
   const handleSaveJob = async () => {
     if (!id || !currentUser) {
       navigate('/login');
@@ -168,8 +195,19 @@ export function JobDetailsPage() {
       setApplied(true);
       setShowApplyModal(false);
       setCoverLetter('');
+      const app = await applicationService.getMyApplicationForJob(job.id);
+      if (app) setExistingApplication(app);
     } catch (err: any) {
-      setApplyError(err.response?.data?.detail || t('pages.jobDetails.failedToSubmit'));
+      if (err.response?.status === 409) {
+        setApplied(true);
+        setShowApplyModal(false);
+        setApplyError(null);
+        applicationService.getMyApplicationForJob(job.id).then((app) => {
+          if (app) setExistingApplication(app);
+        }).catch(() => {});
+      } else {
+        setApplyError(err.response?.data?.detail || t('pages.jobDetails.failedToSubmit'));
+      }
     } finally {
       setApplying(false);
     }
@@ -433,6 +471,11 @@ export function JobDetailsPage() {
                 <div className="text-center">
                   <h3 className="font-semibold text-slate-900">{t('pages.jobDetails.applicationSubmitted')}</h3>
                   <p className="text-sm text-slate-600">{t('pages.jobDetails.employerWillReview')}</p>
+                  {existingApplication?.status && APPLICATION_STATUS_KEYS[existingApplication.status] && (
+                    <p className="text-sm font-medium text-slate-700 mt-1">
+                      {t(`pages.myApplications.${APPLICATION_STATUS_KEYS[existingApplication.status]}`)}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -76,6 +76,19 @@ export const applicationService = {
   },
 
   /**
+   * Get current user's application for a job. Returns null if not applied (404).
+   */
+  getMyApplicationForJob: async (jobId: number): Promise<Application | null> => {
+    try {
+      const response = await api.get(`/v1/applications/me/job/${jobId}`);
+      return toCamelCase(response.data);
+    } catch (err: any) {
+      if (err.response?.status === 404) return null;
+      throw err;
+    }
+  },
+
+  /**
    * Get application by ID
    */
   getApplication: async (id: number): Promise<Application> => {
