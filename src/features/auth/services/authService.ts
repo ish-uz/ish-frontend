@@ -56,8 +56,51 @@ export const authService = {
       email: data.email,
       password: data.password,
     };
-    
+
     const response = await api.post('/v1/auth/register', backendData);
+    return response.data;
+  },
+
+  /**
+   * Verify email with token from registration email link (legacy / backwards compat)
+   */
+  verifyEmail: async (token: string): Promise<{ message: string; email: string }> => {
+    const response = await api.get('/v1/auth/verify-email', { params: { token } });
+    return response.data;
+  },
+
+  /**
+   * Verify email with 6-digit code sent after registration (web and mobile)
+   */
+  verifyEmailByCode: async (
+    email: string,
+    code: string
+  ): Promise<{ message: string; email: string }> => {
+    const response = await api.post('/v1/auth/verify-email', { email, code });
+    return response.data;
+  },
+
+  /**
+   * Request password reset: send 6-digit code to email
+   */
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await api.post('/v1/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  /**
+   * Reset password with code from email
+   */
+  resetPassword: async (
+    email: string,
+    code: string,
+    newPassword: string
+  ): Promise<{ message: string }> => {
+    const response = await api.post('/v1/auth/reset-password', {
+      email,
+      code,
+      new_password: newPassword,
+    });
     return response.data;
   },
 };

@@ -47,6 +47,16 @@ export const userService = {
   },
 
   /**
+   * Change password (current user). Requires current password.
+   */
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    await api.post('/v1/users/me/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+  },
+
+  /**
    * Update current user
    */
   updateCurrentUser: async (data: Partial<User>): Promise<User> => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, MapPin, FileText, Upload, ArrowRight, X } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
@@ -9,6 +9,8 @@ import { userService } from '@/features/users/services/userService';
 export function ProfileSetupPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const verificationEmailSent = (location.state as { verificationEmailSent?: boolean } | null)?.verificationEmailSent ?? false;
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -175,6 +177,11 @@ export function ProfileSetupPage() {
 
         {/* Form */}
         <div className='bg-white rounded-2xl shadow-xl p-8'>
+          {verificationEmailSent && (
+            <div className='mb-6 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800'>
+              {t('pages.auth.verificationEmailSent')}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className='space-y-6'>
             {/* Avatar Upload */}
             <div>

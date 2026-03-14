@@ -311,6 +311,7 @@
       "termsRequired": "You must accept the terms",
       "loginFailed": "Sign in failed. Please check your credentials.",
       "registerFailed": "Registration failed. Please try again.",
+      "verificationEmailSent": "We've sent a verification link to your email. Check your inbox to verify your account.",
       "wrongCredentials": "Phone or password is incorrect",
       "userNotFound": "User not found",
       "unauthorized": "Access denied. Please check your credentials.",
@@ -322,6 +323,36 @@
         "codeRequired": "Enter the 6-digit code from the bot.",
         "loginFailed": "Invalid or expired code. Get a new code from the bot.",
         "back": "Back"
+      },
+      "verifyEmail": {
+        "title": "Verify your email",
+        "enterCode": "Enter the 6-digit code we sent to your email.",
+        "code": "Code",
+        "submit": "Verify",
+        "verifying": "Verifying your email...",
+        "success": "Email verified successfully!",
+        "goToLogin": "Go to Sign in",
+        "continueToProfile": "Continue to profile",
+        "errorTitle": "Verification failed",
+        "invalidLink": "Invalid or missing verification link.",
+        "failed": "Invalid or expired code. Please register again or request a new code.",
+        "registerAgain": "Register again"
+      },
+      "forgotPasswordPage": {
+        "title": "Forgot password?",
+        "subtitle": "Enter your email and we'll send you a 6-digit code to reset your password.",
+        "sendCode": "Send code",
+        "requestFailed": "Could not send code. Try again later.",
+        "resetTitle": "Enter code and new password",
+        "enterCode": "Enter the 6-digit code we sent to your email and choose a new password.",
+        "code": "Code",
+        "codeRequired": "Enter the 6-digit code from the email.",
+        "newPassword": "New password",
+        "resetButton": "Reset password",
+        "resetFailed": "Invalid or expired code. Request a new code.",
+        "doneTitle": "Password updated",
+        "doneSubtitle": "You can now sign in with your new password.",
+        "doneMessage": "Your password has been changed successfully."
       }
     },
     "profileSetup": {
@@ -453,6 +484,16 @@
         "linked": "Telegram linked successfully.",
         "alreadyLinked": "Telegram is linked. You can log in with Telegram.",
         "linkError": "Invalid or expired code. Get a new code from the bot."
+      },
+      "changePassword": {
+        "title": "Change password",
+        "currentPassword": "Current password",
+        "currentPlaceholder": "Enter current password",
+        "newPassword": "New password",
+        "button": "Change password",
+        "success": "Password updated successfully.",
+        "failed": "Failed to change password. Check current password.",
+        "wrongCurrentPassword": "Current password is incorrect."
       },
       "errors": {
         "failedLoad": "Failed to load profile",

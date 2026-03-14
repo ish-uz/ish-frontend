@@ -7,7 +7,7 @@ import { getUploadsUrl } from '@/lib/utils';
 import { Profile, Experience, Education } from '@/types';
 import { 
   Settings, User, Briefcase, GraduationCap, FileText, 
-  Eye, Save, Plus, X, Trash2, Upload, CheckCircle2, ChevronDown, Link2
+  Eye, Save, Plus, X, Trash2, Upload, CheckCircle2, ChevronDown, Link2, Lock, EyeOff
 } from 'lucide-react';
 import { authService } from '@/features/auth/services/authService';
 import { TELEGRAM_BOT_URL_LINK } from '@/constants';
@@ -56,6 +56,17 @@ export function ProfileSettingsPage() {
   const [telegramLinking, setTelegramLinking] = useState(false);
   const [telegramLinkError, setTelegramLinkError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<{ telegramId?: string | null } | null>(null);
+
+  // Change password (account tab)
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState(false);
 
   // Update tab from URL when it changes
   useEffect(() => {
@@ -260,6 +271,42 @@ export function ProfileSettingsPage() {
       setTelegramLinkError(err.response?.data?.detail || t('pages.profileSettings.telegram.linkError') || 'Failed to link.');
     } finally {
       setTelegramLinking(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangePasswordError(null);
+    if (newPassword.length < 6) {
+      setChangePasswordError(t('pages.auth.passwordMin'));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError(t('pages.auth.passwordsMismatch'));
+      return;
+    }
+    setChangePasswordLoading(true);
+    try {
+      await userService.changePassword(currentPassword, newPassword);
+      setChangePasswordSuccess(true);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setSuccess(t('pages.profileSettings.changePassword.success'));
+      setTimeout(() => { setSuccess(null); setChangePasswordSuccess(false); }, 3000);
+    } catch (err: any) {
+      const detail = err.response?.data?.detail;
+      const isWrongCurrentPassword =
+        err.response?.status === 400 &&
+        (typeof detail === 'string' &&
+          (detail.toLowerCase().includes('current') || detail.toLowerCase().includes('incorrect')));
+      setChangePasswordError(
+        isWrongCurrentPassword
+          ? t('pages.profileSettings.changePassword.wrongCurrentPassword')
+          : (typeof detail === 'string' ? detail : t('pages.profileSettings.changePassword.failed'))
+      );
+    } finally {
+      setChangePasswordLoading(false);
     }
   };
 
@@ -1013,6 +1060,100 @@ setSuccess(t('pages.profileSettings.cv.successDelete'));
                     )}
                   </div>
                 )}
+
+                {/* Change password */}
+                <div className="border-t border-slate-200 pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                    {t('pages.profileSettings.changePassword.title')}
+                  </h3>
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-sm">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        {t('pages.profileSettings.changePassword.currentPassword')}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-slate-400" />
+                        </div>
+                        <input
+                          type={showCurrentPassword ? 'text' : 'password'}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder={t('pages.profileSettings.changePassword.currentPlaceholder')}
+                          className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        >
+                          {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        {t('pages.profileSettings.changePassword.newPassword')}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-slate-400" />
+                        </div>
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder={t('pages.auth.passwordMin')}
+                          className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        >
+                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        {t('pages.auth.confirmPassword')}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-slate-400" />
+                        </div>
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder={t('pages.auth.confirmPasswordPlaceholder')}
+                          className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+                    {changePasswordError && (
+                      <p className="text-sm text-red-600">{changePasswordError}</p>
+                    )}
+                    {changePasswordSuccess && (
+                      <p className="text-sm text-green-600">{t('pages.profileSettings.changePassword.success')}</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={changePasswordLoading || !currentPassword || !newPassword || !confirmPassword}
+                      className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+                    >
+                      {changePasswordLoading ? t('common.loading') : t('pages.profileSettings.changePassword.button')}
+                    </button>
+                  </form>
+                </div>
               </div>
             )}
           </div>

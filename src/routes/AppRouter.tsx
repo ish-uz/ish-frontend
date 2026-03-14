@@ -4,6 +4,8 @@ import {
   LoginPage,
   RegisterPage,
   ProfileSetupPage,
+  VerifyEmailPage,
+  ForgotPasswordPage,
 } from '@/features/auth/pages';
 import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, SavedJobsPage } from '@/features/jobs/pages';
 import { EmployeesPage, InvitationsPage } from '@/features/users/pages';
@@ -22,6 +24,8 @@ export function AppRouter() {
       {/* Auth routes */}
       <Route path='/login' element={<LoginPage />} />
       <Route path='/register' element={<RegisterPage />} />
+      <Route path='/verify-email' element={<VerifyEmailPage />} />
+      <Route path='/forgot-password' element={<ForgotPasswordPage />} />
       <Route path='/profile-setup' element={<ProfileSetupPage />} />
 
       {/* Redirects from old/marketing URLs to existing routes */}

@@ -311,6 +311,7 @@
       "termsRequired": "Shartlarni qabul qilishingiz kerak",
       "loginFailed": "Kirish muvaffaqiyatsiz. Ma'lumotlarni tekshiring.",
       "registerFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz. Qayta urinib ko'ring.",
+      "verificationEmailSent": "Emailingizga tasdiqlash havolasi yuborildi. Hisobingizni tasdiqlash uchun pochtangizni tekshiring.",
       "wrongCredentials": "Telefon yoki parol noto'g'ri",
       "userNotFound": "Foydalanuvchi topilmadi",
       "unauthorized": "Kirish rad etildi. Ma'lumotlarni tekshiring.",
@@ -322,6 +323,36 @@
         "codeRequired": "Botdan 6 xonali kodni kiriting.",
         "loginFailed": "Kod noto'g'ri yoki muddati tugagan. Botdan yangi kod oling.",
         "back": "Orqaga"
+      },
+      "verifyEmail": {
+        "title": "Emailni tasdiqlash",
+        "enterCode": "Emailingizga yuborilgan 6 xonali kodni kiriting.",
+        "code": "Kod",
+        "submit": "Tasdiqlash",
+        "verifying": "Email tasdiqlanmoqda...",
+        "success": "Email muvaffaqiyatli tasdiqlandi!",
+        "goToLogin": "Kirish sahifasiga",
+        "continueToProfile": "Profilga o'tish",
+        "errorTitle": "Tasdiqlash muvaffaqiyatsiz",
+        "invalidLink": "Havola noto'g'ri yoki yo'q.",
+        "failed": "Kod noto'g'ri yoki muddati tugagan. Qayta ro'yxatdan o'ting yoki yangi kod so'rang.",
+        "registerAgain": "Qayta ro'yxatdan o'tish"
+      },
+      "forgotPasswordPage": {
+        "title": "Parolni unutdingizmi?",
+        "subtitle": "Emailingizni kiriting — parolni tiklash uchun 6 xonali kod yuboramiz.",
+        "sendCode": "Kod yuborish",
+        "requestFailed": "Kod yuborib bo'lmadi. Keyinroq urinib ko'ring.",
+        "resetTitle": "Kod va yangi parol",
+        "enterCode": "Emailga yuborilgan 6 xonali kodni va yangi parolni kiriting.",
+        "code": "Kod",
+        "codeRequired": "Emaildagi 6 xonali kodni kiriting.",
+        "newPassword": "Yangi parol",
+        "resetButton": "Parolni yangilash",
+        "resetFailed": "Kod noto'g'ri yoki muddati tugagan. Yangi kod so'rang.",
+        "doneTitle": "Parol yangilandi",
+        "doneSubtitle": "Endi yangi parol bilan kira olasiz.",
+        "doneMessage": "Parolingiz muvaffaqiyatli o'zgartirildi."
       }
     },
     "profileSetup": {
@@ -453,6 +484,16 @@
         "linked": "Telegram muvaffaqiyatli ulandi.",
         "alreadyLinked": "Telegram ulangan. Telegram orqali kira olasiz.",
         "linkError": "Kod noto'g'ri yoki muddati tugagan. Botdan yangi kod oling."
+      },
+      "changePassword": {
+        "title": "Parolni o'zgartirish",
+        "currentPassword": "Joriy parol",
+        "currentPlaceholder": "Joriy parolni kiriting",
+        "newPassword": "Yangi parol",
+        "button": "Parolni o'zgartirish",
+        "success": "Parol muvaffaqiyatli yangilandi.",
+        "failed": "Parol o'zgartirilmadi. Joriy parolni tekshiring.",
+        "wrongCurrentPassword": "Joriy parol noto'g'ri."
       },
       "errors": {
         "failedLoad": "Profil yuklanmadi",

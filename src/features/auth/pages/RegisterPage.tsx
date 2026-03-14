@@ -65,15 +65,14 @@ export function RegisterPage() {
 
     setIsLoading(true);
     try {
-      // Register API call
-      await authService.register({
+      // Register API call (sends 6-digit verification code to email)
+      const user = await authService.register({
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
       });
-
       // After registration, login automatically
       const authResponse = await authService.login({
         phone: formData.phone,
@@ -83,8 +82,9 @@ export function RegisterPage() {
       // Save token
       localStorage.setItem('token', authResponse.access_token);
 
-      // Always go to profile setup after registration
-      navigate('/profile-setup');
+      // Go to verify-email page to enter the code (email from register response)
+      const email = typeof user?.email === 'string' ? user.email : formData.email;
+      navigate('/verify-email', { state: { email } });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || t('pages.auth.registerFailed');
       if (error.response?.data?.detail?.includes('Email')) {
