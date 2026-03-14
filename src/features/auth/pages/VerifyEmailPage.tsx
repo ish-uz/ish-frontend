@@ -54,7 +54,7 @@ export function VerifyEmailPage() {
     }
   };
 
-  const showForm = mode === 'form' && status !== 'success' && status !== 'loading';
+  const showForm = mode === 'form' && status !== 'success';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -80,7 +80,7 @@ export function VerifyEmailPage() {
             </div>
           )}
 
-          {showForm && status !== 'loading' && (
+          {showForm && (
             <form onSubmit={handleSubmitCode} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -125,13 +125,6 @@ export function VerifyEmailPage() {
                 )}
               </button>
             </form>
-          )}
-
-          {status === 'loading' && mode === 'form' && (
-            <div className="flex flex-col items-center justify-center py-8">
-              <Loader2 className="h-12 w-12 text-[#0A66C2] animate-spin mb-4" />
-              <p className="text-gray-600">{t('pages.auth.verifyEmail.verifying')}</p>
-            </div>
           )}
 
           {status === 'success' && (
