@@ -495,6 +495,16 @@
         "failed": "Failed to change password. Check current password.",
         "wrongCurrentPassword": "Current password is incorrect."
       },
+      "deleteAccount": {
+        "title": "Delete account",
+        "description": "Permanently delete your account and all associated data, including your profile, applications, jobs, and messages. This action cannot be undone.",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password to confirm",
+        "button": "Delete account",
+        "confirm": "Are you sure you want to permanently delete your account? This cannot be undone.",
+        "failed": "Failed to delete account. Please try again.",
+        "wrongPassword": "Password is incorrect."
+      },
       "errors": {
         "failedLoad": "Failed to load profile",
         "failedUpdate": "Failed to update profile",

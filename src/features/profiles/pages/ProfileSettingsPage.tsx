@@ -68,6 +68,12 @@ export function ProfileSettingsPage() {
   const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
   const [changePasswordSuccess, setChangePasswordSuccess] = useState(false);
 
+  // Delete account (account tab)
+  const [deleteAccountPassword, setDeleteAccountPassword] = useState('');
+  const [showDeleteAccountPassword, setShowDeleteAccountPassword] = useState(false);
+  const [deleteAccountLoading, setDeleteAccountLoading] = useState(false);
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+
   // Update tab from URL when it changes
   useEffect(() => {
     const tabFromUrl = getInitialTab();
@@ -307,6 +313,33 @@ export function ProfileSettingsPage() {
       );
     } finally {
       setChangePasswordLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDeleteAccountError(null);
+    if (!deleteAccountPassword.trim()) return;
+    if (!confirm(t('pages.profileSettings.deleteAccount.confirm'))) return;
+
+    setDeleteAccountLoading(true);
+    try {
+      await userService.deleteAccount(deleteAccountPassword);
+      localStorage.removeItem('token');
+      navigate('/');
+    } catch (err: any) {
+      const detail = err.response?.data?.detail;
+      const isWrongPassword =
+        err.response?.status === 400 &&
+        typeof detail === 'string' &&
+        detail.toLowerCase().includes('password');
+      setDeleteAccountError(
+        isWrongPassword
+          ? t('pages.profileSettings.deleteAccount.wrongPassword')
+          : (typeof detail === 'string' ? detail : t('pages.profileSettings.deleteAccount.failed'))
+      );
+    } finally {
+      setDeleteAccountLoading(false);
     }
   };
 
@@ -1151,6 +1184,53 @@ setSuccess(t('pages.profileSettings.cv.successDelete'));
                       className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
                     >
                       {changePasswordLoading ? t('common.loading') : t('pages.profileSettings.changePassword.button')}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Delete account */}
+                <div className="border-t border-red-200 pt-6 mt-6">
+                  <h3 className="text-lg font-semibold text-red-700 mb-2">
+                    {t('pages.profileSettings.deleteAccount.title')}
+                  </h3>
+                  <p className="text-sm text-slate-600 mb-4 max-w-xl">
+                    {t('pages.profileSettings.deleteAccount.description')}
+                  </p>
+                  <form onSubmit={handleDeleteAccount} className="space-y-4 max-w-sm">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        {t('pages.profileSettings.deleteAccount.password')}
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Lock className="h-5 w-5 text-slate-400" />
+                        </div>
+                        <input
+                          type={showDeleteAccountPassword ? 'text' : 'password'}
+                          value={deleteAccountPassword}
+                          onChange={(e) => setDeleteAccountPassword(e.target.value)}
+                          placeholder={t('pages.profileSettings.deleteAccount.passwordPlaceholder')}
+                          className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowDeleteAccountPassword(!showDeleteAccountPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                        >
+                          {showDeleteAccountPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      </div>
+                    </div>
+                    {deleteAccountError && (
+                      <p className="text-sm text-red-600">{deleteAccountError}</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={deleteAccountLoading || !deleteAccountPassword}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 font-medium"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deleteAccountLoading ? t('common.loading') : t('pages.profileSettings.deleteAccount.button')}
                     </button>
                   </form>
                 </div>

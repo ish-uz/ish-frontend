@@ -495,6 +495,16 @@
         "failed": "Parol o'zgartirilmadi. Joriy parolni tekshiring.",
         "wrongCurrentPassword": "Joriy parol noto'g'ri."
       },
+      "deleteAccount": {
+        "title": "Hisobni o'chirish",
+        "description": "Hisobingiz va barcha bog'liq ma'lumotlarni (profil, arizalar, ishlar, xabarlar) butunlay o'chirish. Bu amalni ortga qaytarib bo'lmaydi.",
+        "password": "Parol",
+        "passwordPlaceholder": "Tasdiqlash uchun parolingizni kiriting",
+        "button": "Hisobni o'chirish",
+        "confirm": "Hisobingizni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.",
+        "failed": "Hisob o'chirilmadi. Qayta urinib ko'ring.",
+        "wrongPassword": "Parol noto'g'ri."
+      },
       "errors": {
         "failedLoad": "Profil yuklanmadi",
         "failedUpdate": "Profil yangilanmadi",

@@ -57,6 +57,15 @@ export const userService = {
   },
 
   /**
+   * Permanently delete the current user's account. Requires password confirmation.
+   */
+  deleteAccount: async (password: string): Promise<void> => {
+    await api.delete('/v1/users/me', {
+      data: { password },
+    });
+  },
+
+  /**
    * Update current user
    */
   updateCurrentUser: async (data: Partial<User>): Promise<User> => {
