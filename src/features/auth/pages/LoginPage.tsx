@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X } from 'lucide-react';
-import { PhoneInput } from '../components/PhoneInput';
+import { Lock, ArrowRight, Eye, EyeOff, AlertCircle, X, User } from 'lucide-react';
 import ishLogo from '@/assets/images/ish-logo.PNG';
 import { authService } from '../services/authService';
 import { TELEGRAM_BOT_URL_LOGIN } from '@/constants';
@@ -10,7 +9,7 @@ import { TELEGRAM_BOT_URL_LOGIN } from '@/constants';
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [phone, setPhone] = useState('+998 ');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ phone?: string; password?: string }>(
@@ -25,8 +24,18 @@ export function LoginPage() {
   const validate = () => {
     const newErrors: { phone?: string; password?: string } = {};
 
-    if (!phone || phone.length < 15) {
-      newErrors.phone = t('pages.auth.phoneRequired');
+    if (!phone) {
+      newErrors.phone = t('pages.auth.phoneOrEmailRequired');
+    } else if (phone.includes('@')) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(phone.trim())) {
+        newErrors.phone = t('pages.auth.emailInvalid');
+      }
+    } else {
+      const cleaned = phone.replace(/\D/g, '');
+      if (cleaned.length !== 9 && cleaned.length !== 12) {
+        newErrors.phone = t('pages.auth.phoneInvalid');
+      }
     }
 
     if (!password || password.length < 6) {
@@ -207,11 +216,34 @@ export function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className='space-y-6'>
-            <PhoneInput
-              value={phone}
-              onChange={setPhone}
-              error={errors.phone}
-            />
+            <div>
+              <label
+                htmlFor='loginIdentifier'
+                className='block text-sm font-medium text-gray-700 mb-2'
+              >
+                {t('pages.auth.phoneOrEmail')}
+              </label>
+              <div className='relative'>
+                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                  <User className='h-5 w-5 text-gray-400' />
+                </div>
+                <input
+                  id='loginIdentifier'
+                  type='text'
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={t('pages.auth.phoneOrEmailPlaceholder')}
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:border-transparent ${
+                    errors.phone
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300 bg-white'
+                  }`}
+                />
+              </div>
+              {errors.phone && (
+                <p className='mt-1 text-sm text-red-600'>{errors.phone}</p>
+              )}
+            </div>
 
             <div>
               <label
