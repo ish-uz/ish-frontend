@@ -107,8 +107,8 @@ export function CreateJobPage() {
         salaryMin: salaryMin ?? undefined,
         salaryMax: salaryMax ?? undefined,
       };
-      const job = await jobService.createJob(payload);
-      navigate(`/jobs/${job.id}`);
+      await jobService.createJob(payload);
+      navigate('/jobs/my');
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
