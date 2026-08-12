@@ -65,7 +65,7 @@ export type PostStatus = 'draft' | 'published'
 export interface PostCreate {
   title: string
   content: string
-  companyId?: number
+  companyId?: number | null
   status?: PostStatus
 }
 
