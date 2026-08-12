@@ -77,10 +77,10 @@
       "securityDesc": "Barcha ma'lumotlar shifrlangan. Maxfiylik kafolatlangan",
       "fastResponse": "Tezkor javob",
       "fastResponseDesc": "O'rtacha 2 soat ichida javob oling. Tezkor aloqa va suhbatlar mumkin",
-    "trustedPlatform": "Ishonchli platforma",
-    "whyTrust": "Nega ISH ishonchli?",
-    "whyTrustDesc": "Biz O'zbekistondagi eng xavfsiz va ishonchli ish topish platformasini yaratdik.",
-    "whyTrustDesc2": "Har bir qadamda sizning xavfsizligingiz va muvaffaqiyatingiz bizning ustuvor vazifamiz."
+      "trustedPlatform": "Ishonchli platforma",
+      "whyTrust": "Nega ISH ishonchli?",
+      "whyTrustDesc": "Biz O'zbekistondagi eng xavfsiz va ishonchli ish topish platformasini yaratdik.",
+      "whyTrustDesc2": "Har bir qadamda sizning xavfsizligingiz va muvaffaqiyatingiz bizning ustuvor vazifamiz."
     },
     "footer": {
       "tagline": "Ish va mutaxassislar topishning eng oson yo'li",
@@ -102,10 +102,10 @@
     }
   },
   "dashboard": {
-"sidebar": {
-    "main": "Asosiy",
-    "dashboard": "Dashboard",
-    "myProfile": "Mening profilim",
+    "sidebar": {
+      "main": "Asosiy",
+      "dashboard": "Dashboard",
+      "myProfile": "Mening profilim",
       "employees": "Xodimlar",
       "messages": "Xabarlar",
       "invitations": "Takliflar",
@@ -114,6 +114,10 @@
       "savedJobs": "Saqlanganlar",
       "postJob": "Ish e'lon qilish",
       "myJobs": "Mening ishlarim",
+      "posts": "Postlar",
+      "browsePosts": "Postlarni ko'rish",
+      "createPost": "Post yaratish",
+      "myPosts": "Mening postlarim",
       "applications": "Arizalar",
       "myApplications": "Mening arizalarim",
       "companies": "Kompaniyalar",
@@ -549,7 +553,14 @@
       "jobTitleRequired": "Ish nomi kiritilishi shart",
       "descriptionRequired": "Ish ta'rifi kiritilishi shart",
       "locationRequired": "Manzil kiritilishi shart",
-      "createFailed": "Ish e'lon qilib bo'lmadi"
+      "createFailed": "Ish e'lon qilib bo'lmadi",
+      "logoOptional": "Kompaniya logotipi (ixtiyoriy)",
+      "logoHint": "Kvadrat rasm yuklang (JPG, PNG, WEBP). Maks. 5MB.",
+      "logoChoose": "Logotip tanlash",
+      "logoChange": "Logotipni almashtirish",
+      "logoRemove": "Olib tashlash",
+      "logoInvalidType": "Noto‘g‘ri fayl turi. Ruxsat: JPEG, PNG, GIF, WebP",
+      "logoTooLarge": "Fayl juda katta. Maks. hajm: 5MB"
     },
     "editJob": {
       "title": "Ishni tahrirlash",
@@ -600,6 +611,68 @@
       "totalViews": "Ko'rilish",
       "publish": "E'lon qilish",
       "close": "Yopish"
+    },
+    "posts": {
+      "title": "Postlar",
+      "subtitle": "Kompaniya yangiliklari va jamiyat yangilanishlari",
+      "searchPlaceholder": "Postlarni qidirish...",
+      "createPost": "Post yaratish",
+      "empty": "Hali postlar yo'q",
+      "createFirst": "Birinchi postni yarating",
+      "failedToLoad": "Postlarni yuklab bo'lmadi",
+      "statusPublished": "E'lon qilingan",
+      "statusDraft": "Qoralama"
+    },
+    "createPost": {
+      "title": "Post yaratish",
+      "subtitle": "Yangilik yoki yangilanish ulashing",
+      "back": "Postlarga qaytish",
+      "titleLabel": "Sarlavha",
+      "contentLabel": "Matn",
+      "companyLabel": "Kompaniya (ixtiyoriy)",
+      "noCompany": "Kompaniyasiz",
+      "statusLabel": "Holat",
+      "imageLabel": "Rasm",
+      "addImage": "Rasm qo'shish",
+      "imageInvalidType": "Noto'g'ri fayl turi. JPEG, PNG, GIF yoki WebP.",
+      "imageTooLarge": "Rasm juda katta (maks. 5MB).",
+      "requiredFields": "Sarlavha va matn majburiy",
+      "failedToCreate": "Post yaratib bo'lmadi",
+      "cancel": "Bekor qilish",
+      "saving": "Saqlanmoqda...",
+      "submit": "E'lon qilish"
+    },
+    "editPost": {
+      "title": "Postni tahrirlash",
+      "back": "Postga qaytish",
+      "failedToLoad": "Postni yuklab bo'lmadi",
+      "failedToSave": "Postni saqlab bo'lmadi",
+      "submit": "Saqlash"
+    },
+    "postDetails": {
+      "back": "Postlarga qaytish",
+      "failedToLoad": "Postni yuklab bo'lmadi",
+      "failedToLike": "Laykni yangilab bo'lmadi",
+      "failedToCopy": "Havolani nusxalab bo'lmadi",
+      "failedToDelete": "Postni o'chirib bo'lmadi",
+      "confirmDelete": "Bu postni o'chirasizmi?",
+      "edit": "Tahrirlash",
+      "delete": "O'chirish",
+      "likes": "layk",
+      "share": "Ulashish",
+      "linkCopied": "Havola nusxalandi"
+    },
+    "myPosts": {
+      "title": "Mening postlarim",
+      "subtitle": "Postlaringizni boshqaring",
+      "createPost": "Post yaratish",
+      "empty": "Siz hali post yaratmagansiz",
+      "createFirst": "Birinchi postingizni yarating",
+      "edit": "Tahrirlash",
+      "delete": "O'chirish",
+      "confirmDelete": "Bu postni o'chirasizmi?",
+      "failedToLoad": "Postlarni yuklab bo'lmadi",
+      "failedToDelete": "Postni o'chirib bo'lmadi"
     },
     "employees": {
       "title": "Xodimlar",

@@ -8,6 +8,7 @@ import {
   ForgotPasswordPage,
 } from '@/features/auth/pages';
 import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, SavedJobsPage } from '@/features/jobs/pages';
+import { PostsPage, PostDetailsPage, CreatePostPage, EditPostPage, MyPostsPage } from '@/features/posts/pages';
 import { EmployeesPage, InvitationsPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
@@ -56,6 +57,13 @@ export function AppRouter() {
         <Route path="/jobs/saved" element={<SavedJobsPage />} />
         <Route path="/jobs/:id" element={<JobDetailsPage />} />
         <Route path="/jobs/:id/edit" element={<EditJobPage />} />
+
+        {/* Posts */}
+        <Route path="/posts" element={<PostsPage />} />
+        <Route path="/posts/create" element={<CreatePostPage />} />
+        <Route path="/posts/my" element={<MyPostsPage />} />
+        <Route path="/posts/:id" element={<PostDetailsPage />} />
+        <Route path="/posts/:id/edit" element={<EditPostPage />} />
         
         {/* Applications */}
         <Route path="/applications" element={<MyApplicationsPage />} />

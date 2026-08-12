@@ -9,6 +9,7 @@ import { jobService } from '../services/jobService';
 import { applicationService } from '@/features/applications/services/applicationService';
 import { userService } from '@/features/users/services/userService';
 import { Application, Job, User as UserType } from '@/types';
+import { getJobImageUrl } from '@/utils';
 
 const JOB_TYPE_KEYS: Record<string, string> = {
   'full-time': 'fullTime',
@@ -303,11 +304,19 @@ export function JobDetailsPage() {
           <div className="p-6 lg:p-8 border-b border-slate-100">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
               <div className="flex-1">
-                {/* Company Logo Placeholder */}
+                {/* Company Logo */}
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                    <Building2 className="h-8 w-8 text-white" />
-                  </div>
+                  {getJobImageUrl(job) ? (
+                    <img
+                      src={getJobImageUrl(job)}
+                      alt={job.company?.name || t('pages.jobs.company')}
+                      className="h-16 w-16 rounded-xl object-cover flex-shrink-0 border border-slate-200 bg-slate-50"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Building2 className="h-8 w-8 text-white" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-1">
                       {job.title}

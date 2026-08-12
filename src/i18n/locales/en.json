@@ -77,10 +77,10 @@
       "securityDesc": "All data encrypted. Privacy guaranteed",
       "fastResponse": "Fast response",
       "fastResponseDesc": "Get a reply within 2 hours on average",
-    "trustedPlatform": "Trusted platform",
-    "whyTrust": "Why trust ISH?",
-    "whyTrustDesc": "We built the safest and most trusted job platform in Uzbekistan.",
-    "whyTrustDesc2": "Your security and success at every step is our top priority."
+      "trustedPlatform": "Trusted platform",
+      "whyTrust": "Why trust ISH?",
+      "whyTrustDesc": "We built the safest and most trusted job platform in Uzbekistan.",
+      "whyTrustDesc2": "Your security and success at every step is our top priority."
     },
     "footer": {
       "tagline": "Easiest way to find jobs and talent",
@@ -102,10 +102,10 @@
     }
   },
   "dashboard": {
-"sidebar": {
-    "main": "Main",
-    "dashboard": "Dashboard",
-    "myProfile": "My Profile",
+    "sidebar": {
+      "main": "Main",
+      "dashboard": "Dashboard",
+      "myProfile": "My Profile",
       "employees": "Employees",
       "messages": "Messages",
       "invitations": "Invitations",
@@ -114,6 +114,10 @@
       "savedJobs": "Saved Jobs",
       "postJob": "Post a Job",
       "myJobs": "My Jobs",
+      "posts": "Posts",
+      "browsePosts": "Browse Posts",
+      "createPost": "Create Post",
+      "myPosts": "My Posts",
       "applications": "Applications",
       "myApplications": "My Applications",
       "companies": "Companies",
@@ -549,7 +553,14 @@
       "jobTitleRequired": "Job title is required",
       "descriptionRequired": "Job description is required",
       "locationRequired": "Location is required",
-      "createFailed": "Failed to create job"
+      "createFailed": "Failed to create job",
+      "logoOptional": "Company Logo (Optional)",
+      "logoHint": "Upload a square image (JPG, PNG, WEBP). Max 5MB.",
+      "logoChoose": "Choose logo",
+      "logoChange": "Change logo",
+      "logoRemove": "Remove",
+      "logoInvalidType": "Invalid file type. Allowed: JPEG, PNG, GIF, WebP",
+      "logoTooLarge": "File is too large. Max size: 5MB"
     },
     "editJob": {
       "title": "Edit Job",
@@ -600,6 +611,68 @@
       "totalViews": "Total Views",
       "publish": "Publish",
       "close": "Close"
+    },
+    "posts": {
+      "title": "Posts",
+      "subtitle": "Company news and updates from the community",
+      "searchPlaceholder": "Search posts...",
+      "createPost": "Create Post",
+      "empty": "No posts yet",
+      "createFirst": "Create the first post",
+      "failedToLoad": "Failed to load posts",
+      "statusPublished": "Published",
+      "statusDraft": "Draft"
+    },
+    "createPost": {
+      "title": "Create Post",
+      "subtitle": "Share news or an update",
+      "back": "Back to posts",
+      "titleLabel": "Title",
+      "contentLabel": "Content",
+      "companyLabel": "Company (optional)",
+      "noCompany": "No company",
+      "statusLabel": "Status",
+      "imageLabel": "Image",
+      "addImage": "Add image",
+      "imageInvalidType": "Invalid image type. Use JPEG, PNG, GIF, or WebP.",
+      "imageTooLarge": "Image is too large (max 5MB).",
+      "requiredFields": "Title and content are required",
+      "failedToCreate": "Failed to create post",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "submit": "Publish"
+    },
+    "editPost": {
+      "title": "Edit Post",
+      "back": "Back to post",
+      "failedToLoad": "Failed to load post",
+      "failedToSave": "Failed to save post",
+      "submit": "Save changes"
+    },
+    "postDetails": {
+      "back": "Back to posts",
+      "failedToLoad": "Failed to load post",
+      "failedToLike": "Failed to update like",
+      "failedToCopy": "Failed to copy link",
+      "failedToDelete": "Failed to delete post",
+      "confirmDelete": "Are you sure you want to delete this post?",
+      "edit": "Edit",
+      "delete": "Delete",
+      "likes": "likes",
+      "share": "Share",
+      "linkCopied": "Link copied"
+    },
+    "myPosts": {
+      "title": "My Posts",
+      "subtitle": "Manage your posts",
+      "createPost": "Create Post",
+      "empty": "You haven't created any posts yet",
+      "createFirst": "Create your first post",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this post?",
+      "failedToLoad": "Failed to load posts",
+      "failedToDelete": "Failed to delete post"
     },
     "employees": {
       "title": "Employees",

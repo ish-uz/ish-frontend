@@ -31,6 +31,7 @@ export interface Job {
   status: JobStatus
   requirements?: string[]
   isRemote: boolean
+  image?: string
   viewsCount: number
   createdAt: string
   updatedAt: string
@@ -41,6 +42,32 @@ export interface Job {
 
 export type JobType = 'full-time' | 'part-time' | 'contract' | 'internship' | 'remote'
 export type JobStatus = 'active' | 'closed' | 'draft'
+
+// Post types (news / company updates)
+export interface Post {
+  id: number
+  authorId: number
+  companyId?: number
+  title: string
+  content: string
+  image?: string
+  status: PostStatus
+  likesCount: number
+  liked?: boolean
+  createdAt: string
+  updatedAt: string
+  company?: Company
+  author?: User
+}
+
+export type PostStatus = 'draft' | 'published'
+
+export interface PostCreate {
+  title: string
+  content: string
+  companyId?: number
+  status?: PostStatus
+}
 
 // Application types
 export interface Application {

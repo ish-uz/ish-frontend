@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, Briefcase, MapPin, DollarSign, FileText,
-  Plus, X, Save, Globe, Building2
+  Plus, X, Save, Globe, Building2, ImagePlus
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
 import { JobType, JobCreate } from '@/types';
-import { formatSalaryForInput, parseSalaryInput } from '@/utils';
+import { formatSalaryForInput, parseSalaryInput, getJobImageUrl } from '@/utils';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export function EditJobPage() {
   const { t } = useTranslation();
@@ -16,6 +19,11 @@ export function EditJobPage() {
   const [loading, setLoading] = useState(false);
   const [loadingJob, setLoadingJob] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [existingImage, setExistingImage] = useState<string | undefined>();
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [formData, setFormData] = useState<JobCreate>({
@@ -49,6 +57,14 @@ export function EditJobPage() {
     }
   }, [id]);
 
+  useEffect(() => {
+    return () => {
+      if (logoPreview && logoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    };
+  }, [logoPreview]);
+
   const loadJob = async () => {
     try {
       setLoadingJob(true);
@@ -67,6 +83,11 @@ export function EditJobPage() {
       });
       setSalaryMinDisplay(formatSalaryForInput(job.salaryMin));
       setSalaryMaxDisplay(formatSalaryForInput(job.salaryMax));
+      setExistingImage(job.image || job.company?.logo);
+      const imageUrl = getJobImageUrl(job);
+      setLogoPreview(imageUrl || null);
+      setRemoveExistingImage(false);
+      setLogoFile(null);
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -78,6 +99,40 @@ export function EditJobPage() {
     } finally {
       setLoadingJob(false);
     }
+  };
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError(t('pages.createJob.logoInvalidType'));
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError(t('pages.createJob.logoTooLarge'));
+      e.target.value = '';
+      return;
+    }
+
+    if (logoPreview && logoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(logoPreview);
+    }
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+    setRemoveExistingImage(false);
+    setError(null);
+  };
+
+  const clearLogo = () => {
+    if (logoPreview && logoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(logoPreview);
+    }
+    setLogoFile(null);
+    setLogoPreview(null);
+    setRemoveExistingImage(!!existingImage);
+    if (logoInputRef.current) logoInputRef.current.value = '';
   };
 
   const addRequirement = () => {
@@ -130,6 +185,15 @@ export function EditJobPage() {
         salaryMax: salaryMax ?? undefined,
       };
       await jobService.updateJob(Number(id), payload);
+      if (logoFile) {
+        await jobService.uploadJobImage(Number(id), logoFile);
+      } else if (removeExistingImage) {
+        try {
+          await jobService.deleteJobImage(Number(id));
+        } catch {
+          // Ignore 404 if image was only from company logo
+        }
+      }
       navigate(`/jobs/${id}`);
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -206,6 +270,55 @@ export function EditJobPage() {
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('pages.createJob.jobTitlePlaceholder')}
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  {t('pages.createJob.logoOptional')}
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Briefcase className="h-8 w-8 text-slate-400" />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2 min-w-0">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleLogoSelect}
+                      className="hidden"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                      >
+                        <ImagePlus className="h-4 w-4" />
+                        {logoPreview ? t('pages.createJob.logoChange') : t('pages.createJob.logoChoose')}
+                      </button>
+                      {logoPreview && (
+                        <button
+                          type="button"
+                          onClick={clearLogo}
+                          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                          {t('pages.createJob.logoRemove')}
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500">{t('pages.createJob.logoHint')}</p>
+                  </div>
+                </div>
               </div>
 
               <div>

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { jobService } from '../services/jobService';
 import { Job, JobType } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
+import { getJobImageUrl } from '@/utils';
 import {
   Briefcase, MapPin, DollarSign, Clock, Search, Filter, Building2, X, Code,
   ChevronDown, ChevronUp, Globe, Calendar, SlidersHorizontal
@@ -503,25 +504,31 @@ export function JobsPage() {
                 className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
-                      {job.title}
-                    </h3>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">
-                        {job.company?.name || 
-                         (job.author ? `${job.author.firstName} ${job.author.lastName}` : t('pages.jobs.company'))}
-                      </span>
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    {getJobImageUrl(job) ? (
+                      <img
+                        src={getJobImageUrl(job)}
+                        alt={job.company?.name || t('pages.jobs.company')}
+                        className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border border-gray-200 bg-slate-50"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200">
+                        <Briefcase className="h-6 w-6 text-slate-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+                        {job.title}
+                      </h3>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Building2 className="h-4 w-4 mr-1 flex-shrink-0" />
+                        <span className="truncate">
+                          {job.company?.name || 
+                           (job.author ? `${job.author.firstName} ${job.author.lastName}` : t('pages.jobs.company'))}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  {job.company?.logo && (
-                    <img
-                      src={job.company.logo}
-                      alt={job.company.name || t('pages.jobs.company')}
-                      className="h-12 w-12 rounded-lg object-cover ml-3 flex-shrink-0 border border-gray-200"
-                    />
-                  )}
                 </div>
 
                 <div className="space-y-2 mb-4 flex-1">

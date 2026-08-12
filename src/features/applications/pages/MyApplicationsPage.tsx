@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { applicationService } from '../services/applicationService';
 import { Application } from '@/types';
+import { getJobImageUrl } from '@/utils';
 
 export function MyApplicationsPage() {
   const { t } = useTranslation();
@@ -160,9 +161,17 @@ export function MyApplicationsPage() {
                     {/* Job Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start gap-4">
-                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
-                          <Building2 className="h-6 w-6 text-white" />
-                        </div>
+                        {application.job && getJobImageUrl(application.job) ? (
+                          <img
+                            src={getJobImageUrl(application.job)}
+                            alt=""
+                            className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border border-slate-200 bg-slate-50"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                            <Building2 className="h-6 w-6 text-white" />
+                          </div>
+                        )}
                         <div className="flex-1 min-w-0">
                           <Link
                             to={`/jobs/${application.jobId}`}

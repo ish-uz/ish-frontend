@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { 
   User as UserIcon, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp, MessageCircle, Mail, Link2
+  ChevronDown, ChevronUp, MessageCircle, Mail, Link2, Newspaper
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { userService } from '@/features/users/services/userService';
@@ -45,6 +45,15 @@ const navGroups: NavGroup[] = [
       { icon: BookmarkCheck, labelKey: 'savedJobs', path: '/jobs/saved' },
       { icon: PlusCircle, labelKey: 'postJob', path: '/jobs/create' },
       { icon: FileText, labelKey: 'myJobs', path: '/jobs/my' },
+    ],
+    defaultOpen: true,
+  },
+  {
+    labelKey: 'posts',
+    items: [
+      { icon: Newspaper, labelKey: 'browsePosts', path: '/posts' },
+      { icon: PlusCircle, labelKey: 'createPost', path: '/posts/create' },
+      { icon: FileText, labelKey: 'myPosts', path: '/posts/my' },
     ],
     defaultOpen: true,
   },

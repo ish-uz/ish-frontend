@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft, Briefcase, MapPin, DollarSign, FileText,
-  Plus, X, Save, Globe, Building2
+  Plus, X, Save, Globe, Building2, ImagePlus
 } from 'lucide-react';
 import { jobService } from '../services/jobService';
 import { companyService } from '../../companies/services/companyService';
 import { JobType, JobCreate, Company } from '@/types';
 import { parseSalaryInput } from '@/utils';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export function CreateJobPage() {
   const { t } = useTranslation();
@@ -17,6 +20,9 @@ export function CreateJobPage() {
   const [error, setError] = useState<string | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [formData, setFormData] = useState<JobCreate>({
@@ -35,6 +41,40 @@ export function CreateJobPage() {
   // Salary inputs as text so user can type "2.500.000"
   const [salaryMinDisplay, setSalaryMinDisplay] = useState('');
   const [salaryMaxDisplay, setSalaryMaxDisplay] = useState('');
+
+  useEffect(() => {
+    return () => {
+      if (logoPreview) URL.revokeObjectURL(logoPreview);
+    };
+  }, [logoPreview]);
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError(t('pages.createJob.logoInvalidType'));
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError(t('pages.createJob.logoTooLarge'));
+      e.target.value = '';
+      return;
+    }
+
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+    setError(null);
+  };
+
+  const clearLogo = () => {
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (logoInputRef.current) logoInputRef.current.value = '';
+  };
 
   // Load user's companies
   useEffect(() => {
@@ -107,7 +147,10 @@ export function CreateJobPage() {
         salaryMin: salaryMin ?? undefined,
         salaryMax: salaryMax ?? undefined,
       };
-      await jobService.createJob(payload);
+      const created = await jobService.createJob(payload);
+      if (logoFile) {
+        await jobService.uploadJobImage(created.id, logoFile);
+      }
       navigate('/jobs/my');
     } catch (err: any) {
       if (err.response?.status === 401) {
@@ -201,6 +244,55 @@ export function CreateJobPage() {
                     {t('pages.createJob.noCompaniesYet')}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  {t('pages.createJob.logoOptional')}
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Briefcase className="h-8 w-8 text-slate-400" />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2 min-w-0">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleLogoSelect}
+                      className="hidden"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                      >
+                        <ImagePlus className="h-4 w-4" />
+                        {logoPreview ? t('pages.createJob.logoChange') : t('pages.createJob.logoChoose')}
+                      </button>
+                      {logoPreview && (
+                        <button
+                          type="button"
+                          onClick={clearLogo}
+                          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                          {t('pages.createJob.logoRemove')}
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500">{t('pages.createJob.logoHint')}</p>
+                  </div>
+                </div>
               </div>
 
               <div>

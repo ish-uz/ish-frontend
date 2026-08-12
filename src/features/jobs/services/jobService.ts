@@ -62,6 +62,7 @@ const toCamelCase = (data: any): Job => {
     status: data.status,
     requirements: data.requirements,
     isRemote: data.is_remote,
+    image: data.image || undefined,
     viewsCount: data.views_count,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
@@ -160,9 +161,29 @@ export const jobService = {
   },
 
   /**
+   * Upload job logo/image (replaces existing). Returns updated job.
+   */
+  uploadJobImage: async (id: number, file: File): Promise<Job> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post(`/v1/jobs/${id}/image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return toCamelCase(response.data);
+  },
+
+  /**
+   * Remove job logo/image
+   */
+  deleteJobImage: async (id: number): Promise<Job> => {
+    const response = await api.delete(`/v1/jobs/${id}/image`);
+    return toCamelCase(response.data);
+  },
+
+  /**
    * Update job
    */
-  updateJob: async (id: number, data: Partial<JobCreate & { status: JobStatus }>): Promise<Job> => {
+  updateJob: async (id: number, data: Partial<JobCreate & { status: JobStatus; image?: string | null }>): Promise<Job> => {
     const snakeData: any = {};
     if (data.title !== undefined) snakeData.title = data.title;
     if (data.description !== undefined) snakeData.description = data.description;
@@ -174,6 +195,7 @@ export const jobService = {
     if (data.requirements !== undefined) snakeData.requirements = data.requirements;
     if (data.isRemote !== undefined) snakeData.is_remote = data.isRemote;
     if (data.status !== undefined) snakeData.status = data.status;
+    if (data.image !== undefined) snakeData.image = data.image;
     
     const response = await api.put(`/v1/jobs/${id}`, snakeData);
     return toCamelCase(response.data);

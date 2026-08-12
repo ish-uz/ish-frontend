@@ -1,3 +1,5 @@
+import { getUploadsUrl } from '@/lib/utils';
+
 // Date formatting
 export function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat('en-US', {
@@ -82,4 +84,18 @@ export function isValidPassword(password: string): boolean {
 // URL helpers
 export function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+}
+
+/** Job post image, falling back to linked company logo. */
+export function getJobImageUrl(job: { image?: string; company?: { logo?: string } }): string | undefined {
+  const src = job.image || job.company?.logo;
+  if (!src) return undefined;
+  return getUploadsUrl(src);
+}
+
+/** Post image, falling back to linked company logo. */
+export function getPostImageUrl(post: { image?: string; company?: { logo?: string } }): string | undefined {
+  const src = post.image || post.company?.logo;
+  if (!src) return undefined;
+  return getUploadsUrl(src);
 }

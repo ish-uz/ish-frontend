@@ -8,6 +8,7 @@ import {
 import { jobService } from '../services/jobService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
+import { getJobImageUrl } from '@/utils';
 
 const JOB_TYPE_KEYS: Record<string, string> = {
   'full-time': 'fullTime',
@@ -194,7 +195,19 @@ export function MyJobsPage() {
                     {/* Job Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
+                        <div className="flex items-start gap-3 min-w-0">
+                          {getJobImageUrl(job) ? (
+                            <img
+                              src={getJobImageUrl(job)}
+                              alt=""
+                              className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border border-slate-200 bg-slate-50"
+                            />
+                          ) : (
+                            <div className="h-12 w-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200">
+                              <Briefcase className="h-6 w-6 text-slate-400" />
+                            </div>
+                          )}
+                          <div>
                           <Link
                             to={`/jobs/${job.id}`}
                             className="text-lg font-semibold text-slate-900 hover:text-blue-600 transition-colors"
@@ -214,6 +227,7 @@ export function MyJobsPage() {
                               <Calendar className="h-4 w-4" />
                               {formatDate(job.createdAt)}
                             </span>
+                          </div>
                           </div>
                         </div>
 
