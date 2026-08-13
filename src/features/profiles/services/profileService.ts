@@ -67,6 +67,20 @@ export const profileService = {
   },
 
   /**
+   * Download CV for a user (authenticated). Opens in a new tab via blob URL.
+   */
+  downloadCV: async (userId?: number): Promise<void> => {
+    const path = userId != null ? `/v1/profiles/user/${userId}/cv` : '/v1/profiles/me/cv';
+    const response = await api.get(path, { responseType: 'blob' });
+    const contentType = response.headers['content-type'] || 'application/pdf';
+    const blob = new Blob([response.data], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    // Revoke after the browser has a chance to load it
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  },
+
+  /**
    * Get dashboard stats (profile views, jobs applied, connections, notifications)
    */
   getDashboardStats: async (): Promise<{

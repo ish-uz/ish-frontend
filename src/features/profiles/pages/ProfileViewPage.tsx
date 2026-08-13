@@ -357,15 +357,20 @@ export function ProfileViewPage() {
                   <p className="text-sm text-slate-500">{t('pages.profile.uploadedCv')}</p>
                 </div>
               </div>
-              <a
-                href={getUploadsUrl(profile.cvFile)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await profileService.downloadCV(profile.userId);
+                  } catch {
+                    setError(t('pages.profile.resumeCv') + ' — failed to open');
+                  }
+                }}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <ExternalLink className="h-4 w-4" />
                 <span>{t('pages.profile.view')}</span>
-              </a>
+              </button>
             </div>
           </div>
         )}
