@@ -69,6 +69,13 @@ export function parseSalaryInput(input: string): number | undefined {
   return Number.isNaN(n) ? undefined : n;
 }
 
+/** Live-format a salary/price field with thousand dots as the user types. */
+export function formatSalaryInputAsTyped(raw: string): string {
+  const digits = raw.replace(/[^\d]/g, '');
+  if (!digits) return '';
+  return formatSalaryForInput(parseInt(digits, 10));
+}
+
 // Validation
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,4 +105,9 @@ export function getPostImageUrl(post: { image?: string; company?: { logo?: strin
   const src = post.image || post.company?.logo;
   if (!src) return undefined;
   return getUploadsUrl(src);
+}
+
+export function getServiceImageUrl(service: { image?: string }): string | undefined {
+  if (!service.image) return undefined;
+  return getUploadsUrl(service.image);
 }

@@ -43,7 +43,7 @@ export function MainBlocks() {
       icon: Wrench,
       titleKey: 'freelancer' as const,
       descKey: 'freelancerDesc' as const,
-      link: '/jobs',
+      link: '/services',
       gradient: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',

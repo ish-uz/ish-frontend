@@ -66,6 +66,7 @@ export function JobApplicationsPage() {
       setApplications(applications.map(app => 
         app.id === applicationId ? { ...app, status: newStatus } : app
       ));
+      window.dispatchEvent(new Event('ish:refresh-job-application-unread'));
     } catch (err: any) {
       setError(err.response?.data?.detail || t('pages.jobApplications.failedToUpdate'));
     }

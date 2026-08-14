@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { 
   User as UserIcon, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp, MessageCircle, Mail, Link2, Newspaper
+  ChevronDown, ChevronUp, MessageCircle, Mail, Link2, Newspaper, Wrench
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { userService } from '@/features/users/services/userService';
+import { invitationService } from '@/features/users/services/invitationService';
+import { applicationService } from '@/features/applications/services/applicationService';
 import { getUploadsUrl } from '@/lib/utils';
 import { Profile, User } from '@/types';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -45,6 +47,15 @@ const navGroups: NavGroup[] = [
       { icon: BookmarkCheck, labelKey: 'savedJobs', path: '/jobs/saved' },
       { icon: PlusCircle, labelKey: 'postJob', path: '/jobs/create' },
       { icon: FileText, labelKey: 'myJobs', path: '/jobs/my' },
+    ],
+    defaultOpen: true,
+  },
+  {
+    labelKey: 'services',
+    items: [
+      { icon: Wrench, labelKey: 'browseServices', path: '/services' },
+      { icon: PlusCircle, labelKey: 'postService', path: '/services/create' },
+      { icon: FileText, labelKey: 'myServices', path: '/services/my' },
     ],
     defaultOpen: true,
   },
@@ -92,6 +103,8 @@ export function DashboardLayout() {
     new Set(navGroups.filter(g => g.defaultOpen).map(g => g.labelKey))
   );
   const [messageUnreadCount, setMessageUnreadCount] = useState(0);
+  const [invitationPendingCount, setInvitationPendingCount] = useState(0);
+  const [jobApplicationPendingCount, setJobApplicationPendingCount] = useState(0);
 
   const loadUnreadCount = useCallback(async () => {
     try {
@@ -99,6 +112,24 @@ export function DashboardLayout() {
       setMessageUnreadCount(stats.notifications ?? 0);
     } catch {
       // ignore: user may be logged out or stats unavailable
+    }
+  }, []);
+
+  const loadInvitationCount = useCallback(async () => {
+    try {
+      const { items } = await invitationService.listReceived(0, 100);
+      setInvitationPendingCount(items.filter((i) => i.status === 'pending').length);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const loadJobApplicationCount = useCallback(async () => {
+    try {
+      const count = await applicationService.getIncomingPendingCount();
+      setJobApplicationPendingCount(count);
+    } catch {
+      // ignore
     }
   }, []);
 
@@ -113,12 +144,37 @@ export function DashboardLayout() {
     loadUnreadCount();
   }, [location.pathname, isOnChatSection, loadUnreadCount]);
 
+  useEffect(() => {
+    loadInvitationCount();
+    loadJobApplicationCount();
+  }, [location.pathname, loadInvitationCount, loadJobApplicationCount]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      loadInvitationCount();
+      loadJobApplicationCount();
+    }, 30000);
+    return () => window.clearInterval(id);
+  }, [loadInvitationCount, loadJobApplicationCount]);
+
   // Refetch when user opens a chat and marks as read (so badge updates immediately)
   useEffect(() => {
     const handler = () => loadUnreadCount();
     window.addEventListener('ish:refresh-message-unread', handler);
     return () => window.removeEventListener('ish:refresh-message-unread', handler);
   }, [loadUnreadCount]);
+
+  useEffect(() => {
+    const handler = () => loadInvitationCount();
+    window.addEventListener('ish:refresh-invitation-unread', handler);
+    return () => window.removeEventListener('ish:refresh-invitation-unread', handler);
+  }, [loadInvitationCount]);
+
+  useEffect(() => {
+    const handler = () => loadJobApplicationCount();
+    window.addEventListener('ish:refresh-job-application-unread', handler);
+    return () => window.removeEventListener('ish:refresh-job-application-unread', handler);
+  }, [loadJobApplicationCount]);
 
   // Refetch profile when avatar (or profile) is updated elsewhere (e.g. profile/settings)
   useEffect(() => {
@@ -342,6 +398,10 @@ export function DashboardLayout() {
                     {group.items.map((item) => {
                       const displayItem = item.path === '/chat'
                         ? { ...item, badge: messageUnreadCount > 0 ? messageUnreadCount : undefined }
+                        : item.path === '/invitations'
+                        ? { ...item, badge: invitationPendingCount > 0 ? invitationPendingCount : undefined }
+                        : item.path === '/jobs/my'
+                        ? { ...item, badge: jobApplicationPendingCount > 0 ? jobApplicationPendingCount : undefined }
                         : item;
                       const Icon = displayItem.icon;
                       const isActive = isActiveRoute(displayItem.path);

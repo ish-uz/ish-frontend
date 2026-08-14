@@ -9,6 +9,7 @@ import {
 } from '@/features/auth/pages';
 import { JobsPage, JobDetailsPage, CreateJobPage, EditJobPage, MyJobsPage, SavedJobsPage } from '@/features/jobs/pages';
 import { PostsPage, PostDetailsPage, CreatePostPage, EditPostPage, MyPostsPage } from '@/features/posts/pages';
+import { ServicesPage, ServiceDetailsPage, CreateServicePage, EditServicePage, MyServicesPage } from '@/features/services/pages';
 import { EmployeesPage, InvitationsPage } from '@/features/users/pages';
 import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages';
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
@@ -33,8 +34,8 @@ export function AppRouter() {
       <Route path='/employers' element={<Navigate to="/employees" replace />} />
       <Route path='/employers/post' element={<Navigate to="/jobs/create" replace />} />
       <Route path='/employers/pricing' element={<Navigate to="/" replace />} />
-      <Route path='/freelancers' element={<Navigate to="/jobs" replace />} />
-      <Route path='/freelancers/services' element={<Navigate to="/jobs" replace />} />
+      <Route path='/freelancers' element={<Navigate to="/services" replace />} />
+      <Route path='/freelancers/services' element={<Navigate to="/services" replace />} />
       <Route path='/freelancers/support' element={<Navigate to="/" replace />} />
       <Route path='/about' element={<Navigate to="/" replace />} />
       <Route path='/how-it-works' element={<Navigate to="/" replace />} />
@@ -57,6 +58,13 @@ export function AppRouter() {
         <Route path="/jobs/saved" element={<SavedJobsPage />} />
         <Route path="/jobs/:id" element={<JobDetailsPage />} />
         <Route path="/jobs/:id/edit" element={<EditJobPage />} />
+
+        {/* Services */}
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services/create" element={<CreateServicePage />} />
+        <Route path="/services/my" element={<MyServicesPage />} />
+        <Route path="/services/:id" element={<ServiceDetailsPage />} />
+        <Route path="/services/:id/edit" element={<EditServicePage />} />
 
         {/* Posts */}
         <Route path="/posts" element={<PostsPage />} />

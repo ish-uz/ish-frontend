@@ -332,13 +332,18 @@ export function MyJobsPage() {
                           <Eye className="h-4 w-4" />
                           {job.viewsCount} {t('pages.myJobs.views')}
                         </span>
-                        {job.status === 'active' && (
+                        {job.status !== 'draft' && (
                           <Link
                             to={`/jobs/${job.id}/applications`}
-                            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                            className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
                           >
                             <Users className="h-4 w-4" />
                             {t('pages.myJobs.applications')}
+                            {(job.pendingApplicationsCount ?? 0) > 0 && (
+                              <span className="ml-0.5 bg-red-500 text-white text-xs min-w-[1.25rem] px-1.5 py-0.5 rounded-full text-center">
+                                {job.pendingApplicationsCount! > 99 ? '99+' : job.pendingApplicationsCount}
+                              </span>
+                            )}
                           </Link>
                         )}
                       </div>

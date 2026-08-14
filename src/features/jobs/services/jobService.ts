@@ -64,6 +64,7 @@ const toCamelCase = (data: any): Job => {
     isRemote: data.is_remote,
     image: data.image || undefined,
     viewsCount: data.views_count,
+    pendingApplicationsCount: data.pending_applications_count ?? 0,
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     company,

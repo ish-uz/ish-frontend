@@ -81,6 +81,11 @@ export const applicationService = {
     return response.data.map(toCamelCase);
   },
 
+  getIncomingPendingCount: async (): Promise<number> => {
+    const response = await api.get('/v1/applications/incoming-pending-count');
+    return Number(response.data.count ?? 0);
+  },
+
   /**
    * Get applications for a job (only job author can see)
    */

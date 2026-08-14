@@ -33,6 +33,7 @@ export interface Job {
   isRemote: boolean
   image?: string
   viewsCount: number
+  pendingApplicationsCount?: number
   createdAt: string
   updatedAt: string
   // Populated fields
@@ -189,6 +190,52 @@ export interface JobCreate {
 export interface ApplicationCreate {
   jobId: number
   coverLetter?: string
+}
+
+export type ServiceCategory =
+  | 'plumber'
+  | 'electrician'
+  | 'cleaner'
+  | 'handyman'
+  | 'painter'
+  | 'nanny'
+  | 'tutor'
+  | 'driver'
+  | 'beauty'
+  | 'other'
+
+export type ServicePriceType = 'hourly' | 'fixed' | 'negotiable'
+export type ServiceStatus = 'draft' | 'active' | 'closed'
+
+export interface ServiceListing {
+  id: number
+  authorId: number
+  title: string
+  description: string
+  location: string
+  category: ServiceCategory
+  priceMin?: number
+  priceMax?: number
+  priceCurrency: string
+  priceType: ServicePriceType
+  status: ServiceStatus
+  image?: string
+  viewsCount: number
+  createdAt: string
+  updatedAt: string
+  author?: User
+}
+
+export interface ServiceCreate {
+  title: string
+  description: string
+  location: string
+  category: ServiceCategory
+  priceMin?: number
+  priceMax?: number
+  priceCurrency?: string
+  priceType?: ServicePriceType
+  status?: ServiceStatus
 }
 
 // Chat types

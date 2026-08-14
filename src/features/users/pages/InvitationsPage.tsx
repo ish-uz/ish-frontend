@@ -46,6 +46,7 @@ export function InvitationsPage() {
     try {
       const updated = await invitationService.accept(inv.id);
       setReceived((prev) => prev.filter((i) => i.id !== inv.id));
+      window.dispatchEvent(new Event('ish:refresh-invitation-unread'));
       if (updated.conversationId) {
         navigate(`/chat/${updated.conversationId}`);
       }
@@ -61,6 +62,7 @@ export function InvitationsPage() {
     try {
       await invitationService.reject(inv.id);
       setReceived((prev) => prev.filter((i) => i.id !== inv.id));
+      window.dispatchEvent(new Event('ish:refresh-invitation-unread'));
     } catch (err) {
       setError((err as any)?.response?.data?.detail || t('pages.invitations.failedToReject'));
     } finally {

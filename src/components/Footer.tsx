@@ -16,8 +16,8 @@ export function Footer() {
       { label: t('landing.footer.pricing'), to: '/' },
     ],
     freelancers: [
-      { label: t('landing.footer.freelancers'), to: '/jobs' },
-      { label: t('landing.footer.services'), to: '/jobs' },
+      { label: t('landing.footer.freelancers'), to: '/services' },
+      { label: t('landing.footer.services'), to: '/services' },
       { label: t('landing.footer.support'), to: '/' },
     ],
     legal: [
