@@ -15,6 +15,7 @@ import { ProfileSettingsPage, ProfileViewPage } from '@/features/profiles/pages'
 import { MyApplicationsPage, JobApplicationsPage } from '@/features/applications/pages';
 import { CreateCompanyPage, MyCompaniesPage, EditCompanyPage } from '@/features/companies/pages';
 import { ChatsPage, ChatPage } from '@/features/chat';
+import { NotificationsPage } from '@/features/notifications/pages';
 import { DashboardLayout } from '@/components/layouts';
 
 export function AppRouter() {
@@ -89,6 +90,7 @@ export function AppRouter() {
         <Route path="/chat" element={<ChatsPage />} />
         <Route path="/chat/:id" element={<ChatPage />} />
         <Route path="/invitations" element={<InvitationsPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Route>
 
       {/* 404 */}

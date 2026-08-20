@@ -6,6 +6,8 @@ import ishLogo from '@/assets/images/ish-logo.PNG';
 import { userService } from '@/features/users/services/userService';
 import { User as UserType } from '@/types';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { disableWebPush } from '@/lib/webPush';
+import { disconnectRealtime } from '@/features/chat/realtime';
 
 export function Header() {
   const { t } = useTranslation();
@@ -59,7 +61,9 @@ export function Header() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await disableWebPush();
+    disconnectRealtime();
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     setCurrentUser(null);

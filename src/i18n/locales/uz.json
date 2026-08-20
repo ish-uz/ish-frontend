@@ -108,6 +108,7 @@
       "myProfile": "Mening profilim",
       "employees": "Xodimlar",
       "messages": "Xabarlar",
+      "notifications": "Bildirishnomalar",
       "invitations": "Takliflar",
       "jobs": "Ishlar",
       "browseJobs": "Ishlarni ko'rish",
@@ -823,6 +824,16 @@
       "failedToLoad": "Takliflar yuklanmadi",
       "failedToAccept": "Qabul qilib bo'lmadi",
       "failedToReject": "Rad etib bo'lmadi"
+    },
+    "notifications": {
+      "title": "Bildirishnomalar",
+      "subtitle": "Xabarlar, takliflar va ariza yangilanishlari",
+      "loading": "Bildirishnomalar yuklanmoqda...",
+      "empty": "Bildirishnomalar yo'q",
+      "emptyDesc": "Yangi xabar, taklif yoki ariza holati o'zgarsa, u shu yerda ko'rinadi.",
+      "markAllRead": "Barchasini o'qilgan qilish",
+      "failedToLoad": "Bildirishnomalar yuklanmadi",
+      "failedToMarkAll": "O'qilgan qilib bo'lmadi"
     },
     "chats": {
       "title": "Xabarlar",

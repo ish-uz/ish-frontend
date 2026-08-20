@@ -1,185 +1,102 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Message, WSMessage } from '@/types';
-
-function getWebSocketUrl(): string {
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-  const base = apiUrl.replace(/\/api\/?$/, '');
-  const wsProtocol = base.startsWith('https') ? 'wss' : 'ws';
-  const wsHost = base.replace(/^https?:\/\//, '');
-  return `${wsProtocol}://${wsHost}/ws`;
-}
-
-const WS_BASE_URL = getWebSocketUrl();
+import {
+  connectRealtime,
+  disconnectRealtime,
+  joinRealtimeConversation,
+  leaveRealtimeConversation,
+  markRealtimeDelivered,
+  markRealtimeRead,
+  parseRealtimeMessage,
+  sendRealtimeMessage,
+  subscribeRealtime,
+  subscribeRealtimeConnection,
+} from '../realtime';
 
 interface UseChatWebSocketOptions {
   onNewMessage?: (message: Message) => void;
   onMessageDelivered?: (messageId: number) => void;
   onMessageRead?: (messageId: number) => void;
   onMessagesRead?: (conversationId: number, count: number) => void;
+  onInvitation?: (data: Record<string, unknown>) => void;
+  onApplication?: (data: Record<string, unknown>) => void;
+  onNotification?: (data: Record<string, unknown>) => void;
   onError?: (error: string) => void;
   onConnectionChange?: (connected: boolean) => void;
 }
 
 export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
   const [isConnected, setIsConnected] = useState(false);
-  const [currentConversationId, setCurrentConversationId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const unsubConn = subscribeRealtimeConnection((connected) => {
+      setIsConnected(connected);
+      optionsRef.current.onConnectionChange?.(connected);
+    });
+    const unsubMsg = subscribeRealtime((data: WSMessage) => {
+      const opts = optionsRef.current;
+      switch (data.type) {
+        case 'new_message':
+          opts.onNewMessage?.(parseRealtimeMessage(data.data));
+          break;
+        case 'message_delivered':
+          opts.onMessageDelivered?.(data.data.messageId);
+          break;
+        case 'message_read':
+          opts.onMessageRead?.(data.data.messageId);
+          break;
+        case 'messages_read':
+          opts.onMessagesRead?.(data.data.conversationId, data.data.count);
+          break;
+        case 'invitation':
+          opts.onInvitation?.(data.data);
+          break;
+        case 'application':
+          opts.onApplication?.(data.data);
+          break;
+        case 'notification':
+          opts.onNotification?.(data.data);
+          break;
+        case 'error':
+          opts.onError?.(data.data.message);
+          break;
+      }
+    });
+    return () => {
+      unsubConn();
+      unsubMsg();
+    };
+  }, []);
 
   const connect = useCallback(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.warn('No token found, cannot connect to WebSocket');
-      return;
-    }
-
-    // Don't connect if already connected
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    const ws = new WebSocket(`${WS_BASE_URL}/chat?token=${token}`);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      setIsConnected(true);
-      options.onConnectionChange?.(true);
-      
-      // Rejoin conversation if we were in one
-      if (currentConversationId) {
-        ws.send(JSON.stringify({ type: 'join', conversation_id: currentConversationId }));
-      }
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data: WSMessage = JSON.parse(event.data);
-        
-        switch (data.type) {
-          case 'new_message':
-            const message: Message = {
-              id: data.data.id,
-              conversationId: data.data.conversationId,
-              senderId: data.data.senderId,
-              content: data.data.content,
-              status: data.data.status,
-              createdAt: data.data.createdAt,
-              readAt: data.data.readAt,
-            };
-            options.onNewMessage?.(message);
-            break;
-            
-          case 'message_delivered':
-            options.onMessageDelivered?.(data.data.messageId);
-            break;
-            
-          case 'message_read':
-            options.onMessageRead?.(data.data.messageId);
-            break;
-            
-          case 'messages_read':
-            options.onMessagesRead?.(data.data.conversationId, data.data.count);
-            break;
-            
-          case 'error':
-            options.onError?.(data.data.message);
-            break;
-        }
-      } catch (err) {
-        console.error('Failed to parse WebSocket message:', err);
-      }
-    };
-
-    ws.onclose = (event) => {
-      setIsConnected(false);
-      options.onConnectionChange?.(false);
-      
-      // Reconnect after 3 seconds if not intentionally closed
-      if (event.code !== 1000) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, 3000);
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-  }, [currentConversationId, options]);
+    connectRealtime();
+  }, []);
 
   const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    
-    if (wsRef.current) {
-      wsRef.current.close(1000, 'User disconnected');
-      wsRef.current = null;
-    }
-    
-    setIsConnected(false);
+    disconnectRealtime();
   }, []);
 
   const joinConversation = useCallback((conversationId: number) => {
-    setCurrentConversationId(conversationId);
-    
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ 
-        type: 'join', 
-        conversation_id: conversationId 
-      }));
-    }
+    joinRealtimeConversation(conversationId);
   }, []);
 
   const leaveConversation = useCallback((conversationId: number) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ 
-        type: 'leave', 
-        conversation_id: conversationId 
-      }));
-    }
-    
-    if (currentConversationId === conversationId) {
-      setCurrentConversationId(null);
-    }
-  }, [currentConversationId]);
+    leaveRealtimeConversation(conversationId);
+  }, []);
 
   const sendMessage = useCallback((conversationId: number, content: string) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ 
-        type: 'message', 
-        conversation_id: conversationId,
-        content 
-      }));
-      return true;
-    }
-    return false;
+    return sendRealtimeMessage(conversationId, content);
   }, []);
 
   const markAsRead = useCallback((conversationId: number) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ 
-        type: 'read', 
-        conversation_id: conversationId 
-      }));
-    }
+    markRealtimeRead(conversationId);
   }, []);
 
   const markAsDelivered = useCallback((messageId: number) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ 
-        type: 'delivered', 
-        message_id: messageId 
-      }));
-    }
+    markRealtimeDelivered(messageId);
   }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-  }, [disconnect]);
 
   return {
     isConnected,

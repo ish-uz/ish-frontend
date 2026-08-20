@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { 
   User as UserIcon, Settings, Briefcase, Users, FileText, Send, PlusCircle,
   LogOut, ChevronLeft, ChevronRight, Home, Eye, Menu, X, BookmarkCheck, Building2,
-  ChevronDown, ChevronUp, MessageCircle, Mail, Link2, Newspaper, Wrench
+  ChevronDown, ChevronUp, MessageCircle, Mail, Link2, Newspaper, Wrench, Bell
 } from 'lucide-react';
 import { profileService } from '@/features/profiles/services/profileService';
 import { userService } from '@/features/users/services/userService';
 import { invitationService } from '@/features/users/services/invitationService';
 import { applicationService } from '@/features/applications/services/applicationService';
+import { enableWebPush, disableWebPush } from '@/lib/webPush';
+import { useChatWebSocket } from '@/features/chat/hooks/useChatWebSocket';
 import { getUploadsUrl } from '@/lib/utils';
 import { Profile, User } from '@/types';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -35,6 +37,7 @@ const navGroups: NavGroup[] = [
       { icon: Home, labelKey: 'dashboard', path: '/dashboard' },
       { icon: UserIcon, labelKey: 'myProfile', path: '/profile' },
       { icon: MessageCircle, labelKey: 'messages', path: '/chat' },
+      { icon: Bell, labelKey: 'notifications', path: '/notifications' },
       { icon: Mail, labelKey: 'invitations', path: '/invitations' },
       { icon: Users, labelKey: 'employees', path: '/employees' },
     ],
@@ -133,29 +136,57 @@ export function DashboardLayout() {
     }
   }, []);
 
+  const refreshSidebarBadges = useCallback(() => {
+    void loadUnreadCount();
+    void loadInvitationCount();
+    void loadJobApplicationCount();
+  }, [loadUnreadCount, loadInvitationCount, loadJobApplicationCount]);
+
+  const { connect, disconnect } = useChatWebSocket({
+    onNewMessage: () => {
+      void loadUnreadCount();
+    },
+    onInvitation: () => {
+      void loadInvitationCount();
+    },
+    onApplication: () => {
+      void loadJobApplicationCount();
+    },
+  });
+
   useEffect(() => {
     loadProfile();
   }, []);
 
-  // Refetch when NOT on chat pages (initial load + when leaving Messages)
+  useEffect(() => {
+    connect();
+    return () => disconnect();
+  }, [connect, disconnect]);
+
+  useEffect(() => {
+    refreshSidebarBadges();
+  }, [refreshSidebarBadges]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshSidebarBadges();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [refreshSidebarBadges]);
+
+  // Refetch unread when leaving a chat (opened chat marks messages read)
   const isOnChatSection = location.pathname === '/chat' || location.pathname.startsWith('/chat/');
   useEffect(() => {
     if (isOnChatSection) return;
     loadUnreadCount();
   }, [location.pathname, isOnChatSection, loadUnreadCount]);
-
-  useEffect(() => {
-    loadInvitationCount();
-    loadJobApplicationCount();
-  }, [location.pathname, loadInvitationCount, loadJobApplicationCount]);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      loadInvitationCount();
-      loadJobApplicationCount();
-    }, 30000);
-    return () => window.clearInterval(id);
-  }, [loadInvitationCount, loadJobApplicationCount]);
 
   // Refetch when user opens a chat and marks as read (so badge updates immediately)
   useEffect(() => {
@@ -191,6 +222,7 @@ export function DashboardLayout() {
       ]);
       setProfile(profileData);
       setCurrentUser(userData);
+      void enableWebPush();
     } catch (err: any) {
       if (err.response?.status === 401) {
         navigate('/login');
@@ -200,7 +232,9 @@ export function DashboardLayout() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    disconnect();
+    await disableWebPush();
     localStorage.removeItem('token');
     navigate('/');
   };

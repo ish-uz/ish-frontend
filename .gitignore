@@ -26,3 +26,4 @@ npm-cache/
 *.sln
 *.sw?
 .env
+public/firebase-messaging-sw.js

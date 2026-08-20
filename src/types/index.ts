@@ -311,7 +311,16 @@ export interface ChatWithUserResponse {
 }
 
 // WebSocket message types
-export type WSMessageType = 'new_message' | 'message_delivered' | 'message_read' | 'messages_read' | 'error'
+export type WSMessageType =
+  | 'auth_ok'
+  | 'new_message'
+  | 'message_delivered'
+  | 'message_read'
+  | 'messages_read'
+  | 'invitation'
+  | 'application'
+  | 'notification'
+  | 'error'
 
 export interface WSMessage {
   type: WSMessageType

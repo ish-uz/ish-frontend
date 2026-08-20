@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { disconnectRealtime } from '@/features/chat/realtime';
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -32,6 +33,7 @@ api.interceptors.response.use(
       // Only redirect if not already on login/register pages
       const currentPath = window.location.pathname;
       if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
+        disconnectRealtime();
         localStorage.removeItem('token');
         window.location.href = '/login';
       }

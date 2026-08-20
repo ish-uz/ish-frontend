@@ -108,6 +108,7 @@
       "myProfile": "My Profile",
       "employees": "Employees",
       "messages": "Messages",
+      "notifications": "Notifications",
       "invitations": "Invitations",
       "jobs": "Jobs",
       "browseJobs": "Browse Jobs",
@@ -823,6 +824,16 @@
       "failedToLoad": "Failed to load invitations",
       "failedToAccept": "Failed to accept",
       "failedToReject": "Failed to reject"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Messages, invitations, and application updates",
+      "loading": "Loading notifications...",
+      "empty": "No notifications yet",
+      "emptyDesc": "When someone messages you, invites you, or updates an application, it will appear here.",
+      "markAllRead": "Mark all as read",
+      "failedToLoad": "Failed to load notifications",
+      "failedToMarkAll": "Failed to mark notifications as read"
     },
     "chats": {
       "title": "Messages",
