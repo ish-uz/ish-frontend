@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { jobService } from '../services/jobService';
 import { Job, JobType } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
-import { getJobImageUrl } from '@/utils';
+import { formatRelativeTime, getJobImageUrl } from '@/utils';
 import {
   Briefcase, MapPin, DollarSign, Clock, Search, Filter, Building2, X, Code,
   ChevronDown, ChevronUp, Globe, Calendar, SlidersHorizontal
 } from 'lucide-react';
 
 export function JobsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -553,6 +553,10 @@ export function JobsPage() {
                   <div className="flex items-center text-sm text-gray-600">
                     <Clock className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
                     <span className="capitalize">{job.jobType.replace('-', ' ')}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600" title={new Date(job.createdAt).toLocaleString(i18n.language)}>
+                    <Calendar className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
+                    <span>{formatRelativeTime(job.createdAt)}</span>
                   </div>
                 </div>
 

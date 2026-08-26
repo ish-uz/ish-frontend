@@ -5,10 +5,10 @@ import { Newspaper, Search, Building2, Heart, Calendar, Plus } from 'lucide-reac
 import { postService } from '../services/postService';
 import { Post } from '@/types';
 import { Pagination } from '@/components/ui/Pagination';
-import { getPostImageUrl } from '@/utils';
+import { formatRelativeTime, getPostImageUrl } from '@/utils';
 
 export function PostsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,13 +51,6 @@ export function PostsPage() {
       setLoading(false);
     }
   };
-
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
 
   const excerpt = (text: string, max = 160) =>
     text.length > max ? `${text.slice(0, max).trim()}…` : text;
@@ -133,9 +126,9 @@ export function PostsPage() {
                           {post.company.name}
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-1">
+                      <span className="inline-flex items-center gap-1" title={new Date(post.createdAt).toLocaleString(i18n.language)}>
                         <Calendar className="h-4 w-4" />
-                        {formatDate(post.createdAt)}
+                        {formatRelativeTime(post.createdAt)}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <Heart className="h-4 w-4" />

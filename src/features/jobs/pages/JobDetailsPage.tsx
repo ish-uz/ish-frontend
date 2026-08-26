@@ -9,7 +9,7 @@ import { jobService } from '../services/jobService';
 import { applicationService } from '@/features/applications/services/applicationService';
 import { userService } from '@/features/users/services/userService';
 import { Application, Job, User as UserType } from '@/types';
-import { getJobImageUrl } from '@/utils';
+import { formatRelativeTime, getJobImageUrl } from '@/utils';
 
 const JOB_TYPE_KEYS: Record<string, string> = {
   'full-time': 'fullTime',
@@ -27,7 +27,7 @@ const APPLICATION_STATUS_KEYS: Record<string, string> = {
 };
 
 export function JobDetailsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [job, setJob] = useState<Job | null>(null);
@@ -224,15 +224,6 @@ export function JobDetailsPage() {
     return t('pages.jobDetails.salaryNotSpecified');
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  };
-
   const getJobTypeLabel = (type: string) => {
     const key = JOB_TYPE_KEYS[type];
     return key ? t(`pages.jobType.${key}`) : type;
@@ -425,7 +416,9 @@ export function JobDetailsPage() {
               </div>
               <div>
                 <p className="text-xs text-slate-500">{t('pages.jobDetails.posted')}</p>
-                <p className="font-medium text-slate-900 text-sm">{formatDate(job.createdAt)}</p>
+                <p className="font-medium text-slate-900 text-sm" title={new Date(job.createdAt).toLocaleString(i18n.language)}>
+                  {formatRelativeTime(job.createdAt)}
+                </p>
               </div>
             </div>
           </div>

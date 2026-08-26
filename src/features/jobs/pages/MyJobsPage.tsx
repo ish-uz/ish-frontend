@@ -8,7 +8,7 @@ import {
 import { jobService } from '../services/jobService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Job } from '@/types';
-import { getJobImageUrl } from '@/utils';
+import { formatRelativeTime, getJobImageUrl } from '@/utils';
 
 const JOB_TYPE_KEYS: Record<string, string> = {
   'full-time': 'fullTime',
@@ -19,7 +19,7 @@ const JOB_TYPE_KEYS: Record<string, string> = {
 };
 
 export function MyJobsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,15 +78,6 @@ export function MyJobsPage() {
     } catch (err: any) {
       setError(err.response?.data?.detail || t('pages.myJobs.failedToClose'));
     }
-  };
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -223,9 +214,9 @@ export function MyJobsPage() {
                               <Briefcase className="h-4 w-4" />
                               {getJobTypeLabel(job.jobType)}
                             </span>
-                            <span className="flex items-center gap-1">
+                            <span className="flex items-center gap-1" title={new Date(job.createdAt).toLocaleString(i18n.language)}>
                               <Calendar className="h-4 w-4" />
-                              {formatDate(job.createdAt)}
+                              {formatRelativeTime(job.createdAt)}
                             </span>
                           </div>
                           </div>

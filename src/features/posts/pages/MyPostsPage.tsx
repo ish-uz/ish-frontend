@@ -13,10 +13,10 @@ import {
 import { postService } from '../services/postService';
 import { Pagination } from '@/components/ui/Pagination';
 import { Post } from '@/types';
-import { getPostImageUrl } from '@/utils';
+import { formatRelativeTime, getPostImageUrl } from '@/utils';
 
 export function MyPostsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,13 +58,6 @@ export function MyPostsPage() {
       setError(err.response?.data?.detail || t('pages.myPosts.failedToDelete'));
     }
   };
-
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -138,9 +131,9 @@ export function MyPostsPage() {
                         {post.company.name}
                       </span>
                     )}
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1" title={new Date(post.createdAt).toLocaleString(i18n.language)}>
                       <Calendar className="h-3.5 w-3.5" />
-                      {formatDate(post.createdAt)}
+                      {formatRelativeTime(post.createdAt)}
                     </span>
                     <span className="inline-flex items-center gap-1">
                       <Heart className="h-3.5 w-3.5" />

@@ -915,6 +915,17 @@
   "common": {
     "menu": "Menyu",
     "remove": "O'chirish",
-    "loading": "Yuklanmoqda..."
+    "loading": "Yuklanmoqda...",
+    "relativeTime": {
+      "justNow": "hozirgina",
+      "minutesAgo_one": "{{count}} daqiqa oldin",
+      "minutesAgo_other": "{{count}} daqiqa oldin",
+      "hoursAgo_one": "{{count}} soat oldin",
+      "hoursAgo_other": "{{count}} soat oldin",
+      "daysAgo_one": "{{count}} kun oldin",
+      "daysAgo_other": "{{count}} kun oldin",
+      "weeksAgo_one": "{{count}} hafta oldin",
+      "weeksAgo_other": "{{count}} hafta oldin"
+    }
   }
 }

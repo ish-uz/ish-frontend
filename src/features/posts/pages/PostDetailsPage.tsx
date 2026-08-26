@@ -14,10 +14,10 @@ import {
 import { postService } from '../services/postService';
 import { userService } from '@/features/users/services/userService';
 import { Post, User } from '@/types';
-import { getPostImageUrl } from '@/utils';
+import { formatRelativeTime, getPostImageUrl } from '@/utils';
 
 export function PostDetailsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
@@ -114,13 +114,6 @@ export function PostDetailsPage() {
     }
   };
 
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString(undefined, {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-
   if (loading) {
     return (
       <div className="flex justify-center py-16">
@@ -204,9 +197,9 @@ export function PostDetailsPage() {
               </span>
             )}
             {authorName && <span>{authorName}</span>}
-            <span className="inline-flex items-center gap-1">
+            <span className="inline-flex items-center gap-1" title={new Date(post.createdAt).toLocaleString(i18n.language)}>
               <Calendar className="h-4 w-4" />
-              {formatDate(post.createdAt)}
+              {formatRelativeTime(post.createdAt)}
             </span>
           </div>
 

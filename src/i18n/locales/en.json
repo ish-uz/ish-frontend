@@ -915,6 +915,17 @@
   "common": {
     "menu": "Menu",
     "remove": "Remove",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "relativeTime": {
+      "justNow": "just now",
+      "minutesAgo_one": "{{count}} minute ago",
+      "minutesAgo_other": "{{count}} minutes ago",
+      "hoursAgo_one": "{{count}} hour ago",
+      "hoursAgo_other": "{{count}} hours ago",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "weeksAgo_one": "{{count}} week ago",
+      "weeksAgo_other": "{{count}} weeks ago"
+    }
   }
 }
