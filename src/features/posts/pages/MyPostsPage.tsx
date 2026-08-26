@@ -103,8 +103,21 @@ export function MyPostsPage() {
                 className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col sm:flex-row gap-4"
               >
                 {imageUrl && (
-                  <Link to={`/posts/${post.id}`} className="sm:w-28 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100">
-                    <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+                  <Link
+                    to={`/posts/${post.id}`}
+                    className="relative sm:w-32 h-28 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-slate-900"
+                  >
+                    <img
+                      src={imageUrl}
+                      alt=""
+                      aria-hidden
+                      className="absolute inset-0 h-full w-full object-cover scale-110 blur-xl opacity-40"
+                    />
+                    <img
+                      src={imageUrl}
+                      alt=""
+                      className="relative z-[1] h-full w-full object-contain"
+                    />
                   </Link>
                 )}
                 <div className="flex-1 min-w-0">

@@ -3,18 +3,16 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
-  Building2,
   Calendar,
   Edit2,
   Trash2,
-  Heart,
-  Share2,
-  Check,
 } from 'lucide-react';
 import { postService } from '../services/postService';
 import { userService } from '@/features/users/services/userService';
 import { Post, User } from '@/types';
 import { formatRelativeTime, getPostImageUrl } from '@/utils';
+import { PostActionsBar } from '../components/PostActionsBar';
+import { PostCardAuthor } from '../components/PostCardAuthor';
 
 export function PostDetailsPage() {
   const { t, i18n } = useTranslation();
@@ -24,8 +22,6 @@ export function PostDetailsPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [liking, setLiking] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -60,47 +56,6 @@ export function PostDetailsPage() {
   };
 
   const isOwner = !!(currentUser && post && currentUser.id === post.authorId);
-
-  const handleLikeToggle = async () => {
-    if (!post || !id) return;
-    if (!currentUser) {
-      navigate('/login');
-      return;
-    }
-    try {
-      setLiking(true);
-      if (post.liked) {
-        await postService.unlikePost(Number(id));
-        setPost({
-          ...post,
-          liked: false,
-          likesCount: Math.max(0, post.likesCount - 1),
-        });
-      } else {
-        await postService.likePost(Number(id));
-        setPost({
-          ...post,
-          liked: true,
-          likesCount: post.likesCount + 1,
-        });
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || t('pages.postDetails.failedToLike'));
-    } finally {
-      setLiking(false);
-    }
-  };
-
-  const handleShare = async () => {
-    const url = `${window.location.origin}/posts/${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    } catch {
-      setError(t('pages.postDetails.failedToCopy'));
-    }
-  };
 
   const handleDelete = async () => {
     if (!post || !confirm(t('pages.postDetails.confirmDelete'))) return;
@@ -137,9 +92,6 @@ export function PostDetailsPage() {
   if (!post) return null;
 
   const imageUrl = getPostImageUrl(post);
-  const authorName = post.author
-    ? `${post.author.firstName} ${post.author.lastName}`
-    : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -157,10 +109,20 @@ export function PostDetailsPage() {
         </div>
       )}
 
-      <article className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <article className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-fade-up">
         {imageUrl && (
-          <div className="w-full max-h-80 bg-slate-100">
-            <img src={imageUrl} alt="" className="w-full h-full max-h-80 object-cover" />
+          <div className="relative w-full h-56 sm:h-72 md:h-80 bg-slate-900 overflow-hidden">
+            <img
+              src={imageUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-50"
+            />
+            <img
+              src={imageUrl}
+              alt=""
+              className="relative z-[1] h-full w-full object-contain"
+            />
           </div>
         )}
 
@@ -189,47 +151,29 @@ export function PostDetailsPage() {
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-6">
-            {post.company && (
-              <span className="inline-flex items-center gap-1">
-                <Building2 className="h-4 w-4" />
-                {post.company.name}
-              </span>
-            )}
-            {authorName && <span>{authorName}</span>}
-            <span className="inline-flex items-center gap-1" title={new Date(post.createdAt).toLocaleString(i18n.language)}>
-              <Calendar className="h-4 w-4" />
-              {formatRelativeTime(post.createdAt)}
-            </span>
-          </div>
+          <span
+            className="inline-flex items-center gap-1 text-sm text-slate-500 mb-6"
+            title={new Date(post.createdAt).toLocaleString(i18n.language)}
+          >
+            <Calendar className="h-4 w-4" />
+            {formatRelativeTime(post.createdAt)}
+          </span>
 
           <div className="prose prose-slate max-w-none whitespace-pre-wrap text-slate-700 leading-relaxed">
             {post.content}
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleLikeToggle}
-              disabled={liking}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-colors disabled:opacity-50 ${
-                post.liked
-                  ? 'border-red-200 bg-red-50 text-red-600'
-                  : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Heart className={`h-4 w-4 ${post.liked ? 'fill-current' : ''}`} />
-              {post.likesCount} {t('pages.postDetails.likes')}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50"
-            >
-              {shareCopied ? <Check className="h-4 w-4 text-green-600" /> : <Share2 className="h-4 w-4" />}
-              {shareCopied ? t('pages.postDetails.linkCopied') : t('pages.postDetails.share')}
-            </button>
+          <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between gap-4">
+            <PostCardAuthor post={post} />
+            <PostActionsBar
+              postId={post.id}
+              likesCount={post.likesCount}
+              liked={post.liked}
+              className="flex-shrink-0"
+              onChange={({ liked, likesCount }) =>
+                setPost((prev) => (prev ? { ...prev, liked, likesCount } : prev))
+              }
+            />
           </div>
         </div>
       </article>
