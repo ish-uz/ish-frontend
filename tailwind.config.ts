@@ -73,12 +73,20 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'soft-pulse': {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.7', transform: 'scale(1.05)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'heart-pop': 'heart-pop 0.35s ease-out',
-        'fade-up': 'fade-up 0.4s ease-out both',
+        'fade-up': 'fade-up 0.45s ease-out both',
+        'soft-pulse': 'soft-pulse 2s ease-in-out infinite',
+      },
+      transitionTimingFunction: {
+        'out-soft': 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },
